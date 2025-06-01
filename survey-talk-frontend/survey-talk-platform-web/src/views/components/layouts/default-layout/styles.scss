@@ -10,3 +10,11 @@
     // background-color: green;
   }
 }
+.btn-main-blue {
+  background-color: var(--main-blue, #3e5dab) !important;
+  color: #fff;
+  border-radius: 20px !important;
+  &:hover {
+    background-color: darken(#3e5dab, 10%);
+  }
+}

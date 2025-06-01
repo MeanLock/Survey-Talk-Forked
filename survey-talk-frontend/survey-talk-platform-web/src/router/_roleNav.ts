@@ -1,72 +1,76 @@
-export const getRoleNavItems = (isAdmin: number): {
-  label: string,
-  path: string,
+export const getRoleNavItems = (
+  isAdmin: number
+): {
+  label: string;
+  path: string;
 }[] => {
   const _roleNav = [
-    // Admin  
+    // Admin
     [
       {
-        label: 'Perfumes',
-        path: '/perfumes',
+        label: "Perfumes",
+        path: "/perfumes",
       },
       {
-        label: 'Comments',
-        path: '/comments',
+        label: "Comments",
+        path: "/comments",
       },
       {
-        label: 'Profile',
-        path: '/profile',
+        label: "Profile",
+        path: "/profile",
       },
       {
-        label: 'Perfumes Manage',
-        path: '/admin/perfumes',
+        label: "Perfumes Manage",
+        path: "/admin/perfumes",
       },
       {
-        label: 'Brands Manage',
-        path: '/admin/brands',
+        label: "Brands Manage",
+        path: "/admin/brands",
       },
       {
-        label: 'Collectors Manage',
-        path: '/admin/collectors',
+        label: "Collectors Manage",
+        path: "/admin/collectors",
       },
       {
-        label: 'Survey',
-        path: '/survey',
+        label: "Survey",
+        path: "/survey",
       },
     ],
     // Normal Member
     [
       {
-        label: 'Perfumes',
-        path: '/perfumes',
+        label: "Perfumes",
+        path: "/perfumes",
       },
       {
-        label: 'Comments',
-        path: '/comments',
+        label: "Comments",
+        path: "/comments",
       },
       {
-        label: 'Profile',
-        path: '/profile',
+        label: "Profile",
+        path: "/profile",
       },
       {
-        label: 'Survey',
-        path: '/survey',
+        label: "Survey",
+        path: "/survey",
       },
-    ]
-
-  ]
-  const roleNav = _roleNav[isAdmin]
+    ],
+  ];
+  const roleNav = _roleNav[isAdmin];
 
   return roleNav;
-}
+};
 
 export const _nonLoginNav: {
-  label: string,
-  path: string,
+  label: string;
+  path: string;
 }[] = [
-    {
-      label: 'Perfumes',
-      path: '/perfumes',
-    }
-  ]
-
+  {
+    label: "Trang chủ",
+    path: "/home",
+  },
+  {
+    label: "Về chúng tôi",
+    path: "/about-us",
+  },
+];
