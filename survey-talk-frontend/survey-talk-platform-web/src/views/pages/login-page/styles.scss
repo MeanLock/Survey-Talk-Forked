@@ -1,0 +1,11 @@
+.login-left-decoration {
+  background-color: app_vars.$theme-primary;
+  position: relative;
+  .login-left-decoration__image {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    width: 200px;
+    height: 200px;
+  }
+}

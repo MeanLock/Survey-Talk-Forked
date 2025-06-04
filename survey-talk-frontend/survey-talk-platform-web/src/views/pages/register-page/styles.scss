@@ -1,0 +1,12 @@
+.register-right-decoration {
+  .register-right-decoration__shape {
+    width: 95%;
+    height: 80%;
+    background-color: app_vars.$theme-primary;
+    border-top-left-radius: 100vh;
+    border-bottom-left-radius: 100vh;
+
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}

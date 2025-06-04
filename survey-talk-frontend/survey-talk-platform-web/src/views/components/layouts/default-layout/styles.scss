@@ -4,17 +4,24 @@
     // background-color: aqua;
   }
   .default-layout-content {
-    // background-color: yellow;
+    background-color: app_vars.$background-color-primary;
   }
   .default-layout-footer {
-    // background-color: green;
+    background-color: #3e5dab !important;
+    width: 100%;
+    .default-layout-footer__nav-links {
+      color: white;
+      &:hover {
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    }
+    .default-layout-footer__copy-right {
+      color: white;
+      font-weight: 500;
+    }
   }
 }
-.btn-main-blue {
-  background-color: var(--main-blue, #3e5dab) !important;
-  color: #fff;
-  border-radius: 20px !important;
-  &:hover {
-    background-color: darken(#3e5dab, 10%);
-  }
+:export {
+  button_bgColor: app_vars.$theme-primary;
 }

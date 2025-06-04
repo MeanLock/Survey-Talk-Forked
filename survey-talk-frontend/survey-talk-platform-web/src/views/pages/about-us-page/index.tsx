@@ -1,0 +1,60 @@
+const AboutUsPage = () => {
+  return (
+    <div>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+      <h1>A</h1>
+    </div>
+  );
+};
+
+export default AboutUsPage;

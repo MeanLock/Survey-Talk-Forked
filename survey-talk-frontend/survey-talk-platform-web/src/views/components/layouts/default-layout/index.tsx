@@ -8,8 +8,11 @@ import { JwtUtil } from "../../../../core/utils/jwt.util";
 import { DefaultLayoutHeader } from "./DefaultLayoutHeader";
 import { DefaultLayoutContent } from "./DefaultLayoutContent";
 import { DefaultLayoutFooter } from "./DefaultLayoutFooter";
-import { _nonLoginNav, getRoleNavItems } from "../../../../router/_roleNav";
-import { Box, Container } from "@mui/material";
+import {
+  _nonLoginNav,
+  getRoleNavItems,
+  _footerNav,
+} from "../../../../router/_roleNav";
 
 interface DefaultLayoutContextProps {
   isAdmin: boolean;
@@ -35,10 +38,18 @@ const DefaultLayout = () => {
     }[]
   >([]);
 
+  const [footerNavItems, setFooterNavItems] = useState<
+    {
+      label: string;
+      path: string;
+    }[]
+  >([]);
+
   // REDUX
   const auth = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
+    setFooterNavItems(_footerNav);
     if (!auth.token) {
       setNavItems(_nonLoginNav);
 
@@ -62,27 +73,23 @@ const DefaultLayout = () => {
         isLogin: member ? true : false,
       }}
     >
-      <Box
-        className={"default-layout"}
-        display={"flex"}
-        flexDirection="column"
-        width={"100%"}
-        height={"100vh"}
-      >
+      <div className="default-layout flex flex-col w-full h-screen">
+        {/* HEADER */}
         <DefaultLayoutHeader navItems={navItems} />
-        <div className="wrapper d-flex flex-column min-vh-100 mt-[83px]">
-          <div className="body flex-grow-1">
-            <Container
-              maxWidth="xl"
-              className="default-layout-container"
-              sx={{ height: "100vh", width: "100%" }}
-            >
+
+        {/* MAIN WRAPPER */}
+        <div className="flex flex-col flex-grow w-full mt-[83px]">
+          <div className="flex-grow m-0 p-0">
+            <div className="w-full min-h-[calc(100vh-83px-95px)]">
+              {/* trừ header */}
               <DefaultLayoutContent />
-            </Container>
+            </div>
           </div>
-          <DefaultLayoutFooter />
+
+          {/* FOOTER */}
+          <DefaultLayoutFooter navItems={footerNavItems} />
         </div>
-      </Box>
+      </div>
     </DefaultLayoutContext.Provider>
   );
 };

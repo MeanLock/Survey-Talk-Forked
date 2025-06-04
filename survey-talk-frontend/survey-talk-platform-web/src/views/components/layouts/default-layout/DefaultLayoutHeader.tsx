@@ -13,20 +13,12 @@ import { JwtUtil } from "../../../../core/utils/jwt.util";
 import LogoIcon from "../../common/system/logo/LogoIcon";
 import "./styles.scss";
 import LinkButton from "../../common/system/button/LinkButton";
+// import variables from "./styles.scss";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
-  // flexShrink: 0,
-  // borderRadius: `calc(${theme.shape.borderRadius}px + 8px)`,
-  // backdropFilter: "blur(24px)",
-  // border: "1px solid",
-  // borderColor: (theme.vars || theme).palette.divider,
-  // backgroundColor: theme.vars
-  //   ? `rgba(${theme.vars.palette.background.defaultChannel} / 0.4)`
-  //   : alpha(theme.palette.background.default, 0.4),
-  // boxShadow: (theme.vars || theme).shadows[1],
   padding: "15px 0px",
 }));
 
@@ -95,19 +87,29 @@ export const DefaultLayoutHeader: FC<DefaultLayoutHeaderProps> = ({
           <Box
             sx={{ flexGrow: 1, display: "flex", alignItems: "center", px: 0 }}
           >
-            <LogoIcon />
+            <LogoIcon variant="default" />
             <Box sx={{ display: { xs: "none", md: "flex" }, paddingLeft: 3 }}>
               {navItems
                 ? navItems.map((item, index) => {
                     return (
                       <Button
-                        variant={value === item.path ? "contained" : "text"}
-                        color={value === item.path ? "primary" : "info"}
-                        size="small"
-                        key={index}
-                        defaultValue={item.path}
                         component={Link}
                         to={item.path}
+                        variant="text"
+                        size="small"
+                        key={index}
+                        sx={{
+                          marginRight: "50px",
+                          color: "#3e5dab", //HARDCODE
+                          fontSize: "15px",
+                          fontWeight: value === item.path ? "bold" : "normal",
+                          textTransform: "none",
+                          "&:hover": {
+                            fontWeight: "bold",
+                            backgroundColor: "transparent",
+                            color: "#3e5dab", //HARDCODE
+                          },
+                        }}
                       >
                         {item.label}
                       </Button>
@@ -154,7 +156,7 @@ export const DefaultLayoutHeader: FC<DefaultLayoutHeaderProps> = ({
               </Button> */}
               <LinkButton
                 link="/login"
-                backgroundColor="var(--main-blue)"
+                backgroundColor="#3e5dab" //HARDCODE
                 color="#fff"
                 title="Tham Gia Ngay"
               />

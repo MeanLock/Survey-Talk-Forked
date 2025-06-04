@@ -74,3 +74,21 @@ export const _nonLoginNav: {
     path: "/about-us",
   },
 ];
+
+export const _footerNav: {
+  label: string;
+  path: string;
+}[] = [
+  {
+    label: "Điều khoản",
+    path: "/clause",
+  },
+  {
+    label: "Quyền Riêng Tư",
+    path: "/privacy",
+  },
+  {
+    label: "Cookies",
+    path: "cookies",
+  },
+];

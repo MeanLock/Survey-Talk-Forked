@@ -36,5 +36,6 @@ $background-color-primary: var(
   --app-background-color-primary,
   #f5f7f9
 ); // used (màu nền chính của toàn bộ tất cả layout) default: #f5f7f9
-$main-blue: var(--main-blue, #3e5dab); // màu xanh chính
-$main-yellow: var(--main-yellow, #ffc40d); // màu vàng chính
+$theme-primary: var(--main-blue, #3e5dab); // màu xanh chính
+$theme-second: var(--main-yellow, #ffc40d); // màu vàng chính
+$text-white: var(--text-white, #fff); //màu trắng trơn
