@@ -23,7 +23,7 @@ const PaymentResultPage: React.FC = () => {
       status === "PAID" &&
       !isNaN(amount) &&
       auth.user &&
-      auth.user.Balance
+      (auth.user.Balance || auth.user.Balance === 0)
     ) {
       dispatch(
         updateAuthUser({
@@ -35,13 +35,13 @@ const PaymentResultPage: React.FC = () => {
       // Nếu không hợp lệ, điều hướng về trang giao dịch
       if (type !== "1") {
         alert("Type sai");
-      } else if (status !== "1") {
+      } else if (status !== "PAID") {
         alert("Status sai");
       } else if (isNaN(amount)) {
         alert("Amount không hợp lệ");
       } else if (!auth.user) {
         alert("User không tồn tại");
-      } else if (!auth.user.Balance) {
+      } else if (!auth.user.Balance || auth.user.Balance !== 0) {
         alert("Không có balance");
       }
       navigate("/user/transactions");

@@ -127,128 +127,128 @@ const LoginPage: FC<LoginPageProps> = (props) => {
     };
 
     // CALL API TẠI ĐÂY
-    // try {
-    //   const response = await callAxiosRestApi(
-    //     {
-    //       instance: publicAxiosInstance,
-    //       method: "post",
-    //       url: "User/auth/login",
-    //       data: { LoginInfo: Login_Info },
-    //     },
-    //     "Login Manual"
-    //   );
-
-    //   if (response.success) {
-    //     const token = response.data.AccessToken;
-    //     if (token) {
-    //       console.log("Token: ", token);
-    //       // Lưu token vào Redux
-    //       dispatch(
-    //         setAuthToken({
-    //           token: token,
-    //         })
-    //       );
-
-    //       // Lưu token vào LocalStorage
-    //       LocalStorageUtil.setAuthTokenToPersistLocalStorage(token);
-
-    //       // CALL API GET USER INFORMATIONS
-    //       const userResponses = await callAxiosRestApi({
-    //         instance: loginRequiredAxiosInstance,
-    //         method: "get",
-    //         url: "User/accounts/me",
-    //       });
-    //       if (userResponses.success && userResponses.data) {
-    //         const user = {
-    //           Id: userResponses.data.Account.Id,
-    //           RoleId: userResponses.data.Account.Role.Id,
-    //           FullName: userResponses.data.Account.FullName,
-    //           Balance: userResponses.data.Account.Balance,
-    //           IsVerified: userResponses.data.Account.IsVerified,
-    //           Xp: userResponses.data.Account.Xp,
-    //           Level: userResponses.data.Account.Level,
-    //           IsFilterSurveyRequired:
-    //             userResponses.data.Account.IsFilterSurveyRequired,
-    //           LastFilterSurveyTakenAt:
-    //             userResponses.data.Account.LastFilterSurveyTakenAt,
-    //           MainImageUrl: userResponses.data.Account.MainImageUrl,
-    //         };
-    //         console.log("User: ", user);
-    //         // Cập nhật Redux với thông tin user
-    //         dispatch(
-    //           setAuthToken({
-    //             token: token,
-    //             user: user,
-    //           })
-    //         );
-
-    //         // Lưu user vào LocalStorage
-    //         LocalStorageUtil.setAuthUserToPersistLocalStorage(user);
-
-    //         // NAVIGATE TO PREVIOUS ROUTE IF NEEDED
-    //         const redirectUrl = localStorage.getItem("redirectUrl");
-    //         if (redirectUrl) {
-    //           localStorage.removeItem("redirectUrl");
-    //           window.location.href = redirectUrl;
-    //         } else {
-    //           window.location.href = "/";
-    //         }
-    //       }
-    //     } else if (response.isAppError) {
-    //       errorAlert(
-    //         response.message.content
-    //           ? response.message.content
-    //           : "Lỗi khi đăng nhập!"
-    //       );
-    //     }
-    //   }
-    // } catch (error) {
-    //   console.log("Error while login: ", error);
-    // }
-
-    const token =
-      "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjI2IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6Ikhvw6BuZyBNaW5oIEzhu5ljIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZW1haWxhZGRyZXNzIjoic29yeXp6bWlrZWx5QGdtYWlsLmNvbSIsImlkIjoiMjYiLCJyb2xlX2lkIjoiNCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkN1c3RvbWVyIiwiYmFsYW5jZSI6IjAuMDAiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3NlcmlhbG51bWJlciI6IjQ4ZWU4ODZjLWJiNWUtNGEzZS04MmZiLThhZmU3NDQ5OGNkOCIsImV4cCI6Nzc1MDEzODE1NSwiaXNzIjoibG9jYWxob3N0IiwiYXVkIjoibG9jYWxob3N0In0.lNnUEYZfT3ujUYjNjQ8bbx-v5TxOHcUtTL8dwKU64eXLukIvtfPWmisocSWQEn7G72ZoSwpcz18ztB8MDDXQ55-LBsvztuL3IU3OLuuVa3ZHgGGsfyzNM-iGKMqNM84FfPFw1wQvM4A2gwlSzpUhLpS7OktMe1XoFyj9tn1RHbp-7IQO-Zak5sJGiXv09M1joXMyfmAOwHmZIeRgN9HZL_My27vcTz3Pvb12NXwu_NX89l-f1NBD-5T6Q5gLDKwB2-ag-GcCFfFz7RpUOKYjOTenwp1wWj33irCFHDIIApLwdEp7qD4rUlmBVfj6Mh2SirhWIiBvtC4cvmH6aZHB-Q";
-
-    if (email === "soryzzmikely@gmail.com") {
-      const user = {
-        Id: 1,
-        RoleId: 4,
-        FullName: takerFake.FullName,
-        Balance: takerFake.Point,
-        IsVerified: true,
-        Xp: takerFake.Xp,
-        Level: takerFake.Level,
-        IsFilterSurveyRequired: false,
-        LastFilterSurveyTakenAt: null,
-        MainImageUrl: takerFake.MainImageUrl,
-      };
-      dispatch(
-        setAuthToken({
-          token: token,
-          user: user,
-        })
+    try {
+      const response = await callAxiosRestApi(
+        {
+          instance: publicAxiosInstance,
+          method: "post",
+          url: "User/auth/login",
+          data: { LoginInfo: Login_Info },
+        },
+        "Login Manual"
       );
-    } else {
-      const user = {
-        Id: 1,
-        RoleId: 4,
-        FullName: requesterFake.FullName,
-        Balance: requesterFake.Point,
-        IsVerified: true,
-        Xp: requesterFake.Xp,
-        Level: requesterFake.Level,
-        IsFilterSurveyRequired: false,
-        LastFilterSurveyTakenAt: null,
-        MainImageUrl: requesterFake.MainImageUrl,
-      };
-      dispatch(
-        setAuthToken({
-          token: token,
-          user: user,
-        })
-      );
+
+      if (response.success) {
+        const token = response.data.AccessToken;
+        if (token) {
+          console.log("Token: ", token);
+          // Lưu token vào Redux
+          dispatch(
+            setAuthToken({
+              token: token,
+            })
+          );
+
+          // Lưu token vào LocalStorage
+          LocalStorageUtil.setAuthTokenToPersistLocalStorage(token);
+
+          // CALL API GET USER INFORMATIONS
+          const userResponses = await callAxiosRestApi({
+            instance: loginRequiredAxiosInstance,
+            method: "get",
+            url: "User/accounts/me",
+          });
+          if (userResponses.success && userResponses.data) {
+            const user = {
+              Id: userResponses.data.Account.Id,
+              RoleId: userResponses.data.Account.Role.Id,
+              FullName: userResponses.data.Account.FullName,
+              Balance: userResponses.data.Account.Balance,
+              IsVerified: userResponses.data.Account.IsVerified,
+              Xp: userResponses.data.Account.Xp,
+              Level: userResponses.data.Account.Level,
+              IsFilterSurveyRequired:
+                userResponses.data.Account.IsFilterSurveyRequired,
+              LastFilterSurveyTakenAt:
+                userResponses.data.Account.LastFilterSurveyTakenAt,
+              MainImageUrl: userResponses.data.Account.MainImageUrl,
+            };
+            console.log("User: ", user);
+            // Cập nhật Redux với thông tin user
+            dispatch(
+              setAuthToken({
+                token: token,
+                user: user,
+              })
+            );
+
+            // Lưu user vào LocalStorage
+            LocalStorageUtil.setAuthUserToPersistLocalStorage(user);
+
+            // NAVIGATE TO PREVIOUS ROUTE IF NEEDED
+            const redirectUrl = localStorage.getItem("redirectUrl");
+            if (redirectUrl) {
+              localStorage.removeItem("redirectUrl");
+              window.location.href = redirectUrl;
+            } else {
+              window.location.href = "/";
+            }
+          }
+        } else if (response.isAppError) {
+          errorAlert(
+            response.message.content
+              ? response.message.content
+              : "Lỗi khi đăng nhập!"
+          );
+        }
+      }
+    } catch (error) {
+      console.log("Error while login: ", error);
     }
-    window.location.href = "/";
+
+    // const token =
+    //   "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjI2IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6Ikhvw6BuZyBNaW5oIEzhu5ljIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZW1haWxhZGRyZXNzIjoic29yeXp6bWlrZWx5QGdtYWlsLmNvbSIsImlkIjoiMjYiLCJyb2xlX2lkIjoiNCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkN1c3RvbWVyIiwiYmFsYW5jZSI6IjAuMDAiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3NlcmlhbG51bWJlciI6IjQ4ZWU4ODZjLWJiNWUtNGEzZS04MmZiLThhZmU3NDQ5OGNkOCIsImV4cCI6Nzc1MDEzODE1NSwiaXNzIjoibG9jYWxob3N0IiwiYXVkIjoibG9jYWxob3N0In0.lNnUEYZfT3ujUYjNjQ8bbx-v5TxOHcUtTL8dwKU64eXLukIvtfPWmisocSWQEn7G72ZoSwpcz18ztB8MDDXQ55-LBsvztuL3IU3OLuuVa3ZHgGGsfyzNM-iGKMqNM84FfPFw1wQvM4A2gwlSzpUhLpS7OktMe1XoFyj9tn1RHbp-7IQO-Zak5sJGiXv09M1joXMyfmAOwHmZIeRgN9HZL_My27vcTz3Pvb12NXwu_NX89l-f1NBD-5T6Q5gLDKwB2-ag-GcCFfFz7RpUOKYjOTenwp1wWj33irCFHDIIApLwdEp7qD4rUlmBVfj6Mh2SirhWIiBvtC4cvmH6aZHB-Q";
+
+    // if (email === "soryzzmikely@gmail.com") {
+    //   const user = {
+    //     Id: 1,
+    //     RoleId: 4,
+    //     FullName: takerFake.FullName,
+    //     Balance: takerFake.Point,
+    //     IsVerified: true,
+    //     Xp: takerFake.Xp,
+    //     Level: takerFake.Level,
+    //     IsFilterSurveyRequired: false,
+    //     LastFilterSurveyTakenAt: null,
+    //     MainImageUrl: takerFake.MainImageUrl,
+    //   };
+    //   dispatch(
+    //     setAuthToken({
+    //       token: token,
+    //       user: user,
+    //     })
+    //   );
+    // } else {
+    //   const user = {
+    //     Id: 1,
+    //     RoleId: 4,
+    //     FullName: requesterFake.FullName,
+    //     Balance: requesterFake.Point,
+    //     IsVerified: true,
+    //     Xp: requesterFake.Xp,
+    //     Level: requesterFake.Level,
+    //     IsFilterSurveyRequired: false,
+    //     LastFilterSurveyTakenAt: null,
+    //     MainImageUrl: requesterFake.MainImageUrl,
+    //   };
+    //   dispatch(
+    //     setAuthToken({
+    //       token: token,
+    //       user: user,
+    //     })
+    //   );
+    // }
+    // window.location.href = "/";
     setManualLoading(false);
   };
 

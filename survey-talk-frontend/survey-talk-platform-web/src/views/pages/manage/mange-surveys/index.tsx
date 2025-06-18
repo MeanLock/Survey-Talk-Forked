@@ -118,6 +118,14 @@ const ManageSurveyPage = () => {
   };
   const handleDelete = (id: number) => {};
 
+  const changeSurveyStatus = (id: number) => {
+    const updatedSurveys = surveys?.map((survey) =>
+      survey.Id === id ? { ...survey, StatusId: 2 } : survey
+    );
+    setSurveys(updatedSurveys);
+    setFilteredSurveys(updatedSurveys);
+  };
+
   return (
     <div className="surveys-me w-full flex flex-col items-start p-10">
       <p className="surveys-me__title mb-2">Tài liệu khảo sát của tôi</p>
@@ -278,6 +286,7 @@ const ManageSurveyPage = () => {
           survey={selectedSurvey}
           open={showPublishModal}
           onClose={handleClosePublishModal}
+          changeStatus={() => changeSurveyStatus(selectedSurvey?.Id || 0)}
         />
       )}
     </div>

@@ -8,16 +8,20 @@ import {
   Slider,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { Survey } from "../../../../../core/types";
 import { SegmentBasic } from "./SegmentBasic";
 import { SegmentAge } from "./SegmentAge";
 import dayjs from "dayjs"; // Ensure dayjs is installed for date manipulation
+import type { RootState } from "../../../../../redux/rootReducer";
+import { updateAuthUser } from "../../../../../redux/auth/authSlice";
+import { Balance } from "@mui/icons-material";
 
 interface Props {
   survey: Survey;
   open: boolean;
   onClose: () => void;
+  changeStatus: () => void;
 }
 
 const segmentData = {
@@ -69,7 +73,16 @@ const segmentData = {
   },
 };
 
-export const PublishModal: React.FC<Props> = ({ survey, open, onClose }) => {
+export const PublishModal: React.FC<Props> = ({
+  survey,
+  open,
+  onClose,
+  changeStatus,
+}) => {
+  // REDUX
+  const user = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch();
+
   // STATES
   const [isDoneSegmentFilter, setIsDoneSegmentFilter] =
     useState<boolean>(false);
@@ -110,9 +123,6 @@ export const PublishModal: React.FC<Props> = ({ survey, open, onClose }) => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [errPrice, setErrPrice] = useState(false);
   const [errPriceMsg, setErrPriceMsg] = useState("");
-
-  // REDUX
-  const user = useSelector((state: any) => state.auth.user);
 
   // HOOKS
   useEffect(() => {
@@ -336,7 +346,7 @@ export const PublishModal: React.FC<Props> = ({ survey, open, onClose }) => {
 
   const handleEnterDeadline = () => {
     setIsDeadlineEntered(true);
-    setTheoryPrice(1000000);
+    setTheoryPrice(10000);
   };
 
   // 7. Price
@@ -344,10 +354,10 @@ export const PublishModal: React.FC<Props> = ({ survey, open, onClose }) => {
     if (theoryPrice > Number(value)) {
       setErrPrice(true);
       setErrPriceMsg(`Số tiền đăng tối thiểu là: ${formatVND(theoryPrice)}`);
-    } else if (Number(value) > userPoint) {
+    } else if (Number(value) > user?.Balance) {
       setErrPrice(true);
       setErrPriceMsg(
-        "Tài khoản của bạn có vẻ không đủ, bạn có muốn nạp thêm ?"
+        `Tài khoản của bạn đang có: ${user?.Balance} có vẻ không đủ, bạn có muốn nạp thêm ?`
       );
     } else {
       setErrPrice(false);
@@ -375,6 +385,23 @@ export const PublishModal: React.FC<Props> = ({ survey, open, onClose }) => {
 
   const handleAccuracyChange = (value: number) => {
     setAccuracy(value);
+  };
+
+  // 9. Handle Publish:
+  const handlePublish = () => {
+    // Logic xử lý khi hoàn thành
+    dispatch(
+      updateAuthUser({
+        Balance: user?.Balance - totalPrice,
+      })
+    );
+    console.log("Hoàn thành đăng khảo sát!");
+
+    // Gọi hàm changeStatus để cập nhật statusId
+    changeStatus();
+
+    // Đóng modal
+    onClose();
   };
 
   return (
@@ -520,6 +547,15 @@ export const PublishModal: React.FC<Props> = ({ survey, open, onClose }) => {
             onChange={(e) => handleTotalPriceChange(e.target.value)}
           />
         </div>
+
+        <Button
+          onClick={() => handlePublish()}
+          variant="contained"
+          color="primary"
+          disabled={errPrice}
+        >
+          Đăng Khảo Sát
+        </Button>
       </div>
     </Modal>
   );
