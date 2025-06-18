@@ -1,18 +1,21 @@
 // Font
-$font-family-base: var(
-  --app-font-primary,
-  "Segoe UI",
-  "San Francisco",
-  "Helvetica Neue",
-  Helvetica,
-  "Lucida Grande",
-  Roboto,
-  Ubuntu,
-  Tahoma,
-  "Microsoft Sans Serif",
-  Arial,
-  sans-serif
-); // used (font chính của toàn bộ tất cả layout) default: 'Roboto', sans-serif
+// $font-family-base: var(
+//   --app-font-primary,
+//   "Segoe UI",
+//   "San Francisco",
+//   "Helvetica Neue",
+//   Helvetica,
+//   "Lucida Grande",
+//   Roboto,
+//   Ubuntu,
+//   Tahoma,
+//   "Microsoft Sans Serif",
+//   Arial,
+//   sans-serif
+// ); // used (font chính của toàn bộ tất cả layout) default: 'Roboto', sans-serif
+
+$font-primary: var(--app-font-primary, "Bricolage Grotesque", sans-serif);
+
 $font-size-base: var(
   --app-font-size-base,
   16px
@@ -36,6 +39,12 @@ $background-color-primary: var(
   --app-background-color-primary,
   #f5f7f9
 ); // used (màu nền chính của toàn bộ tất cả layout) default: #f5f7f9
-$theme-primary: var(--main-blue, #3e5dab); // màu xanh chính
-$theme-second: var(--main-yellow, #ffc40d); // màu vàng chính
-$text-white: var(--text-white, #fff); //màu trắng trơn
+
+$bg-primary: var(--app-bg-primary, #3e5dab); // màu xanh chính
+$bg-secondary: var(--app-bg-second, #ffc40d); // màu vàng chính
+$bg-blue-2: var(--app-bg-blue-2, #e5f2ff);
+
+$text-primary: var(--app-text-primary, #3e5dab); // màu xanh chính
+$text-secondary: var(--app-text-second, #ffc40d); // màu vàng chính
+$text-blue-2: var(--app-text-blue-2, #e5f2ff);
+$text-white: var(--app-text-white, #fff); //màu trắng trơn

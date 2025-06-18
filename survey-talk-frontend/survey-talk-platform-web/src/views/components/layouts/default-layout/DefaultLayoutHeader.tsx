@@ -1,19 +1,29 @@
-import { useEffect, useState, type FC } from "react";
-import { alpha, styled } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import Button from "@mui/material/Button";
-import Container from "@mui/material/Container";
+import { useEffect, useState } from "react";
+import {
+  Box,
+  AppBar,
+  Toolbar,
+  Button,
+  Container,
+  IconButton,
+  Menu,
+  MenuItem,
+  Divider,
+  styled,
+} from "@mui/material";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { clearAuthToken } from "../../../../redux/auth/authSlice";
-import type { RootState } from "../../../../redux/rootReducer";
 import { JwtUtil } from "../../../../core/utils/jwt.util";
 import LogoIcon from "../../common/system/logo/LogoIcon";
-import "./styles.scss";
+import StarsIcon from "@mui/icons-material/Stars";
+import "./headerStyle.scss";
 import LinkButton from "../../common/system/button/LinkButton";
-// import variables from "./styles.scss";
+import { NavItemBasic } from "./NavItemBasic";
+import { NavItemDropDown } from "./NavItemDropDown";
+import User1 from "../../../../assets/Image/Customers/user-0001/avatar.jpg";
+import { Level } from "./Level";
+import type { RootState } from "../../../../redux/rootReducer";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
@@ -27,38 +37,38 @@ function useQuery() {
 }
 
 interface DefaultLayoutHeaderProps {
-  navItems: {
-    label: string;
-    path: string;
-  }[];
+  navItems: any;
+  member: {
+    Id: number;
+    RoleId: number;
+    FullName: string;
+    Balance: number;
+    IsVerified: boolean;
+    Xp: number;
+    Level: number;
+    IsFilterSurveyRequired: boolean;
+    LastFilterSurveyTakenAt: string | null;
+    MainImageUrl: string | null;
+  } | null;
 }
 
-export const DefaultLayoutHeader: FC<DefaultLayoutHeaderProps> = ({
+export const DefaultLayoutHeader: React.FC<DefaultLayoutHeaderProps> = ({
   navItems,
+  member,
 }) => {
-  const [open, setOpen] = useState(false);
-
-  const toggleDrawer = (newOpen: boolean) => () => {
-    setOpen(newOpen);
-  };
-
-  // HOOKS
-  const query = useQuery();
-  const navigate = useNavigate();
-
-  // STATES
+  const [openMenu, setOpenMenu] = useState<null | HTMLElement>(null);
   const [value, setValue] = useState("");
   const [isLogin, setIsLogin] = useState(false);
 
-  // REDUX
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const auth = useSelector((state: RootState) => state.auth);
+
+  // TASK FAKE DATA, PHẢI BỎ KHI ĐÃ CÓ API
+  const fake = useSelector((state: RootState) => state.fake);
 
   useEffect(() => {
     setValue(window.location.pathname);
-  }, [query]);
-
-  useEffect(() => {
     if (auth.token && JwtUtil.isTokenValid(auth.token)) {
       setIsLogin(true);
     } else {
@@ -71,17 +81,16 @@ export const DefaultLayoutHeader: FC<DefaultLayoutHeaderProps> = ({
     navigate("/login");
   };
 
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setOpenMenu(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setOpenMenu(null);
+  };
+
   return (
-    <AppBar
-      // position="fixed"
-      enableColorOnDark
-      sx={{
-        boxShadow: 0,
-        bgcolor: "#FFEAA8",
-        backgroundImage: "none",
-        // mt: "calc(var(--template-frame-height, 0px) + 28px)",
-      }}
-    >
+    <AppBar sx={{ boxShadow: 0, bgcolor: "#FFEAA8", backgroundImage: "none" }}>
       <Container maxWidth="xl">
         <StyledToolbar variant="dense" disableGutters>
           <Box
@@ -90,52 +99,92 @@ export const DefaultLayoutHeader: FC<DefaultLayoutHeaderProps> = ({
             <LogoIcon variant="default" />
             <Box sx={{ display: { xs: "none", md: "flex" }, paddingLeft: 3 }}>
               {navItems
-                ? navItems.map((item, index) => {
-                    return (
-                      <Button
-                        component={Link}
-                        to={item.path}
-                        variant="text"
-                        size="small"
+                ? navItems.map((item: any, index: number) =>
+                    item.isDropDown ? (
+                      <NavItemDropDown
                         key={index}
-                        sx={{
-                          marginRight: "50px",
-                          color: "#3e5dab", //HARDCODE
-                          fontSize: "15px",
-                          fontWeight: value === item.path ? "bold" : "normal",
-                          textTransform: "none",
-                          "&:hover": {
-                            fontWeight: "bold",
-                            backgroundColor: "transparent",
-                            color: "#3e5dab", //HARDCODE
-                          },
-                        }}
-                      >
-                        {item.label}
-                      </Button>
-                    );
-                  })
+                        index={index}
+                        navItem={item}
+                      />
+                    ) : (
+                      <NavItemBasic
+                        key={index}
+                        index={index}
+                        label={item.label}
+                        path={item.paths[0].path}
+                        activeLink={value}
+                      />
+                    )
+                  )
                 : null}
             </Box>
           </Box>
 
           {isLogin ? (
-            <Box
-              sx={{
-                display: { xs: "none", md: "flex" },
-                gap: 1,
-                alignItems: "center",
-              }}
-            >
-              <Button
-                color="error"
-                variant="contained"
-                size="small"
-                onClick={handleLogout}
+            <div className="user-profile flex gap-3 items-center">
+              <div className="flex items-center gap-2 text-[#ffc40d]">
+                <StarsIcon />
+                <p className="font-bold">
+                  {/* TASK FAKE DATA, PHẢI BỎ KHI ĐÃ CÓ API */}
+                  {fake.Point.toLocaleString("vn")}
+                  {/* {member?.Balance.toLocaleString("vn")} */}
+                </p>
+              </div>
+              <IconButton onClick={handleMenuOpen}>
+                <img
+                  src={User1}
+                  alt={member?.FullName}
+                  className="w-[48px] h-[48px] rounded-full"
+                />
+              </IconButton>
+
+              <div className="user-details flex flex-col items-start">
+                <p className="user-profile__full-name">{member?.FullName}</p>
+                <Level
+                  //TASK FAKE DATA, PHẢI BỎ KHI ĐÃ CÓ API
+                  xp={fake.Xp}
+                  level={fake.Level}
+                  // xp={member ? member.Xp : null}
+                  // level={member ? member.Level : null}
+                />
+              </div>
+
+              {/* Menu Avatar */}
+              <Menu
+                anchorEl={openMenu}
+                open={Boolean(openMenu)}
+                onClose={handleMenuClose}
+                sx={{
+                  borderRadius: "8px",
+                  minWidth: "200px",
+                  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+                }}
               >
-                Log out
-              </Button>
-            </Box>
+                <MenuItem
+                  component={Link}
+                  to="/user/profile"
+                  onClick={handleMenuClose}
+                >
+                  Quản lý thông tin cá nhân
+                </MenuItem>
+                <MenuItem
+                  component={Link}
+                  to="/user/level"
+                  onClick={handleMenuClose}
+                >
+                  Quản lý cấp độ
+                </MenuItem>
+                <MenuItem
+                  component={Link}
+                  to="/user/transactions"
+                  onClick={handleMenuClose}
+                >
+                  Nạp/Rút tiền
+                </MenuItem>
+                <Divider />
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              </Menu>
+            </div>
           ) : (
             <Box
               sx={{
@@ -144,31 +193,12 @@ export const DefaultLayoutHeader: FC<DefaultLayoutHeaderProps> = ({
                 alignItems: "center",
               }}
             >
-              {/* <Button
-                variant="contained"
-                size="small"
-                disableElevation
-                component={Link}
-                to="/login"
-                className="btn-main-blue"
-              >
-                Tham gia ngay
-              </Button> */}
               <LinkButton
                 link="/login"
-                backgroundColor="#3e5dab" //HARDCODE
+                backgroundColor="#3e5dab"
                 color="#fff"
                 title="Tham Gia Ngay"
               />
-              {/* <Button
-                color="success"
-                variant="contained"
-                size="small"
-                component={Link}
-                to="/register"
-              >
-                Register
-              </Button> */}
             </Box>
           )}
         </StyledToolbar>

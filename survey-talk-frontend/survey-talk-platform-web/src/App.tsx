@@ -5,6 +5,7 @@ import "./App.scss";
 import { Box, CircularProgress } from "@mui/material";
 import { RouterProvider } from "react-router-dom";
 import { appRouter } from "./router";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -34,6 +35,7 @@ function App() {
       >
         <RouterProvider router={appRouter} />
       </Suspense>
+      <ToastContainer />
     </Box>
   );
 }

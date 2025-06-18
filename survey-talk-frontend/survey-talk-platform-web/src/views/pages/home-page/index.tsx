@@ -1,255 +1,275 @@
-import { useEffect, useState, type FC } from 'react';
-import './styles.scss'
-import Typography from '@mui/material/Typography';
-import { Box, Paper, TableBody, Table as muiTable, TableContainer, TableRow, TableCell, TextField, IconButton, Card, CardMedia, CardContent, AvatarGroup, Avatar, CircularProgress, Grid } from '@mui/material';
-import './styles.scss'
-import RssFeedRoundedIcon from '@mui/icons-material/RssFeedRounded';
-import Chip from '@mui/material/Chip';
-import { Link, useNavigate } from 'react-router-dom';
-import { callAxiosRestApi } from '../../../core/api/rest-api/main/api-call';
-import { publicAxiosInstance } from '../../../core/api/rest-api/config/instances/v2';
-import { StyledTypography, SyledCard, SyledCardContent } from '../../components/common/mui-ui/MuiUiComponents';
+import { useEffect, useState, type FC } from "react";
+import "./styles.scss";
 
+// IMAGES
+import TopBanner from "../../../assets/Image/Home/topBanner.png";
+import Gif1 from "../../../assets/Image/Home/gif1.gif";
+import Benefit1 from "../../../assets/Image/Home/benefit1.png";
+import Benefit2 from "../../../assets/Image/Home/benefit2.png";
+import Benefit3 from "../../../assets/Image/Home/benefit3.png";
+import YellowBanner from "../../../assets/Image/Home/bottomYellowBanner.png";
+
+// COMPONENTS
+import LinkButton from "../../components/common/system/button/LinkButton";
+import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
+import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUpload";
+import AddReactionIcon from "@mui/icons-material/AddReaction";
+import type { RootState } from "../../../redux/rootReducer";
+import { useSelector } from "react-redux";
+import type { SurveyCommunityCard } from "../../../core/types";
+import { homeSurveysData } from "../../../core/mockData/mockData";
+import { CircularProgress } from "@mui/material";
+import { SurveysCarousel } from "./SurveysCarousel";
+import { clearAuthToken } from "../../../redux/auth/authSlice";
+
+const progressVisualizeSteps = [
+  {
+    index: 1,
+    name: "Tạo Khảo Sát",
+    icon: <CreateNewFolderIcon sx={{ fontSize: 60, color: "#FFC40D" }} />,
+  },
+  {
+    index: 2,
+    name: "Đăng Khảo Sát",
+    icon: <DriveFolderUploadIcon sx={{ fontSize: 60, color: "#FFC40D" }} />,
+  },
+  {
+    index: 3,
+    name: "Nhận Ý Kiến Phản Hồi",
+    icon: <AddReactionIcon sx={{ fontSize: 60, color: "#FFC40D" }} />,
+  },
+];
+
+const benefitData = [
+  {
+    index: 1,
+    title: "Giúp khảo sát của bạn nổi bật ngay từ cái nhìn đầu tiên!",
+    description:
+      "Dễ dàng thêm logo, màu sắc và phong cách thương hiệu vào khảo sát của bạn, rồi nhúng vào trang đích hoặc email một cách mượt mà mà không cần viết mã.",
+    imageUrl: Benefit1,
+  },
+  {
+    index: 2,
+    title: "Cơ hội để bạn tìm kiếm thu nhập",
+    description:
+      "Những người muốn kiếm thêm thu nhập bằng cách tham gia khảo sát và chia sẻ một số thông tin cá nhân.",
+    imageUrl: Benefit3,
+  },
+  {
+    index: 3,
+    title: "Khuyến khích người tham gia chia sẻ nhiều hơn!",
+    description:
+      "Những cá nhân và doanh nghiệp sẵn sàng đầu tư để thu thập ý kiến khảo sát chất lượng, giúp họ đưa ra quyết định chính xác hơn.",
+    imageUrl: Benefit2,
+  },
+];
 
 interface HomePageProps {}
 
-const HomePage : FC<HomePageProps>=() => {
-    // HOOKS
-    const navigate = useNavigate();
+const HomePage: FC<HomePageProps> = () => {
+  // REDUX
+  const user = useSelector((state: RootState) => state.auth.user);
+  const fake = useSelector((state: RootState) => state.fake);
 
-    // STATES
-    const [loading, setLoading] = useState(true)
-    const [keyword, setKeyword] = useState('')
-    const [filter, setFilter] = useState<{ brand: string | null, perfumeName: string | null }>({
-        brand: null,
-        perfumeName: null,
-    })
-    const [perfumes, setPerfumes] = useState([])
-    const [brands, setBrands] = useState([])
+  // STATES
+  const [isLoading, setIsLoading] = useState(true);
+  const [surveys, setSurveys] = useState([]);
 
-    useEffect(() => {
-        setAttributes(filter);
-    }, [])
+  const [suitYouBest, setSuitYouBest] = useState<SurveyCommunityCard[] | null>(
+    null
+  );
+  const [bigBonus, setBigBonus] = useState<SurveyCommunityCard[] | null>(null);
+  const [baseOnFavTopic, setBaseOnFavTopic] = useState<
+    SurveyCommunityCard[] | null
+  >(null);
 
-    useEffect(() => {
-        setAttributes(filter);
-    }, [filter])
-
-    const setAttributes = async (filter: {
-        brand: string | null,
-        perfumeName: string | null,
-    }) => {
-        setLoading(false)
-        // const rep= await axios.get('https://e734-2a09-bac5-d46f-16c8-00-245-59.ngrok-free.app/api/services/service-types',{headers:{
-        //     "ngrok-skip-browser-warning": "69420"
-        // }})
-        // console.log(rep.data)
-
-        const params = new URLSearchParams();
-        if (filter.brand) params.append('brand', filter.brand);
-        if (filter.perfumeName) params.append('perfumeName', filter.perfumeName);
-
-        const brands = await callAxiosRestApi({
-            instance: publicAxiosInstance,
-            method: 'get',
-            url: '/Perfume/brands',
-        });
-
-        setBrands(brands.data.brands)
-
-        const perfumes = await callAxiosRestApi({
-            instance: publicAxiosInstance,
-            method: 'get',
-            url: '/Perfume/perfumes' + (params.toString() ? '?' + params.toString() : ''),
-        });
-
-        if (perfumes.success) {
-            setPerfumes(perfumes.data.perfumes)
-        } else {
-            setPerfumes([])
-        }
-
-        setLoading(false)
+  // HOOKS
+  useEffect(() => {
+    if (user) {
+      setIsLoading(true);
+      fetchSurveys();
     }
+  }, []);
 
-
-    const handleBrandFilter = (brand: string | null) => {
-        setFilter({ ...filter, brand: brand })
+  // FUNCTIONS
+  const fetchSurveys = async () => {
+    try {
+      // CALL API TO GET SURVEYS FEATURES
+      const response = homeSurveysData;
+      if (response) {
+        setSuitYouBest(response.suitYouBest);
+        setBigBonus(response.bigBonus);
+        setBaseOnFavTopic(response.baseOnFavTopic);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.log("Error while fetching surveys at home: ", error);
     }
+  };
 
-    const handlePerfumeNameFilter = () => {
-        // console.log('keyword:', keyword)
-        setFilter({ ...filter, perfumeName: keyword })
-    }
+  return (
+    <div className="home-page w-full flex flex-col items-center">
+      <div className="w-full mb-20">
+        <img src={TopBanner} className="w-full" />
+      </div>
+      {user ? (
+        <div className="features w-full">
+          <div className="features-div w-full flex flex-col items-start p-12">
+            <p className="features-div___title">Suit You Best!</p>
+            {isLoading ? (
+              <CircularProgress />
+            ) : (
+              <SurveysCarousel prefix="suityoubest" data={fake.SuitYouBest} />
+            )}
+          </div>
 
-    const handleSearchInput = (keyword: string) => {
-        // console.log('keyword:', keyword)
-        setKeyword(keyword)
-    }
+          <div className="features-div w-full flex flex-col items-start p-12">
+            <p className="features-div___title">Big bonus!</p>
+            {isLoading ? (
+              <CircularProgress />
+            ) : (
+              <SurveysCarousel prefix="bigbonus" data={bigBonus} />
+            )}
+          </div>
 
-    const handleNavigate = (url: string) => {
-        navigate(url)
-    }
+          <div className="features-div w-full flex flex-col items-start p-12 mb-10">
+            <p className="features-div___title">
+              Base On Your Favorite Topics!
+            </p>
+            {isLoading ? (
+              <CircularProgress />
+            ) : (
+              <SurveysCarousel prefix="base" data={baseOnFavTopic} />
+            )}
+          </div>
+        </div>
+      ) : (
+        <>
+          <p className="home-page__title mt-10 mx-10">
+            Tạo khảo sát một cách khác biệt và thú vị
+          </p>
+          <p className="home-page__sub-title mx-10">
+            Tạo các cuộc khảo sát được thiết kế để cung cấp cho bạn nhiều dữ
+            liệu hơn và tốt hơn.
+          </p>
+          <div className="my-5 py-10 px-20 mx-10">
+            <img src={Gif1} />
+          </div>
 
-
-    const [focusedCardIndex, setFocusedCardIndex] = useState<number | null>(
-        null,
-    );
-    const handleFocus = (index: number) => {
-        setFocusedCardIndex(index);
-    };
-
-    const handleBlur = () => {
-        setFocusedCardIndex(null);
-    };
-
-    return (
-
-
-        <Box className="PerfumesPage" sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <div>
-                <Typography variant="h1" gutterBottom>
-                    Perfumes
-                </Typography>
-                <Typography>Stay in the loop with the latest about our perfumes</Typography>
+          <div className="progress-visualize w-full flex flex-col items-center mx-10">
+            <p className="progress-visualize__title">
+              Với giao diện thân thiện với người dùng, bạn sẽ nhận được các phản
+              hồi khảo sát và ý kiến phản hồi được cải thiện đáng kể.
+            </p>
+            <div className="progress-visualize__image w-11/12 p-10 rounded-md my-5 flex items-center justify-around">
+              {progressVisualizeSteps.map((p) => (
+                <>
+                  <div className="progress-visualize__image__icons flex flex-col items-center gap-1">
+                    <div className="progress-visualize__image__icons__container flex p-7 items-center justify-center">
+                      {p.icon}
+                    </div>
+                    <p className="progress-visualize__image__icons__text">
+                      {p.name}
+                    </p>
+                  </div>
+                  {p.index !== 3 && <div className="divider w-72 h-0.5"></div>}
+                </>
+              ))}
             </div>
+          </div>
 
-
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: { xs: 'column-reverse', md: 'row' },
-                    width: '100%',
-                    justifyContent: 'space-between',
-                    alignItems: { xs: 'start', md: 'center' },
-                    gap: 4,
-                    overflow: 'auto',
-                }}
-            >
-                <Box
-                    sx={{
-                        display: 'inline-flex',
-                        flexDirection: 'row',
-                        gap: 3,
-                        overflow: 'auto',
-                        paddingY: 3,
-                    }}
+          <div className="benefit w-full flex flex-col items-center gap-3 p-14 mt-20 mx-10">
+            {benefitData.map((b) =>
+              b.index % 2 === 0 ? (
+                <div
+                  className="benefit__container w-full grid grid-cols-2"
+                  key={b.index}
                 >
-                    <Chip
-                        onClick={() => handleBrandFilter(null)}
-                        size="medium"
-                        label="All categories"
-                    />
-                    {brands.map((brand : any ) => (
-                        <Chip
-                            onClick={() => handleBrandFilter(brand._id)}
-                            size="medium"
-                            label={brand.brandName}
-                            variant={filter.brand?.toString() == brand._id.toString() ? 'filled' : 'outlined'}
-                            color={filter.brand?.toString() == brand._id.toString() ? 'success' : 'default'}
-                            sx={{
-                                backgroundColor: 'transparent',
-                                border: 'none',
-                            }}
-                        />
-                    ))
-                    }
-
-                </Box>
-                <Box
-                    sx={{
-                        display: { xs: 'none', sm: 'flex' },
-                        flexDirection: 'row',
-                        gap: 1,
-                        width: { xs: '100%', md: 'fit-content' },
-                        overflow: 'auto',
-                    }}
+                  {/* Nội dung cho benefit với index chẵn */}
+                  <div className="benefit__container__text w-full flex flex-col items-center justify-center">
+                    <div className="benefit__container__text__title">
+                      <p>{b.title}</p>
+                    </div>
+                    <p className="benefit__container__text__sub-title">
+                      {b.description}
+                    </p>
+                  </div>
+                  <div className="w-full flex items-center justify-end">
+                    <img src={b.imageUrl} alt={b.title} />
+                  </div>
+                </div>
+              ) : (
+                <div
+                  className="benefit__container w-full grid grid-cols-2"
+                  key={b.index}
                 >
+                  {/* Nội dung cho benefit với index lẻ */}
+                  <div className="w-full flex items-center justify-start">
+                    <img src={b.imageUrl} alt={b.title} />
+                  </div>
+                  <div className="benefit__container__text w-full flex flex-col items-center gap-2 justify-center">
+                    <div className="benefit__container__text__title">
+                      <p>{b.title}</p>
+                    </div>
+                    <p className="benefit__container__text__sub-title">
+                      {b.description}
+                    </p>
+                  </div>
+                </div>
+              )
+            )}
 
-                    <IconButton size="small" aria-label="RSS feed" onClick={handlePerfumeNameFilter}>
-                        <RssFeedRoundedIcon />
-                    </IconButton>
-                </Box>
-            </Box>
-            {/* {(filter.brand?.length > 0 || filter.perfumeName?.length > 0 ) ? "true" : "false"} */}
-            {(!loading  && ((filter.brand && filter.brand?.length > 0) || (filter.perfumeName && filter.perfumeName?.length > 0) )) &&
+            <div className="w-full flex items-center justify-center mt-20">
+              <LinkButton
+                title="TẠO KHẢO SÁT NGAY"
+                backgroundColor="#3E5DAB"
+                color="white"
+                link="/createSurveys"
+              />
+            </div>
+          </div>
 
-                <Typography variant="h6" sx={{ textAlign: 'center', width: '100%' }}  >
-                    {perfumes.length} item found
-                </Typography>
-            }
-            <Grid container spacing={2} columns={12} paddingY={4}>
+          <div className="mx-10">
+            <div className="banner w-full px-10 py-10 my-30 rounded-md flex justify-center items-center">
+              <p className="banner__text">
+                Hãy thử tạo những khảo sát mới mẻ và khác biệt!
+              </p>
+            </div>
+          </div>
 
-                {(!loading  && perfumes.length === 0) &&
-
-                    <Typography variant="h6" sx={{ textAlign: 'center', width: '100%' }}  >
-                        No item found
-                    </Typography>
-                }
-                {!loading ? perfumes.map((perfume : any) => (
-                    <Grid size={{ xs: 12, md: 4 }}>
-                        <SyledCard
-                            variant="outlined"
-                            onFocus={() => handleFocus(2)}
-                            onBlur={handleBlur}
-                            tabIndex={0}
-                            className={focusedCardIndex === 2 ? 'Mui-focused' : ''}
-                            sx={{ height: '100%' }}
-                            onClick={() => handleNavigate(`/perfumes/${perfume._id}`)}
-                        >
-                            <CardMedia
-                                component="img"
-                                alt="green iguana"
-                                image={perfume.imageUrl}
-                                sx={{
-                                    height: { sm: 'auto', md: '50%' },
-                                    aspectRatio: { sm: '16 / 9', md: '' },
-                                }}
-                            />
-                            <SyledCardContent>
-                                <Typography gutterBottom variant="caption" component="div">
-                                    {perfume.brand.brandName}
-                                </Typography>
-                                <Typography gutterBottom variant="h6" component="div">
-                                    {perfume.perfumeName}
-                                </Typography>
-                                <StyledTypography variant="body2" color="text.secondary" gutterBottom>
-                                    Nồng độ: &nbsp;
-                                    <Typography color="primary" variant="body2" component="span">
-                                        {perfume.concentration}
-                                    </Typography>
-                                </StyledTypography>
-                                <StyledTypography variant="body2" color="text.secondary" gutterBottom>
-                                    Đối tượng sử dụng: {perfume.targetAudience}
-                                </StyledTypography>
-                                <StyledTypography variant="body2" color="text.secondary" gutterBottom>
-                                    Giá: &nbsp;
-                                    <Typography color="success" variant="body2" component="span">
-                                        {perfume.price}$
-                                    </Typography>
-                                </StyledTypography>
-
-                            </SyledCardContent>
-                            {/* <Author authors={[{ name: 'AUTHOTR', avatar: '/static/images/avatar/2.jpg' }]} /> */}
-
-                        </SyledCard>
-                    </Grid>
-                ))
-                    :
-                    <Box sx={{ display: 'flex', height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center', paddingY: '100px' }}>
-                        <CircularProgress color="inherit" />
-                    </Box>
-                }
-
-
-            </Grid>
-
-        </Box>
-
-
-
-    );
-}
-
+          <div className="sub-footer w-full flex flex-col items-center py-20">
+            <p className="sub-footer__title">
+              Bạn trả lời, chúng tôi trả tiền—đơn giản vậy thôi!
+            </p>
+            <p className="sub-footer__sub-title">
+              Một nền tảng giúp bạn kiếm tiền từ dữ liệu!
+            </p>
+            <p className="sub-footer__sub-title">
+              Người dùng có thể bán dữ liệu dưới hai hình thức: tham gia khảo
+              sát hoặc giao dịch cổ phiếu dữ liệu.
+            </p>
+            <div className="w-1/3 flex justify-around items-center mt-10">
+              <LinkButton
+                title="Khám Phá"
+                color="#3E5DAB"
+                backgroundColor="white"
+                link="/explore"
+              />
+              <LinkButton
+                title="Liên Hệ"
+                color="#3E5DAB"
+                backgroundColor="white"
+                link="/contact"
+              />
+            </div>
+          </div>
+        </>
+      )}
+      <div className="w-full mb-10">
+        <img src={YellowBanner} className="w-full" />
+      </div>
+    </div>
+  );
+};
 
 export default HomePage;

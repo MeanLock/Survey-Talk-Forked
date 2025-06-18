@@ -1,11 +1,85 @@
 .login-left-decoration {
-  background-color: app_vars.$theme-primary;
-  position: relative;
+  background-color: app_vars.$bg-primary;
   .login-left-decoration__image {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-    width: 200px;
-    height: 200px;
+    height: 100vh;
+  }
+}
+
+.login-form {
+  .login-form__input {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 5px 15px;
+    gap: 5px;
+    border-radius: 20px;
+    border-color: app_vars.$bg-primary;
+    color: app_vars.$text-primary;
+    background-color: app_vars.$text-white;
+    border: 1.5px;
+    border-style: solid;
+    .login-form__input-label {
+      display: flex;
+      vertical-align: middle;
+      width: 100px;
+      // margin-left: 10px;
+      // margin-top: 10px;
+      // margin-bottom: 10px;
+      font-weight: 600;
+      font-family: app_vars.$font-primary;
+      font-size: 15px;
+    }
+    .login-form__input-value {
+      // margin-right: 20px;
+      vertical-align: middle;
+    }
+  }
+
+  .actions {
+    font-family: app_vars.$font-primary;
+    color: app_vars.$text-primary;
+    font-weight: bold;
+    .actions__no-account p {
+      font-size: 13px;
+      cursor: pointer;
+      &:hover {
+        color: app_vars.$text-secondary;
+      }
+    }
+    .actions__forgot-password p {
+      font-size: 12px;
+      cursor: pointer;
+      &:hover {
+        color: app_vars.$text-secondary;
+      }
+    }
+  }
+
+  .login-form__button {
+    width: 100%;
+    // padding: 10px 50px;
+    border-radius: 30px;
+    background-color: app_vars.$bg-primary;
+    color: app_vars.$text-white;
+    &:hover {
+      filter: brightness(1.4); // Làm sáng màu nền (tương tự lighten)
+      color: app_vars.$text-white;
+    }
+  }
+
+  .oauth {
+    .oauth__title {
+      .oauth__title-divider {
+        height: 1px;
+        width: 136px;
+        background-color: app_vars.$bg-primary;
+      }
+      .oauth__title-text {
+        font-size: 12px;
+        font-weight: bold;
+        font-family: app_vars.$font-primary;
+        color: app_vars.$bg-primary;
+      }
+    }
   }
 }

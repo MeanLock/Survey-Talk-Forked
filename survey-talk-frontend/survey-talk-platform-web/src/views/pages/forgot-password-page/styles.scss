@@ -1,0 +1,50 @@
+.forgot-pass_screen {
+  //   background: linear-gradient(to bottom, #3e5dab, #ffeaa8, #ffffff);
+  position: relative;
+  .background-blur {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, #6a85b6, #bac8e0, #ffffff);
+
+    z-index: 0;
+  }
+
+  .forgot-pass_content {
+    position: relative;
+    z-index: 1;
+    padding: 2rem;
+    /* Ví dụ: màu chữ tối để nổi bật trên nền blur */
+    color: #222;
+
+    .forgot-pass__title {
+      .big {
+        font-size: 30px;
+        font-weight: bold;
+        font-family: app_vars.$font-primary;
+        color: app_vars.$text-primary;
+      }
+      .small {
+        font-size: 15px;
+        font-weight: 500;
+        font-family: app_vars.$font-primary;
+        color: "#AEAEAE";
+      }
+    }
+    .forgot-pass__actions {
+      width: 440px;
+      // height: 210px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* đổ bóng */
+      .forgot-pass__actions__instructions-title {
+        color: app_vars.$text-primary;
+        font-family: app_vars.$font-primary;
+      }
+      .forgot-pass__actions__instructions-title {
+        color: "#AEAEAE";
+        font-family: app_vars.$font-primary;
+      }
+    }
+  }
+}

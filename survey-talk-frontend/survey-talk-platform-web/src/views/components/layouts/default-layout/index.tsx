@@ -10,9 +10,10 @@ import { DefaultLayoutContent } from "./DefaultLayoutContent";
 import { DefaultLayoutFooter } from "./DefaultLayoutFooter";
 import {
   _nonLoginNav,
-  getRoleNavItems,
   _footerNav,
+  _loginNav,
 } from "../../../../router/_roleNav";
+import Swal from "sweetalert2";
 
 interface DefaultLayoutContextProps {
   isAdmin: boolean;
@@ -31,12 +32,7 @@ const DefaultLayout = () => {
 
   // STATES
   const [member, setMember] = useState<any>(null);
-  const [navItems, setNavItems] = useState<
-    {
-      label: string;
-      path: string;
-    }[]
-  >([]);
+  const [navItems, setNavItems] = useState<any>([]);
 
   const [footerNavItems, setFooterNavItems] = useState<
     {
@@ -52,15 +48,36 @@ const DefaultLayout = () => {
     setFooterNavItems(_footerNav);
     if (!auth.token) {
       setNavItems(_nonLoginNav);
-
       dispatch(clearAuthToken());
       setMember(null);
     } else if (auth.token && JwtUtil.isTokenValid(auth.token)) {
       const member = auth.user;
+      console.log("MEMBER: ", member);
       setMember(member);
-      const navItems = getRoleNavItems(auth.user.isAdmin == true ? 1 : 0);
-      setNavItems(navItems);
+      setNavItems(_loginNav);
+
+      // if (!auth.user?.Profile) {
+      //   Swal.fire({
+      //     title: "Cho chúng tôi biết bạn là ai",
+      //     text: "Cập nhật thông tin ngay để tiếp tục vào trang web",
+      //     icon: "info",
+      //     showCancelButton: true,
+      //     confirmButtonText: "Vào làm",
+      //     cancelButtonText: "Hủy",
+      //     allowOutsideClick: false,
+      //     allowEscapeKey: false,
+      //   }).then((result) => {
+      //     if (result.isConfirmed) {
+      //       navigate("/survey/filter-survey");
+      //     } else {
+      //       dispatch(clearAuthToken());
+      //       navigate("/login");
+      //     }
+      //   });
+      // }
     } else {
+      console.log("Không valid rồiiiii");
+      alert("Không valid");
       dispatch(clearAuthToken());
       setMember(null);
     }
@@ -75,7 +92,7 @@ const DefaultLayout = () => {
     >
       <div className="default-layout flex flex-col w-full h-screen">
         {/* HEADER */}
-        <DefaultLayoutHeader navItems={navItems} />
+        <DefaultLayoutHeader navItems={navItems} member={member} />
 
         {/* MAIN WRAPPER */}
         <div className="flex flex-col flex-grow w-full mt-[83px]">
