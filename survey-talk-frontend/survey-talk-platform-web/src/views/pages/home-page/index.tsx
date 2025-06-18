@@ -21,6 +21,7 @@ import { homeSurveysData } from "../../../core/mockData/mockData";
 import { CircularProgress } from "@mui/material";
 import { SurveysCarousel } from "./SurveysCarousel";
 import { clearAuthToken } from "../../../redux/auth/authSlice";
+import { requesterFake, takerFake } from "../../../core/mockData/userFake";
 
 const progressVisualizeSteps = [
   {
@@ -119,7 +120,14 @@ const HomePage: FC<HomePageProps> = () => {
             {isLoading ? (
               <CircularProgress />
             ) : (
-              <SurveysCarousel prefix="suityoubest" data={fake.SuitYouBest} />
+              <SurveysCarousel
+                prefix="suityoubest"
+                data={
+                  user.FullName === "Hoàng Minh Lộc"
+                    ? takerFake.SuitYouBest
+                    : requesterFake.SuitYouBest
+                }
+              />
             )}
           </div>
 

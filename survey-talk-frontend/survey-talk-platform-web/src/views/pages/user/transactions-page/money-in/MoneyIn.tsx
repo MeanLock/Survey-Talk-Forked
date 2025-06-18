@@ -8,7 +8,10 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import "./styles.scss";
 import { updateFakeData } from "../../../../../redux/fake/fakeSlice";
-
+import type { RootState } from "../../../../../redux/rootReducer";
+import { updateAuthUser } from "../../../../../redux/auth/authSlice";
+import { callAxiosRestApi } from "../../../../../core/api/rest-api/main/api-call";
+import { loginRequiredAxiosInstance } from "../../../../../core/api/rest-api/config/instances/v2";
 interface Props {
   balance: number | null;
 }
@@ -18,13 +21,6 @@ interface MoneyInRecord {
   Amount: number;
   CreatedAt: string;
   StatusId: number;
-}
-
-interface RootState {
-  fake: {
-    Point: number;
-    MoneyInData: MoneyInRecord[];
-  };
 }
 
 // Custom cell renderer for Amount column
@@ -71,7 +67,7 @@ const DateCellRenderer = (params: any) => {
 export const MoneyIn: React.FC<Props> = ({ balance }) => {
   //TASK FAKE DATA, PHẢI BỎ KHI ĐÃ CÓ API
   const fake = useSelector((state: RootState) => state.fake);
-
+  const user = useSelector((state: RootState) => state.auth.user);
   // STATES
   const [pushAmount, setPushAmount] = useState<string>("");
   const dispatch = useDispatch();
@@ -106,16 +102,27 @@ export const MoneyIn: React.FC<Props> = ({ balance }) => {
     []
   );
 
-  const handlePushMoney = () => {
-    // Logic sẽ được implement sau
-    console.log("Push money:", pushAmount);
-    dispatch(
-      updateFakeData({
-        Point: fake.Point + Number.parseInt(pushAmount),
-      })
-    );
-    // Reset form after submission
-    setPushAmount("");
+  const handlePushMoney = async () => {
+    const amount = Number.parseInt(pushAmount);
+    try {
+      const response = await callAxiosRestApi({
+        instance: loginRequiredAxiosInstance,
+        method: "post",
+        url: `Payment/account/balance-deposits/create-payment-link`,
+        data: {
+          Amount: Number.parseInt(pushAmount),
+          ReturnUrl: `http://localhost:3007/user/transactions/payment-result?type=1&amount=${amount}`,
+          CancelUrl: `http://localhost:3007/user/transactions/payment-result?type=1&amount=${amount}`,
+        },
+      });
+
+      if (response.success) {
+        const PaymentLink = response.data.PaymentLink;
+        window.open(PaymentLink, "_blank");
+      }
+    } catch (error) {
+      console.error("Error creating payment link:", error);
+    }
   };
 
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,7 +139,7 @@ export const MoneyIn: React.FC<Props> = ({ balance }) => {
     <div className="money-in w-full flex flex-col items-start">
       <p className="money-in__remain-title">Số dư khả dụng</p>
       <p className="money-in__remain-value">
-        {fake.Point.toLocaleString("vi-VN")}đ
+        {user?.Balance.toLocaleString("vi-VN")}đ
       </p>
 
       <div className="w-full grid grid-cols-2 gap-6 mt-5">

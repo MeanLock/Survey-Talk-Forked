@@ -87,7 +87,7 @@ const SurveyPage: FC<SurveyPageProps> = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const fake = useSelector((state: RootState) => state.fake);
-  const auth = useSelector((state: RootState) => state.auth);
+  const user = useSelector((state: RootState) => state.auth.user);
 
   // HOOKS
   const useBlockNavigation = (enabled: boolean) => {
@@ -334,10 +334,10 @@ const SurveyPage: FC<SurveyPageProps> = () => {
     // Dispatch updated user to Redux
     // dispatch(updateAuthUser(updatedUser));
     dispatch(
-      updateFakeData({
-        SuitYouBest: homeSurveysAlternativeData,
-        Point: fake.Point + 1700,
-        Xp: fake.Xp + 50,
+      updateAuthUser({
+        Balance: user?.Balance + 1700,
+        Xp: user?.Xp + 50,
+        FullName: "Hoàng Minh Lôc",
       })
     );
 

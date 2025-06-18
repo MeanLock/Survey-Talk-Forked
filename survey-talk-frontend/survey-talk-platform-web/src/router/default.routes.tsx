@@ -12,6 +12,7 @@ import ManageSurveyPage from "../views/pages/manage/mange-surveys";
 import ManagePointPage from "../views/pages/manage/manage-points";
 import ProfilePage from "../views/pages/user/profile-page";
 import LevelPage from "../views/pages/user/level-page";
+import PaymentResultPage from "../views/pages/user/payment-result-page";
 
 const HomePage = lazy(() => import("../views/pages/home-page"));
 
@@ -95,6 +96,15 @@ export const defaultRoutes: RouteObject = {
         <ProtectedRoute
           redirectUrl="user/transactions"
           element={<TransactionsPage />}
+        />
+      ),
+    },
+    {
+      path: "user/transactions/payment-result",
+      element: (
+        <ProtectedRoute
+          redirectUrl="user/transactions"
+          element={<PaymentResultPage />}
         />
       ),
     },

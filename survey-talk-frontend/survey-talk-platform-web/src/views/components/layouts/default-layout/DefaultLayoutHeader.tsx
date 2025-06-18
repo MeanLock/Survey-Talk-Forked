@@ -24,6 +24,8 @@ import { NavItemDropDown } from "./NavItemDropDown";
 import User1 from "../../../../assets/Image/Customers/user-0001/avatar.jpg";
 import { Level } from "./Level";
 import type { RootState } from "../../../../redux/rootReducer";
+import { clearFakeData } from "../../../../redux/fake/fakeSlice";
+import { requesterFake, takerFake } from "../../../../core/mockData/userFake";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
@@ -77,6 +79,7 @@ export const DefaultLayoutHeader: React.FC<DefaultLayoutHeaderProps> = ({
   }, [auth]);
 
   const handleLogout = () => {
+    dispatch(clearFakeData());
     dispatch(clearAuthToken());
     navigate("/login");
   };
@@ -126,13 +129,17 @@ export const DefaultLayoutHeader: React.FC<DefaultLayoutHeaderProps> = ({
                 <StarsIcon />
                 <p className="font-bold">
                   {/* TASK FAKE DATA, PHẢI BỎ KHI ĐÃ CÓ API */}
-                  {fake.Point.toLocaleString("vn")}
+                  {member?.Balance.toLocaleString("vn")}
                   {/* {member?.Balance.toLocaleString("vn")} */}
                 </p>
               </div>
               <IconButton onClick={handleMenuOpen}>
                 <img
-                  src={User1}
+                  src={
+                    member?.FullName === "Hoàng Minh Lộc"
+                      ? takerFake.MainImageUrl
+                      : requesterFake.MainImageUrl
+                  }
                   alt={member?.FullName}
                   className="w-[48px] h-[48px] rounded-full"
                 />
@@ -142,8 +149,8 @@ export const DefaultLayoutHeader: React.FC<DefaultLayoutHeaderProps> = ({
                 <p className="user-profile__full-name">{member?.FullName}</p>
                 <Level
                   //TASK FAKE DATA, PHẢI BỎ KHI ĐÃ CÓ API
-                  xp={fake.Xp}
-                  level={fake.Level}
+                  xp={member?.Xp}
+                  level={member?.Level}
                   // xp={member ? member.Xp : null}
                   // level={member ? member.Level : null}
                 />

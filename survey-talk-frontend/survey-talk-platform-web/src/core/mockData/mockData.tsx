@@ -1348,32 +1348,33 @@ export const SurveyMeData: SurveyList = [
   {
     Id: 1,
     RequesterId: 1,
-    Title: "Khảo Sát 1",
-    Description: "Description của Khảo Sát 1",
+    Title: "Khảo sát về xu hướng mua sắm Online",
+    Description:
+      "Đây là Khảo sát nhằm mục đích tìm hiểu xu hướng mua sắm online của người dùng, sau khi nền kinh tế đã phục hồi hậu COVID-19.",
     SurveyTypeId: 2,
     SurveyTopicId: 1,
     SurveySpecificTopicId: 1,
     StartDate: "2025-06-14",
     EndDate: "2025-07-14",
-    Kpi: 1000,
+    Kpi: null,
     SecurityModeId: 1,
-    TheoryPrice: 1000000,
-    ExtraPrice: 0,
-    TakerBaseRewardPrice: 4000,
-    ProfitPrice: 200000,
-    AllocBaseAmount: 560000, // (TheoryPrice + ExtraPrice - ProfitPrice) x 70%
-    AllocTimeAmount: 160000, // (TheoryPrice + ExtraPrice - ProfitPrice) x 20%
-    AllocLevelAmount: 80000, // (TheoryPrice + ExtraPrice - ProfitPrice) x 10%
-    MaxXp: 100,
+    TheoryPrice: null,
+    ExtraPrice: null,
+    TakerBaseRewardPrice: null,
+    ProfitPrice: null,
+    AllocBaseAmount: null, // (TheoryPrice + ExtraPrice - ProfitPrice) x 70%
+    AllocTimeAmount: null, // (TheoryPrice + ExtraPrice - ProfitPrice) x 20%
+    AllocLevelAmount: null, // (TheoryPrice + ExtraPrice - ProfitPrice) x 10%
+    MaxXp: null,
     IsAvailable: true,
     ConfigJsonString: "",
     PublishedAt: "2025-06-14T04:11:25.218Z",
     DeletedAt: null,
-    CreatedAt: "2025-06-13T04:11:25.218Z",
+    CreatedAt: "2025-06-18T16:20:25.218Z",
     UpdatedAt: "2025-06-14T04:11:20.218Z",
-    SurveyStatusId: 2,
+    SurveyStatusId: 1,
     MainImageUrl:
-      "https://i.pinimg.com/736x/a3/f4/52/a3f4528c4cd2a0ca3de2b13bdf7f4b92.jpg",
+      "https://i.pinimg.com/736x/a7/4f/4f/a74f4fbb222bbb7365c9d0c5a86f701e.jpg",
     BackgroundImageUrl:
       "https://i.pinimg.com/736x/74/14/5c/74145c23c3d2bc9f2f35be2fab74bafc.jpg",
     CurrentSurveyRewardTracking: {
@@ -1383,26 +1384,7 @@ export const SurveyMeData: SurveyList = [
       RewardXp: 87,
       CreatedAt: "2025-06-15T04:11:25.218Z",
     },
-    SurveyTakenResults: [
-      {
-        Id: 1,
-        SurveyId: 1,
-        TakerId: 1,
-        IsValid: true,
-        InvalidReason: null,
-        MoneyEarned: 5600,
-        XpEarned: 75,
-        CompletedAt: "2025-06-15T04:11:25.218Z",
-        Taker: {
-          Id: 1,
-          FullName: "Hoàng Minh Lộc",
-          Dob: "2004-10-03",
-          Gender: "Male",
-          MainImageUrl:
-            "https://i.pinimg.com/736x/da/7e/4c/da7e4cd7e1f8fd4758f0e15f6ea13932.jpg",
-        },
-      },
-    ],
+    SurveyTakenResults: [],
     Versions: null,
   },
   {
@@ -1651,6 +1633,8 @@ export const SurveyMeData: SurveyList = [
   },
 ];
 
+export const SurveyCustomerMeData: SurveyList = [];
+
 export const SurveyTakingData: SurveyTaking = {
   Id: 12345,
   RequesterId: 1,
@@ -1686,7 +1670,7 @@ export const SurveyTakingData: SurveyTaking = {
       MainImageUrl: null,
       Content: "Bạn có hay mua sắm online không ?",
       Description: null,
-      TimeLimit: 10,
+      TimeLimit: 3,
       IsVoice: false,
       Order: 1,
       ConfigJson: {},
@@ -1718,7 +1702,7 @@ export const SurveyTakingData: SurveyTaking = {
       MainImageUrl: null,
       Content: "Tần suất mua sắm online của bạn trong vòng 1 tháng?",
       Description: null,
-      TimeLimit: 10,
+      TimeLimit: 3,
       IsVoice: false,
       Order: 2,
       ConfigJson: {},
@@ -1762,7 +1746,7 @@ export const SurveyTakingData: SurveyTaking = {
       MainImageUrl: null,
       Content: "Sàn thương mại điện tử bạn hay dùng nhất?",
       Description: null,
-      TimeLimit: 10,
+      TimeLimit: 3,
       IsVoice: false,
       Order: 3,
       ConfigJson: {},
@@ -1811,7 +1795,7 @@ export const SurveyTakingData: SurveyTaking = {
       MainImageUrl: null,
       Content: "Bạn hay mua những loại sản phẩm nào Online?",
       Description: null,
-      TimeLimit: 10,
+      TimeLimit: 3,
       IsVoice: false,
       Order: 4,
       ConfigJson: {},
@@ -1856,7 +1840,7 @@ export const SurveyTakingData: SurveyTaking = {
       Content:
         "Số tiền trung bình bạn dùng cho mua sắm online trong vòng 1 tháng?",
       Description: "Kéo để chọn số tiền tương ứng (VND)",
-      TimeLimit: 10,
+      TimeLimit: 3,
       IsVoice: false,
       Order: 5,
       ConfigJson: {
@@ -1875,7 +1859,7 @@ export const SurveyTakingData: SurveyTaking = {
       Content:
         "Xếp hạng các ưu tiên của bạn khi chọn Sàn Thương Mại Điện Tử là?",
       Description: "Nhấn lần lượt theo xếp hạng của bạn",
-      TimeLimit: 10,
+      TimeLimit: 3,
       IsVoice: false,
       Order: 6,
       ConfigJson: {},

@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import type { Survey, SurveyList, SurveyTopic } from "../../../../core/types";
-import { SurveyMeData, SurveyTopics } from "../../../../core/mockData/mockData";
+import {
+  SurveyCustomerMeData,
+  SurveyMeData,
+  SurveyTopics,
+} from "../../../../core/mockData/mockData";
 import "./styles.scss";
 import {
   Button,
@@ -29,6 +33,8 @@ import PublishIcon from "@mui/icons-material/Publish";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { SurveyMeCard } from "./SurveyMeCard";
 import { PublishModal } from "./components/PublishModal";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../../redux/rootReducer";
 
 type Query = {
   Keyword: string | null;
@@ -37,6 +43,9 @@ type Query = {
 };
 
 const ManageSurveyPage = () => {
+  // REDUX FAKE NHỚ BỎ ĐI KHI ĐÃ CÓ API
+  const fake = useSelector((state: RootState) => state.fake);
+  const user = useSelector((state: RootState) => state.auth.user);
   // STATES
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [surveys, setSurveys] = useState<SurveyList | null>(null);
@@ -67,7 +76,13 @@ const ManageSurveyPage = () => {
     try {
       setTimeout(() => {
         // CALL API RIGHT HERE TO FETCH
-        const response = SurveyMeData;
+        const response =
+          user?.FullName === "Hoàng Minh Lộc"
+            ? SurveyCustomerMeData
+            : SurveyMeData;
+        console.log("response:", response);
+        console.log("Fake Full Name: ", fake.FullName);
+        console.log("User Name: ", user?.FullName);
         setSurveys(response);
         setFilteredSurveys(response);
         setTopics(SurveyTopics);

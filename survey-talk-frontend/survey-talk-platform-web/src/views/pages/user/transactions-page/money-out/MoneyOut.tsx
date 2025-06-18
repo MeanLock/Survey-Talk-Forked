@@ -25,6 +25,8 @@ import "ag-grid-community/styles/ag-theme-alpine.css";
 import "./styles.scss";
 import { updateFakeData } from "../../../../../redux/fake/fakeSlice";
 import { banks } from "../../../../../core/mockData/banks";
+import type { RootState } from "../../../../../redux/rootReducer";
+import { updateAuthUser } from "../../../../../redux/auth/authSlice";
 
 type Props = {};
 
@@ -51,14 +53,6 @@ interface Bank {
   support: number;
   isTransfer: number;
   swift_code: string;
-}
-
-interface RootState {
-  fake: {
-    Point: number;
-    MoneyOutData: MoneyOutRecord[];
-    banks: Bank[];
-  };
 }
 
 // Custom cell renderer for Amount column
@@ -107,6 +101,7 @@ const DateCellRenderer = (params: any) => {
 
 export const MoneyOut: React.FC<Props> = () => {
   const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.auth.user);
   const fake = useSelector((state: RootState) => state.fake);
 
   // STATES
@@ -178,7 +173,7 @@ export const MoneyOut: React.FC<Props> = () => {
       newErrors.amount = "Vui lòng nhập số tiền";
     } else if (amountNum < 50000) {
       newErrors.amount = "Số tiền rút tối thiểu là 50,000đ";
-    } else if (amountNum > fake.Point) {
+    } else if (amountNum > user?.Balance) {
       newErrors.amount = "Số dư không đủ";
     }
 
@@ -225,9 +220,12 @@ export const MoneyOut: React.FC<Props> = () => {
     // Update fake data
     const updatedMoneyOutData = [...fake.MoneyOutData, newRecord];
     dispatch(
-      updateFakeData({
-        MoneyOutData: updatedMoneyOutData,
-        Point: fake.Point - Number.parseInt(amount),
+      // updateFakeData({
+      //   MoneyOutData: updatedMoneyOutData,
+      //   Point: fake.Point - Number.parseInt(amount),
+      // })
+      updateAuthUser({
+        Balance: user?.Balance - Number.parseInt(amount),
       })
     );
     console.log(
@@ -258,7 +256,7 @@ export const MoneyOut: React.FC<Props> = () => {
     <div className="money-out w-full flex flex-col items-start">
       <p className="money-out__remain-title">Số dư khả dụng</p>
       <p className="money-out__remain-value">
-        {fake.Point.toLocaleString("vi-VN")}đ
+        {user?.Balance.toLocaleString("vi-VN")}đ
       </p>
 
       <div className="w-full grid grid-cols-2 gap-6 mt-5">
@@ -363,10 +361,10 @@ export const MoneyOut: React.FC<Props> = () => {
               helperText={errors.amount}
             />
 
-            {Number.parseInt(amount) > fake.Point && (
+            {Number.parseInt(amount) > user?.Balance && (
               <Alert severity="error" className="balance-error">
                 Số dư không đủ. Số dư hiện tại:{" "}
-                {fake.Point.toLocaleString("vi-VN")}đ
+                {user?.Balance.toLocaleString("vi-VN")}đ
               </Alert>
             )}
 
@@ -381,7 +379,7 @@ export const MoneyOut: React.FC<Props> = () => {
                 !accountName.trim() ||
                 !amount ||
                 Number.parseInt(amount) < 50000 ||
-                Number.parseInt(amount) > fake.Point
+                Number.parseInt(amount) > user?.Balance
               }
             >
               Tạo yêu cầu rút tiền
