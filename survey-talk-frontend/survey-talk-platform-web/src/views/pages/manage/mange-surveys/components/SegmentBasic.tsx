@@ -28,16 +28,16 @@ export const SegmentBasic: React.FC<Props> = ({
           ? option // Replace "Không quan tâm" with the new option
           : value
           ? `${value
-              .split(". ")
+              .split(" | ")
               .filter((item) => item !== option)
-              .join(". ")}. ${option}`
+              .join(" | ")} | ${option}`
           : option; // Avoid adding leading ". " for empty initial state
         onChangeValue(updatedValue);
       } else {
         const updatedValue = value
-          .split(". ")
+          .split(" | ")
           .filter((item) => item !== option)
-          .join(". ");
+          .join(" | ");
         onChangeValue(updatedValue);
       }
     }

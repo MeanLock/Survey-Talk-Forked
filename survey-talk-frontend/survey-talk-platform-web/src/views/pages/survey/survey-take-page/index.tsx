@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState, type FC } from "react";
 import {
   Button,
@@ -133,9 +131,8 @@ const SurveyPage: FC<SurveyPageProps> = () => {
     return shuffled;
   };
 
-  const fetchSurvey = () => {
+  const fetchSurvey = async () => {
     const surveyData = { ...SurveyTakingData };
-
     // Shuffle questions and options
     const shuffled = shuffleArray(surveyData.Questions).map((q) => ({
       ...q,

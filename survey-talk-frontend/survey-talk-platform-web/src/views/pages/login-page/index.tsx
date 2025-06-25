@@ -172,6 +172,7 @@ const LoginPage: FC<LoginPageProps> = (props) => {
               LastFilterSurveyTakenAt:
                 userResponses.data.Account.LastFilterSurveyTakenAt,
               MainImageUrl: userResponses.data.Account.MainImageUrl,
+              Profile: userResponses.data.Account.Profile,
             };
             console.log("User: ", user);
             // Cập nhật Redux với thông tin user

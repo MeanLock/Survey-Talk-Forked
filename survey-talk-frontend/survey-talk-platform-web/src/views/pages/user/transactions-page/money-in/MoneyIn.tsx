@@ -1,5 +1,5 @@
 import type React from "react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
 import { Button, TextField, InputAdornment, Chip } from "@mui/material";
@@ -72,6 +72,20 @@ export const MoneyIn: React.FC<Props> = ({ balance }) => {
   const [pushAmount, setPushAmount] = useState<string>("");
   const dispatch = useDispatch();
 
+  const [targetDay, setTargetDay] = useState(null);
+
+  // HOOKS
+  useEffect(() => {
+    fetchMockAPI();
+  }, []);
+
+  const fetchMockAPI = async () => {
+    const apiUrl = "https://685b91fb89952852c2d9fd1e.mockapi.io/MoneyFlow";
+    const res = await fetch(apiUrl);
+    const data = await res.json();
+    setTargetDay(data[5]);
+  };
+
   const columnDefs: ColDef[] = useMemo(
     () => [
       {
@@ -105,25 +119,56 @@ export const MoneyIn: React.FC<Props> = ({ balance }) => {
   const handlePushMoney = async () => {
     const amount = Number.parseInt(pushAmount);
     try {
-      const response = await callAxiosRestApi({
-        instance: loginRequiredAxiosInstance,
-        method: "post",
-        url: `Payment/account/balance-deposits/create-payment-link`,
-        data: {
-          Amount: Number.parseInt(pushAmount),
-          ReturnUrl: `http://localhost:3007/user/transactions/payment-result?type=1&amount=${amount}`,
-          CancelUrl: `http://localhost:3007/user/transactions/payment-result?type=1&amount=${amount}`,
-        },
-      });
+      // const response = await callAxiosRestApi({
+      //   instance: loginRequiredAxiosInstance,
+      //   method: "post",
+      //   url: `Payment/account/balance-deposits/create-payment-link`,
+      //   data: {
+      //     Amount: Number.parseInt(pushAmount),
+      //     ReturnUrl: `http://localhost:3007/user/transactions/payment-result?type=1&amount=${amount}`,
+      //     CancelUrl: `http://localhost:3007/user/transactions/payment-result?type=1&amount=${amount}`,
+      //   },
+      // });
+      updateMoneyInById(7, amount);
+      // if (response.success) {
 
-      if (response.success) {
-        const PaymentLink = response.data.PaymentLink;
-        window.open(PaymentLink, "_blank");
-      }
+      //   const PaymentLink = response.data.PaymentLink;
+      //   window.open(PaymentLink, "_blank");
+      // }
     } catch (error) {
       console.error("Error creating payment link:", error);
     }
   };
+
+  async function updateMoneyInById(id, amountToAdd) {
+    const apiUrl = `https://685b91fb89952852c2d9fd1e.mockapi.io/MoneyFlow/${id}`;
+
+    try {
+      // 1. Lấy dữ liệu hiện tại của object
+      const res = await fetch(apiUrl);
+      const currentData = await res.json();
+
+      // 2. Tính moneyIn mới
+      const updatedMoneyIn = (parseInt(currentData.moneyIn) || 0) + amountToAdd;
+
+      // 3. Gửi PUT để cập nhật
+      const updateRes = await fetch(apiUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...currentData,
+          moneyIn: updatedMoneyIn,
+        }),
+      });
+
+      const updated = await updateRes.json();
+      console.log("✅ Đã cập nhật thành công:", updated);
+    } catch (err) {
+      console.error("❌ Lỗi khi cập nhật:", err);
+    }
+  }
 
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.replace(/[^0-9]/g, "");

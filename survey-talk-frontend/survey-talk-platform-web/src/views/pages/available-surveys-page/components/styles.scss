@@ -1,0 +1,14 @@
+.survey-detail {
+  width: 301px;
+  height: 570px;
+  border-radius: 20px;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Bóng mặc định */
+  .header {
+    .title {
+      color: app_vars.$text-primary;
+      font-weight: bold;
+      text-align: center;
+    }
+  }
+}

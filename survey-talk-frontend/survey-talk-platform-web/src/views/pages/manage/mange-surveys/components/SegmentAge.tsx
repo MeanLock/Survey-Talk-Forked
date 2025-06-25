@@ -14,7 +14,7 @@ export const SegmentAge: React.FC<Props> = ({ value, onChangeValue }) => {
     if (minAge && maxAge) {
       const newRange = `Từ ${minAge} đến ${maxAge} tuổi`;
       const updatedValue = value
-        ? `${value}. ${newRange}` // Append with ". " if value is not empty
+        ? `${value} | ${newRange}` // Append with ". " if value is not empty
         : newRange; // Avoid adding leading ". " for empty initial state
       onChangeValue(updatedValue);
       setMinAge("");
@@ -24,15 +24,15 @@ export const SegmentAge: React.FC<Props> = ({ value, onChangeValue }) => {
 
   const handleDeleteChip = (range: string) => {
     const updatedValue = value
-      .split(". ")
+      .split(" | ")
       .filter((item) => item !== range)
-      .join(". ");
+      .join(" | ");
     onChangeValue(updatedValue);
   };
 
   const parseRangesToChips = () => {
     return value
-      .split(". ")
+      .split(" | ")
       .map((range) => {
         const match = range.match(/Từ (\d+) đến (\d+) tuổi/);
         return match ? `${match[1]}-${match[2]}` : null;

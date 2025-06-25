@@ -16,6 +16,9 @@ import dayjs from "dayjs"; // Ensure dayjs is installed for date manipulation
 import type { RootState } from "../../../../../redux/rootReducer";
 import { updateAuthUser } from "../../../../../redux/auth/authSlice";
 import { Balance } from "@mui/icons-material";
+import { callAxiosRestApi } from "../../../../../core/api/rest-api/main/api-call";
+import { loginRequiredAxiosInstance } from "../../../../../core/api/rest-api/config/instances/v2";
+import { toast } from "react-toastify";
 
 interface Props {
   survey: Survey;
@@ -103,6 +106,7 @@ export const PublishModal: React.FC<Props> = ({
   // Prompt Filter
   const [prompt, setPrompt] = useState("");
   const [accuracy, setAccuracy] = useState(80);
+  const [FilterTags, setFilterTags] = useState([]);
 
   // KPI
   const [suggestedKPI, setSuggestedKPI] = useState(-1);
@@ -111,6 +115,7 @@ export const PublishModal: React.FC<Props> = ({
   const [errKPIMesg, setErrKPIMesg] = useState("");
 
   // Deadline
+  const [R, setR] = useState(0);
   const [minRangeDate, setMinRangeDate] = useState(0);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -294,16 +299,32 @@ export const PublishModal: React.FC<Props> = ({
   };
 
   // 4. Filter
-  const handleFilter = () => {
-    console.log("Bắt đầu quá trình filter...");
-    console.log("Filter với segment filter là:");
-    console.log(
-      `"Độ Tuổi": ${age} \n"Giới Tính": ${sex} \n"Xu Hướng Tính Dục": ${sexual} \n"Công Việc": ${job} \n"Trình Độ Học Vấn": ${education} \n"Tình Trạng Hôn Nhân": ${marriage} \n"Thu Nhập": ${income}`
-    );
-    console.log("Filter với prompt filter là:");
-    console.log("Prompt: ", prompt);
-    console.log("Accuracy: ", accuracy);
-    setSuggestedKPI(100);
+  const handleFilter = async () => {
+    try {
+      const response = await callAxiosRestApi({
+        instance: loginRequiredAxiosInstance,
+        method: "post",
+        url: `Survey/core/community/surveys/7/summary-filter-tag`,
+        data: {
+          SurveyTakerSegment: {
+            CountryRegion: null, // Chưa làm
+            MaritalStatus: marriage === "Không quan tâm" ? null : marriage,
+            AverageIncome: income === "Không quan tâm" ? null : income,
+            EducationLevel: education === "Không quan tâm" ? null : education,
+            JobField: job === "Không quan tâm" ? null : job,
+            Prompt: prompt,
+            TagFilterAccuracyRate: accuracy,
+          },
+        },
+      });
+      if (response.success) {
+        setSuggestedKPI(response.data.MaxKpi);
+        setR(response.data.R);
+        setFilterTags(response.data.FilterTags);
+      }
+    } catch (error) {
+      console.log("Error while filtering: ", error);
+    }
   };
 
   // 5. KPI
@@ -319,12 +340,20 @@ export const PublishModal: React.FC<Props> = ({
   };
 
   const handleEnterKPI = () => {
+    if (kpi <= 0 || R <= 0) {
+      setErrKPI(true);
+      setErrKPIMesg("KPI hoặc R không hợp lệ. Vui lòng kiểm tra lại!");
+      return;
+    }
+
     setIsKPIEntered(true);
-    setMinRangeDate(15); // Example minimum range date
+    const minRange = Math.ceil(kpi / Number(R)); // Tính toán số ngày tối thiểu
+    setMinRangeDate(minRange);
+
     const calculatedEndDate = dayjs(startDate)
-      .add(15, "day")
-      .format("YYYY-MM-DD"); // Calculate endDate based on minRangeDate
-    setEndDate(calculatedEndDate); // Set endDate to the calculated minimum date
+      .add(minRange, "day")
+      .format("YYYY-MM-DD"); // Tính toán ngày kết thúc dựa trên minRangeDate
+    setEndDate(calculatedEndDate); // Đặt endDate là ngày tối thiểu
   };
 
   // 6. Deadline
@@ -344,9 +373,48 @@ export const PublishModal: React.FC<Props> = ({
     setEndDate(date);
   };
 
-  const handleEnterDeadline = () => {
-    setIsDeadlineEntered(true);
-    setTheoryPrice(10000);
+  const handleEnterDeadline = async () => {
+    try {
+      const startDateObj = dayjs(startDate);
+      const endDateObj = dayjs(endDate);
+
+      if (!endDate || endDateObj.isBefore(startDateObj)) {
+        setErrEndDate(true);
+        setErrEndDateMsg("Ngày kết thúc không hợp lệ. Vui lòng kiểm tra lại!");
+        return;
+      }
+
+      const realRangeDate = endDateObj.diff(startDateObj, "day"); // Tính số ngày thực tế
+      if (realRangeDate < minRangeDate) {
+        setErrEndDate(true);
+        setErrEndDateMsg(
+          `Ngày kết thúc phải cách ngày bắt đầu tối thiểu ${minRangeDate} ngày.`
+        );
+        return;
+      }
+
+      const RS = realRangeDate / minRangeDate; // Tính tỷ lệ thời gian thực tế
+      const response = await callAxiosRestApi({
+        instance: loginRequiredAxiosInstance,
+        method: "post",
+        url: `Survey/transaction/community/surveys/7/publish-price-calcular`,
+        data: {
+          Kpi: kpi,
+          RS: RS,
+        },
+      });
+      if (response.success) {
+        const theoryPrice = response.data.TheoryPrice;
+        setTheoryPrice(theoryPrice);
+        setIsDeadlineEntered(true);
+        setErrEndDate(false);
+        setErrEndDateMsg("");
+      }
+    } catch (error) {
+      console.error("Error while calculating deadline:", error);
+      setErrEndDate(true);
+      setErrEndDateMsg("Đã xảy ra lỗi khi tính toán deadline.");
+    }
   };
 
   // 7. Price
@@ -388,20 +456,43 @@ export const PublishModal: React.FC<Props> = ({
   };
 
   // 9. Handle Publish:
-  const handlePublish = () => {
-    // Logic xử lý khi hoàn thành
-    dispatch(
-      updateAuthUser({
-        Balance: user?.Balance - totalPrice,
-      })
-    );
-    console.log("Hoàn thành đăng khảo sát!");
-
-    // Gọi hàm changeStatus để cập nhật statusId
-    changeStatus();
-
-    // Đóng modal
-    onClose();
+  const handlePublish = async () => {
+    try {
+      const response = await callAxiosRestApi({
+        instance: loginRequiredAxiosInstance,
+        method: "post",
+        url: `Survey/transaction/community/surveys/7/publish`,
+        data: {
+          Kpi: kpi,
+          EndDate: endDate,
+          FilterTags: FilterTags,
+          SurveyTakerSegment: {
+            CountryRegion: null,
+            MaritalStatus: marriage,
+            AverageIncome: income,
+            EducationLevel: education,
+            JobField: job,
+            Prompt: prompt,
+            TagFilterAccuracyRate: accuracy,
+          },
+          ExtraPrice: totalPrice - theoryPrice,
+          TheoryPrice: theoryPrice,
+        },
+      });
+      if (response.success) {
+        toast.success("Đăng khảo sát thành công!");
+        dispatch(
+          updateAuthUser({
+            Balance: user?.Balance - totalPrice,
+          })
+        );
+        // Đóng modal
+        onClose();
+      }
+      console.log("Hoàn thành đăng khảo sát!");
+    } catch (error) {
+      console.log("Error while publish survey: ", error);
+    }
   };
 
   return (

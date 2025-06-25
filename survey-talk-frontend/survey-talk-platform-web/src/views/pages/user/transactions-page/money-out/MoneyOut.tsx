@@ -181,7 +181,7 @@ export const MoneyOut: React.FC<Props> = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleWithdrawMoney = () => {
+  const handleWithdrawMoney = async () => {
     if (!validateForm()) return;
 
     const selectedBank = banks.find((bank) => bank.code === bankId);
@@ -228,6 +228,8 @@ export const MoneyOut: React.FC<Props> = () => {
         Balance: user?.Balance - Number.parseInt(amount),
       })
     );
+
+    await updateMoneyOutById(7, Number.parseInt(amount));
     console.log(
       "LINK: ",
       `"https://img.vietqr.io/image/${bankId}-${accountNo}-compact.png?amount=${amount}&addInfo="Survey Talk Chuyen Tien"&accountName=${accountName}"`
@@ -249,6 +251,37 @@ export const MoneyOut: React.FC<Props> = () => {
     if (!value) return "";
     return Number.parseInt(value).toLocaleString("vi-VN");
   };
+
+  async function updateMoneyOutById(id, amountToAdd) {
+    const apiUrl = `https://685b91fb89952852c2d9fd1e.mockapi.io/MoneyFlow/${id}`;
+
+    try {
+      // 1. Lấy dữ liệu hiện tại của object
+      const res = await fetch(apiUrl);
+      const currentData = await res.json();
+
+      // 2. Tính moneyOut mới
+      const updatedMoneyOut =
+        (parseInt(currentData.moneyIn) || 0) + amountToAdd;
+
+      // 3. Gửi PUT để cập nhật
+      const updateRes = await fetch(apiUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...currentData,
+          moneyOut: updatedMoneyOut,
+        }),
+      });
+
+      const updated = await updateRes.json();
+      console.log("✅ Đã cập nhật thành công:", updated);
+    } catch (err) {
+      console.error("❌ Lỗi khi cập nhật:", err);
+    }
+  }
 
   const selectedBank = banks.filter((bank) => bank.code === bankId)[0];
 

@@ -24,7 +24,7 @@ export const surveyRoutes: RouteObject = {
     {
       path: "filter-survey",
       element: (
-        <ProtectedRoute
+        <ProtectedRouteNoMargin
           redirectUrl="manage/points"
           element={<FilterSurveyPage />}
         />

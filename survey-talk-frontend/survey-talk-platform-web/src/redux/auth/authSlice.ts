@@ -13,7 +13,17 @@ export interface AuthState {
     IsFilterSurveyRequired?: boolean;
     LastFilterSurveyTakenAt?: string | null;
     MainImageUrl: string | null;
-    Profile: any;
+    Profile: {
+      AccountId: number;
+      CountryRegion: string;
+      MaritalStatus: string;
+      AverageIncome: string;
+      EducationLevel: string;
+      JobField: string;
+      ProvinceCode: number;
+      DistrictCode: number;
+      WardCode: number;
+    };
   } | null;
 }
 

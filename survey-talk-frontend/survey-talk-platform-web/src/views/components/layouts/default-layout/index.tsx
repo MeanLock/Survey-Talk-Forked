@@ -3,7 +3,10 @@ import "./styles.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import type { RootState } from "../../../../redux/rootReducer";
-import { clearAuthToken } from "../../../../redux/auth/authSlice";
+import {
+  clearAuthToken,
+  updateAuthUser,
+} from "../../../../redux/auth/authSlice";
 import { JwtUtil } from "../../../../core/utils/jwt.util";
 import { DefaultLayoutHeader } from "./DefaultLayoutHeader";
 import { DefaultLayoutContent } from "./DefaultLayoutContent";
@@ -14,6 +17,8 @@ import {
   _loginNav,
 } from "../../../../router/_roleNav";
 import Swal from "sweetalert2";
+import { callAxiosRestApi } from "../../../../core/api/rest-api/main/api-call";
+import { loginRequiredAxiosInstance } from "../../../../core/api/rest-api/config/instances/v2";
 
 interface DefaultLayoutContextProps {
   isAdmin: boolean;
@@ -31,6 +36,7 @@ const DefaultLayout = () => {
   const navigate = useNavigate();
 
   // STATES
+  const [isLoading, setIsLoading] = useState(true);
   const [member, setMember] = useState<any>(null);
   const [navItems, setNavItems] = useState<any>([]);
 
@@ -45,43 +51,86 @@ const DefaultLayout = () => {
   const auth = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
+    setIsLoading(true);
     setFooterNavItems(_footerNav);
     if (!auth.token) {
       setNavItems(_nonLoginNav);
       dispatch(clearAuthToken());
       setMember(null);
     } else if (auth.token && JwtUtil.isTokenValid(auth.token)) {
-      const member = auth.user;
-      console.log("MEMBER: ", member);
-      setMember(member);
+      // CALL API TO GET USER
+      fetch();
       setNavItems(_loginNav);
-
-      // if (!auth.user?.Profile) {
-      //   Swal.fire({
-      //     title: "Cho chúng tôi biết bạn là ai",
-      //     text: "Cập nhật thông tin ngay để tiếp tục vào trang web",
-      //     icon: "info",
-      //     showCancelButton: true,
-      //     confirmButtonText: "Vào làm",
-      //     cancelButtonText: "Hủy",
-      //     allowOutsideClick: false,
-      //     allowEscapeKey: false,
-      //   }).then((result) => {
-      //     if (result.isConfirmed) {
-      //       navigate("/survey/filter-survey");
-      //     } else {
-      //       dispatch(clearAuthToken());
-      //       navigate("/login");
-      //     }
-      //   });
-      // }
     } else {
       console.log("Không valid rồiiiii");
       alert("Không valid");
       dispatch(clearAuthToken());
       setMember(null);
     }
-  }, [auth, navigate]);
+  }, []);
+
+  // FUNCTIONS
+  const fetch = async () => {
+    try {
+      const response = await callAxiosRestApi({
+        instance: loginRequiredAxiosInstance,
+        method: "get",
+        url: "User/accounts/me",
+      });
+      if (response.success) {
+        const member = response.data;
+
+        const user = {
+          Id: member.Account.Id,
+          RoleId: member.Account.Role.Id,
+          FullName: member.Account.FullName,
+          Balance: member.Account.Balance,
+          IsVerified: member.Account.IsVerified,
+          Xp: member.Account.Xp,
+          Level: member.Account.Level,
+          IsFilterSurveyRequired: member.Account.IsFilterSurveyRequired,
+          LastFilterSurveyTakenAt: member.Account.LastFilterSurveyTakenAt,
+          MainImageUrl: member.Account.MainImageUrl,
+          Profile: member.Account.Profile,
+        };
+
+        dispatch(
+          updateAuthUser({
+            user: user,
+          })
+        );
+
+        setMember(user);
+        if (
+          !member.Account.Profile ||
+          member.Account.Profile.CountryRegion === null ||
+          member.Account.Profile.AverageIncome === null ||
+          member.Account.Profile.DistrictCode === null ||
+          member.Account.Profile.JobField === null ||
+          member.Account.Profile.MaritalStatus === null ||
+          member.Account.Profile.WardCode === null
+        ) {
+          Swal.fire({
+            title: "Chỉ còn 1 bước nữa thôi!",
+            text: "Cập nhật thông tin ngay để bắt đầu các chức năng của trang web",
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonText: "Vào làm",
+            cancelButtonText: "Hủy",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              navigate("/survey/filter-survey");
+            } else {
+              dispatch(clearAuthToken());
+              navigate("/login");
+            }
+          });
+        }
+      }
+    } catch (error) {}
+  };
 
   return (
     <DefaultLayoutContext.Provider

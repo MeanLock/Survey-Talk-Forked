@@ -13,6 +13,7 @@ import ManagePointPage from "../views/pages/manage/manage-points";
 import ProfilePage from "../views/pages/user/profile-page";
 import LevelPage from "../views/pages/user/level-page";
 import PaymentResultPage from "../views/pages/user/payment-result-page";
+import DataMarketDetailsPage from "../views/pages/data-market-page/data-market-details-page";
 
 const HomePage = lazy(() => import("../views/pages/home-page"));
 
@@ -47,7 +48,15 @@ export const defaultRoutes: RouteObject = {
         />
       ),
     },
-
+    {
+      path: "data-market/details",
+      element: (
+        <ProtectedRoute
+          redirectUrl="data-market/details"
+          element={<DataMarketDetailsPage />}
+        />
+      ),
+    },
     // MANAGE
     {
       path: "manage/surveys",

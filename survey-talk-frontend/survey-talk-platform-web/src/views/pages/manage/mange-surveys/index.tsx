@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
 import type { Survey, SurveyList, SurveyTopic } from "../../../../core/types";
-import {
-  SurveyCustomerMeData,
-  SurveyMeData,
-  SurveyTopics,
-} from "../../../../core/mockData/mockData";
+import { SurveyMeData, SurveyTopics } from "../../../../core/mockData/mockData";
 import "./styles.scss";
 import {
   Button,
@@ -76,13 +72,7 @@ const ManageSurveyPage = () => {
     try {
       setTimeout(() => {
         // CALL API RIGHT HERE TO FETCH
-        const response =
-          user?.FullName === "Hoàng Minh Lộc"
-            ? SurveyCustomerMeData
-            : SurveyMeData;
-        console.log("response:", response);
-        console.log("Fake Full Name: ", fake.FullName);
-        console.log("User Name: ", user?.FullName);
+        const response = SurveyMeData;
         setSurveys(response);
         setFilteredSurveys(response);
         setTopics(SurveyTopics);
