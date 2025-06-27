@@ -1,0 +1,14 @@
+[
+    {
+        "method": "POST",
+        "url": "/api/Payment/account/balance-deposits/create-payment-link",
+        "description": "Tạo đường dẫn nạp tiền",
+        "completed": true
+    },
+    {
+        "method": "POST",
+        "url": "/api/Payment/account/balance-withdrawal",
+        "description": "Rút tiền",
+        "completed": false
+    }
+]

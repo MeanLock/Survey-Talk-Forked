@@ -1,0 +1,29 @@
+namespace SurveyTalkService.BusinessLogic.Enums
+{
+    public enum SurveyTakingSubjectEnum
+    {
+        Verified = 1,
+        Preview = 2,
+        Guest = 3
+    }
+
+    public enum SurveyTakenSubjectEnum
+    {
+        Verified = 1,
+        Guest = 2
+    }
+
+    public enum SurveyDeadlineQueryEnum
+    {
+        OnDeadline = 1,
+        NearDeadline = 2,
+        LateForDeadline = 3
+    }
+
+    public enum SurveyAdditionalQueryEnum
+    {
+        SuitYouBest = 1,
+        BigBonus = 2,
+        SuitYourFavorite = 4
+    }
+}
