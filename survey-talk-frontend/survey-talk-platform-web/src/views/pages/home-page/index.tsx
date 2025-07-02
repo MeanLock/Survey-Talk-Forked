@@ -16,7 +16,7 @@ import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUpload";
 import AddReactionIcon from "@mui/icons-material/AddReaction";
 import type { RootState } from "../../../redux/rootReducer";
 import { useSelector } from "react-redux";
-import type { SurveyCommunityCard } from "../../../core/types";
+import type { SurveyCommunity, SurveyCommunityCard } from "../../../core/types";
 import { homeSurveysData } from "../../../core/mockData/mockData";
 import { CircularProgress } from "@mui/material";
 import { SurveysCarousel } from "./SurveysCarousel";
@@ -76,12 +76,12 @@ const HomePage: FC<HomePageProps> = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [surveys, setSurveys] = useState([]);
 
-  const [suitYouBest, setSuitYouBest] = useState<SurveyCommunityCard[] | null>(
+  const [suitYouBest, setSuitYouBest] = useState<SurveyCommunity[] | null>(
     null
   );
-  const [bigBonus, setBigBonus] = useState<SurveyCommunityCard[] | null>(null);
+  const [bigBonus, setBigBonus] = useState<SurveyCommunity[] | null>(null);
   const [baseOnFavTopic, setBaseOnFavTopic] = useState<
-    SurveyCommunityCard[] | null
+    SurveyCommunity[] | null
   >(null);
 
   // HOOKS
@@ -98,9 +98,9 @@ const HomePage: FC<HomePageProps> = () => {
       // CALL API TO GET SURVEYS FEATURES
       const response = homeSurveysData;
       if (response) {
-        setSuitYouBest(response.suitYouBest);
-        setBigBonus(response.bigBonus);
-        setBaseOnFavTopic(response.baseOnFavTopic);
+        setSuitYouBest(response.BestmatchSurveys);
+        setBigBonus(response.BigbonusSurveys);
+        setBaseOnFavTopic(response.FavoriteSurveys);
         setIsLoading(false);
       }
     } catch (error) {
@@ -120,14 +120,7 @@ const HomePage: FC<HomePageProps> = () => {
             {isLoading ? (
               <CircularProgress />
             ) : (
-              <SurveysCarousel
-                prefix="suityoubest"
-                data={
-                  user.FullName === "Hoàng Minh Lộc"
-                    ? takerFake.SuitYouBest
-                    : requesterFake.SuitYouBest
-                }
-              />
+              <SurveysCarousel prefix="suityoubest" data={suitYouBest} />
             )}
           </div>
 

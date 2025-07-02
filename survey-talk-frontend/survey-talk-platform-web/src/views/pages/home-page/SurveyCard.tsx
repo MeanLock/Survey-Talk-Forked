@@ -1,5 +1,5 @@
 import type React from "react";
-import type { SurveyCommunityCard } from "../../../core/types";
+import type { SurveyCommunity, SurveyCommunityCard } from "../../../core/types";
 import SurveyImg from "../../../assets/Image/Surveys/Community/1/image.jpg";
 import "./surveyCardStyle.scss";
 
@@ -8,7 +8,7 @@ import StarsIcon from "@mui/icons-material/Stars";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 
 interface Props {
-  data: SurveyCommunityCard | null;
+  data: SurveyCommunity | null;
 }
 
 export const SurveyCard: React.FC<Props> = ({ data }) => {
@@ -29,7 +29,8 @@ export const SurveyCard: React.FC<Props> = ({ data }) => {
             <StarsIcon sx={{ color: "#FFC40D" }} />
             <p>{data?.TakerBaseRewardPrice}</p>
             <div className="bonus top-[-15px] right-[-30px]">
-              {data?.CurrentSurveyRewardTracking.RewardPrice}
+              {data?.CurrentSurveyRewardTracking?.RewardPrice -
+                data?.TakerBaseRewardPrice}
             </div>
           </div>
         </div>
@@ -41,7 +42,9 @@ export const SurveyCard: React.FC<Props> = ({ data }) => {
         </div>
       </div>
       <div
-        onClick={() => window.open("/survey/take-survey?id=12345", "_blank")}
+        onClick={() =>
+          window.open(`/survey/take-survey?id=${data?.Id}`, "_blank")
+        }
         className="survey-card__button"
       >
         VÀO LÀM KHẢO SÁT

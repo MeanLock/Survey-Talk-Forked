@@ -1,5 +1,5 @@
 import type React from "react";
-import type { SurveyCommunityCard } from "../../../core/types";
+import type { SurveyCommunity, SurveyCommunityCard } from "../../../core/types";
 import { motion } from "framer-motion";
 import { SurveyCard } from "./SurveyCard";
 import "slick-carousel/slick/slick.css";
@@ -12,7 +12,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 interface Props {
   prefix: string;
-  data: SurveyCommunityCard[] | null;
+  data: SurveyCommunity[] | null;
 }
 
 export const SurveysCarousel: React.FC<Props> = ({ prefix, data }) => {

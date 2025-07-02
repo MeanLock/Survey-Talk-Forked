@@ -86,9 +86,9 @@ export type VersionBasicInformations = {
 
 // 1. Cho Customer ở trang chính
 export type SurveyCommunityFeatures = {
-  suitYouBest: SurveyCommunity[];
-  bigBonus: SurveyCommunity[];
-  baseOnFavTopic: SurveyCommunity[];
+  BestmatchSurveys: SurveyCommunity[];
+  BigbonusSurveys: SurveyCommunity[];
+  FavoriteSurveys: SurveyCommunity[];
 };
 
 // 2. Cho Customer ở danh sách khảo sát
@@ -116,7 +116,7 @@ export type SurveyCommunity = {
     AllocTimeAmount: number;
     AllocLevelAmount: number;
     MaxXp: number;
-    DeletedAt: string;
+    DeletedAt: string | null;
     CreatedAt: string;
     UpdatedAt: string;
   } | null;
@@ -336,4 +336,289 @@ export type SurveyDataMarketDetails = {
   QuestionCount: number | null;
   VersionTrackings: VersionBasicInformations[];
   Questions: DataMarketQuestion[];
+};
+
+// TẠO & CẬP NHẬT SURVEY
+
+// Slider
+export type SlideType = {
+  Min: number;
+  Max: number;
+  Step: number;
+  Unit: string;
+};
+
+// Jump Logic
+export type JumpLogicsType = {
+  Conditions: {
+    QuestionOrder: number;
+    Conjunction: string;
+    Operator: string;
+    CompareValue: number;
+  }[];
+  TargetQuestionOrder: number;
+};
+
+// Options
+export type OptionType = {
+  Id?: number | null;
+  Content: string;
+  Order: number;
+  MainImageBase64?: string; // base64 image data
+};
+
+// Question
+export type QuestionType = {
+  Id?: number | null;
+  MainImageBase64?: string;
+  QuestionTypeId: number;
+  Content: string;
+  Description: string;
+  TimeLimit: number;
+  IsVoice: boolean;
+  Order: number;
+  ConfigJson: Record<string, string | number | SlideType[] | JumpLogicsType[]>;
+  Options: OptionType[];
+};
+
+// Survey
+export type SurveyCreateUpdateType = {
+  Id: number;
+  RequesterId: number;
+  Title: string;
+  Description: string;
+  // IsPause: boolean;
+  MarketSurveyVersionStatusId: number | null;
+  SurveyTypeId: number;
+  SurveyTopicId: number;
+  SurveySpecificTopicId: number;
+  SurveyStatusId: number;
+  SecurityModeId: number;
+  MainImageBase64?: string;
+  BackgroundImageBase64?: string;
+  IsSuccess?: boolean;
+  ConfigJson: {
+    Background: string;
+    IsUseBackgroundImageBase64?: boolean;
+    BackgroundGradient1Color: string;
+    BackgroundGradient2Color: string;
+    TitleColor: string;
+    ContentColor: string;
+    ButtonBackgroundColor: string;
+    ButtonContentColor: string;
+    Password: string | null;
+    Brightness: number;
+    IsResizableIframeEnabled?: boolean;
+    DefaultBackgroundImageId: number;
+    SkipStartPage: boolean;
+  };
+  Questions: QuestionType[];
+} & any;
+
+// export type EditingSession = {
+//   EditingAllow: boolean;
+//   Message: string;
+//   EditingSession: {
+//     Id: number;
+//     RequesterId: number;
+//     Title: string;
+//     Description: string;
+//     SurveyTypeId: number;
+//     SurveyTopicId: number;
+//     SurveySpecificTopicId: number;
+//     MainImageBase64: string;
+//     BackgroundImageBase64: string;
+//     SurveyStatusId: number;
+//     Version: number;
+//     MarketSurveyVersionStatusId: number;
+//     SecurityModeId: number;
+//     ConfigJson: {
+//       DefaultBackgroundImageId: number;
+//       BackgroundGradient1Color: string;
+//       BackgroundGradient2Color: string;
+//       TitleColor: string;
+//       ContentColor: string;
+//       ButtonBackgroundColor: string;
+//       ButtonContentColor: string;
+//       Password: string;
+//       Brightness: number;
+//       IsPause: boolean;
+//       SkipStartPage: boolean;
+//       Background: string;
+//       IsUseBackgroundImageBase64: boolean;
+//     };
+//     Questions: [
+//       {
+//         Id: number;
+//         QuestionTypeId: number;
+//         MainImageBase64: string;
+//         Version: number;
+//         IsReanswerRequired: boolean;
+//         ReferenceSurveyQuestionId: number;
+//         Content: string;
+//         Description: string;
+//         TimeLimit: number;
+//         IsVoiced: boolean;
+//         Order: number;
+//         ConfigJson: {
+//           Min: number;
+//           Max: number;
+//           Step: number;
+//           Unit: string;
+//           RatingLength: number;
+//           RatingIcon: string;
+//           MinChoiceCount: number;
+//           MaxChoiceCount: number;
+//           FieldInputTypeId: number;
+//           RequiredAnswer: boolean;
+//           ViewNumberQuestion: boolean;
+//           NotBack: boolean;
+//           ImageEndQuestion: boolean;
+//           IsUseLabel: boolean;
+//           DisplayLogics: [
+//             {
+//               Conditions: [
+//                 {
+//                   QuestionOrder: number;
+//                   Conjunction: string;
+//                   Operator: string;
+//                   OptionOrder: number;
+//                   CompareValue: number;
+//                 }
+//               ];
+//               TargetQuestionOrder: number;
+//             }
+//           ];
+//           JumpLogics: [
+//             {
+//               Conditions: [
+//                 {
+//                   QuestionOrder: number;
+//                   Conjunction: string;
+//                   Operator: string;
+//                   OptionOrder: number;
+//                   CompareValue: number;
+//                 }
+//               ];
+//               TargetQuestionOrder: number;
+//             }
+//           ];
+//         };
+//       }
+//     ];
+//   };
+// };
+
+// TAKING SESSIONS
+export type DisplayLogic = {
+  Conditions: [
+    {
+      QuestionId: number;
+      Conjunction: string;
+      Operator: string;
+      OptionId: number;
+      CompareValue: number;
+    }
+  ];
+  TargetQuestionId: number;
+};
+
+export type JumpLogic = {
+  Conditions: [
+    {
+      QuestionId: number;
+      Conjunction: string;
+      Operator: string;
+      OptionId: number;
+      CompareValue: number;
+    }
+  ];
+  TargetQuestionId: number;
+};
+
+export type TakingSessionQuestion = {
+  Id: number;
+  QuestionTypeId: number;
+  Version: number | null;
+  MainImageUrl: string;
+  Content: string;
+  Description: string;
+  TimeLimit: number;
+  IsVoiced: boolean;
+  Order: number;
+  ConfigJson: {
+    Min: number | null;
+    Max: number | null;
+    Step: number | null;
+    Unit: string | null;
+    RatingLength: number | null;
+    RatingIcon: string | null;
+    MinChoiceCount: number | null;
+    MaxChoiceCount: number | null;
+    FieldInputTypeId: number | null;
+    RequiredAnswer: boolean; // ALWAYS true
+    ViewNumberQuestion: boolean;
+    NotBack: boolean; // ALWAYS true
+    ImageEndQuestion: boolean; // ALWAYS false
+    IsUseLabel: boolean; // ALWAYS false
+    DisplayLogics: DisplayLogic[];
+    JumpLogics: JumpLogic[];
+  };
+  Options: QuestionOption[];
+};
+
+export type SurveyTakingSession = {
+  TakingAllow: boolean;
+  Message: string;
+  TakingSession: {
+    Id: number;
+    RequesterId: number;
+    Title: string;
+    Description: string;
+    SurveyTypeId: number;
+    SurveyTopicId: number;
+    SurveySpecificTopicId: number;
+    MainImageUrl: string;
+    BackgroundImageUrl: string;
+    SurveyStatusId: number;
+    Version: number | null;
+    MarketSurveyVersionStatusId: number | null;
+    SecurityModeId: number;
+    ConfigJson: {
+      BackgroundGradient1Color: string;
+      BackgroundGradient2Color: string;
+      TitleColor: string;
+      ContentColor: string;
+      ButtonBackgroundColor: string;
+      ButtonContentColor: string;
+      Password: string | null;
+      Brightness: number;
+      IsPause: boolean;
+      SkipStartPage: boolean;
+      Background: string;
+    };
+    Questions: TakingSessionQuestion[];
+  };
+};
+
+// RATING
+export type RatingType = {
+  id: string;
+  surveyId: string;
+  takerId: string;
+  rating: number;
+  comment: string;
+  isSurveyViolated: boolean;
+  violatedType: string | null;
+  ratedAt: string;
+};
+
+export type CreateRatingType = {
+  surveyId: string;
+  takerId: string;
+  rating: number;
+  comment: string;
+  isSurveyViolated: boolean;
+  violatedType: string | null;
+  ratedAt: string;
 };

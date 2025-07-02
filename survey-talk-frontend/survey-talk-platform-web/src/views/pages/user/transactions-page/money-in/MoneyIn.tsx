@@ -140,7 +140,7 @@ export const MoneyIn: React.FC<Props> = ({ balance }) => {
     }
   };
 
-  async function updateMoneyInById(id, amountToAdd) {
+  async function updateMoneyInById(id: any, amountToAdd: any) {
     const apiUrl = `https://685b91fb89952852c2d9fd1e.mockapi.io/MoneyFlow/${id}`;
 
     try {
@@ -184,7 +184,7 @@ export const MoneyIn: React.FC<Props> = ({ balance }) => {
     <div className="money-in w-full flex flex-col items-start">
       <p className="money-in__remain-title">Số dư khả dụng</p>
       <p className="money-in__remain-value">
-        {user?.Balance.toLocaleString("vi-VN")}đ
+        {user?.Balance?.toLocaleString("vi-VN")}đ
       </p>
 
       <div className="w-full grid grid-cols-2 gap-6 mt-5">

@@ -16,7 +16,7 @@ export const surveyRoutes: RouteObject = {
       path: "take-survey",
       element: (
         <ProtectedRouteNoMargin
-          redirectUrl="manage/points"
+          redirectUrl="survey/take-survey"
           element={<SurveyPage />}
         />
       ),
@@ -25,11 +25,12 @@ export const surveyRoutes: RouteObject = {
       path: "filter-survey",
       element: (
         <ProtectedRouteNoMargin
-          redirectUrl="manage/points"
+          redirectUrl="survey/filter-survey"
           element={<FilterSurveyPage />}
         />
       ),
     },
     { path: "create", element: <SurveyCreatePage /> },
+    { path: "update/:id", element: <SurveyCreatePage /> },
   ],
 };

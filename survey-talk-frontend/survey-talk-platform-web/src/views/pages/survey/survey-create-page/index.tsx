@@ -1,12 +1,15 @@
+import type { SurveyCreateUpdateType } from "@/core/types";
 import useBlocker from "../../../../hooks/useBlocker";
 import "./styles.scss";
 
-const SurveyCreatePage = () => {
-  useBlocker(true);
+import React from "react";
+
+interface Props {}
+
+const SurveyCreatePage: React.FC<Props> = ({}) => {
   return (
-    <div>
-      <p>Trang tạo Survey</p>
-      <p>Hẹ hẹ hẹ</p>
+    <div className="w-full flex flex-col">
+      <p>Hehehe</p>
     </div>
   );
 };

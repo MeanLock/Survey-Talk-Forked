@@ -129,7 +129,7 @@ export const DefaultLayoutHeader: React.FC<DefaultLayoutHeaderProps> = ({
                 <StarsIcon />
                 <p className="font-bold">
                   {/* TASK FAKE DATA, PHẢI BỎ KHI ĐÃ CÓ API */}
-                  {member?.Balance.toLocaleString("vn")}
+                  {auth.user?.Balance?.toLocaleString("vn")}
                   {/* {member?.Balance.toLocaleString("vn")} */}
                 </p>
               </div>
@@ -149,8 +149,8 @@ export const DefaultLayoutHeader: React.FC<DefaultLayoutHeaderProps> = ({
                 <p className="user-profile__full-name">{member?.FullName}</p>
                 <Level
                   //TASK FAKE DATA, PHẢI BỎ KHI ĐÃ CÓ API
-                  xp={member?.Xp}
-                  level={member?.Level}
+                  xp={auth.user?.Xp}
+                  level={auth.user?.Level}
                   // xp={member ? member.Xp : null}
                   // level={member ? member.Level : null}
                 />
