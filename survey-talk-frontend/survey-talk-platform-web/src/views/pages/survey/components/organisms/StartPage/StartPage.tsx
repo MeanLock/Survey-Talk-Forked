@@ -604,7 +604,7 @@ any) {
   return (
     <>
       <div className="config-section">
-        <h3>CHỦ ĐỀ KHẢO SÁT</h3>
+        <h3 className="text-left" >CHỦ ĐỀ KHẢO SÁT</h3>
         <FormControl
           // disabled={isTrigger}
           fullWidth
@@ -665,7 +665,7 @@ any) {
         </FormControl>
       </div>
       <div className="config-section">
-        <h3>CHỦ ĐỀ KHẢO SÁT CỤ THỂ</h3>
+        <h3  className="text-left" >CHỦ ĐỀ KHẢO SÁT CỤ THỂ</h3>
         <FormControl
           fullWidth
           sx={{
@@ -872,7 +872,7 @@ function BackgroundMode({
   return (
     <>
       <div>
-        <h3>SỬ DỤNG HÌNH NỀN</h3>
+        <h3  className="text-left" >SỬ DỤNG HÌNH NỀN</h3>
         <div
           className={`background-main-preview ${
             formData?.ConfigJson?.Background === "image" ? "active" : ""
@@ -938,7 +938,7 @@ function BackgroundMode({
       </div>
       {backgroundMode === "image" && (
         <div>
-          <h3>ĐỘ SÁNG HÌNH NỀN</h3>
+          <h3  className="text-left" >ĐỘ SÁNG HÌNH NỀN</h3>
           <Slider
             value={Brightness}
             onChange={handleBrightnessChange}
@@ -960,7 +960,7 @@ function BackgroundMode({
         </div>
       )}
       <div>
-        <h3>SỬ DỤNG MÀU NỀN</h3>
+        <h3  className="text-left" >SỬ DỤNG MÀU NỀN</h3>
         <div
           className={`background-main-preview ${
             formData?.ConfigJson?.Background === "color_gradient"
@@ -1043,13 +1043,13 @@ function SurveyContentTextColor({
   return (
     <>
       <div className="mb-8">
-        <h3 className="text-sm font-semibold text-gray-800 uppercase tracking-wide mb-6">
+        <h3 className="text-sm font-semibold text-gray-800 uppercase tracking-wide mb-6 text-left"  >
           MÀU CHỮ CỦA NỘI DUNG KHẢO SÁT
         </h3>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-500 w-24">Màu tiêu đề</span>
+            <span className="text-sm text-gray-500 w-24 text-left">Màu tiêu đề</span>
             <div className="flex-1 max-w-20">
               <div
                 className="w-full h-8 rounded border border-gray-300 cursor-pointer"
@@ -1063,7 +1063,7 @@ function SurveyContentTextColor({
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-500 w-24">Màu nội dung</span>
+            <span className="text-sm text-gray-500 w-24 text-left">Màu nội dung</span>
             <div className="flex-1 max-w-20">
               <div
                 className="w-full h-8 rounded border border-gray-300 cursor-pointer"
@@ -1092,13 +1092,13 @@ function ButtonColor({
   return (
     <>
       <div>
-        <h3 className="text-sm font-semibold text-gray-800 uppercase tracking-wide mb-6">
+        <h3 className="text-sm font-semibold text-gray-800 uppercase tracking-wide mb-6 text-left">
           MÀU SẮC NÚT BẤM
         </h3>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-500 w-24">Màu nền</span>
+            <span className="text-sm text-gray-500 w-24 text-left">Màu nền</span>
             <div className="flex-1 max-w-20">
               <div
                 className="w-full h-8 rounded border border-gray-300 cursor-pointer"
@@ -1124,7 +1124,7 @@ function ButtonColor({
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-500 w-24">Màu chữ</span>
+            <span className="text-sm text-gray-500 w-24 text-left">Màu chữ</span>
             <div className="flex-1 max-w-20">
               <div
                 className="w-full h-8 rounded border border-gray-300 cursor-pointer"
@@ -1178,7 +1178,22 @@ function DesignSuggestions({
   //   };
   //   fetchBackgrounds();
   // }, []);
-  console.log("defaultBackgroundThemes: ", defaultBackgroundThemes);
+    if (!defaultBackgroundThemes || !Array.isArray(defaultBackgroundThemes)) {
+    return ( //Thịnh redux
+      <div className="config-section">
+        <h3 className="config-title">GỢI Ý THIẾT KẾ</h3>
+        <div className="background-preview">
+          <div className="background-thumbnail">
+            <div className="grid grid-cols-5 gap-4">
+              <div className="col-span-5 text-center py-4">
+                Đang tải gợi ý thiết kế...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       <div className="config-section">

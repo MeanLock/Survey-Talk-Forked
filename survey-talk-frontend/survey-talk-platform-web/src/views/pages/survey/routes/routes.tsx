@@ -51,7 +51,7 @@ export const routes = [
         element: <SurveyCustomer />,
         requiresAuth: false,
     },
-    {
+     {
         name: "EndSurveyCustomer",
         path: "/survey/:id/end", //Thịnh, đổi đường dẫn từ /survey/end/:id sang /survey/:id/end
         element: <EndSurveyCustomer />,

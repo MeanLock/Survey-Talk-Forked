@@ -2,6 +2,7 @@
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {
   useCallback,
+  useEffect,
   useMemo,
   useState,
   type Dispatch,
@@ -43,13 +44,16 @@ const HandleSlide = ({ dataResponse, setIsRefetch }: Props) => {
     () => searchParams.get("taking_subject"),
     [searchParams]
   );
+
+
   const surveyData = useAppSelector((state) => state.appSlice.surveyData);
+  console.log("surveyData", surveyData);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
   const { mutate } = useUpdateSurveyPro({
     mutationConfig: {
-      onSuccess() {},
+      onSuccess() { },
     },
   });
 
@@ -170,6 +174,7 @@ const HandleSlide = ({ dataResponse, setIsRefetch }: Props) => {
     if (!surveyData || !id) return;
     const dataBuider = {
       ...surveyData,
+      surveyId: id,
       taken_subject: taken_subject,
       SurveyResponses: surveyData?.SurveyResponses?.filter(
         (i) => !i.parentId
@@ -179,6 +184,7 @@ const HandleSlide = ({ dataResponse, setIsRefetch }: Props) => {
           ...i.ValueJson,
           QuestionContent: {
             Id: i.ValueJson.QuestionContent.Id,
+            MainImageUrl: i.ValueJson.QuestionContent.MainImageUrl || null,
             QuestionTypeId: i.ValueJson.QuestionContent.QuestionTypeId,
             Content: i.ValueJson.QuestionContent.Content,
             Description: i.ValueJson.QuestionContent.Description,
@@ -186,8 +192,8 @@ const HandleSlide = ({ dataResponse, setIsRefetch }: Props) => {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const { JumpLogics, ...rest } = (i.ValueJson.QuestionContent
                 .ConfigJson || {}) as {
-                [key: string]: any;
-              };
+                  [key: string]: any;
+                };
               return rest;
             })(),
             Options: i.ValueJson.QuestionContent.Options,
@@ -195,6 +201,10 @@ const HandleSlide = ({ dataResponse, setIsRefetch }: Props) => {
         },
       })),
     };
+    if (taken_subject === "Preview") {
+      navigate(routesMap.EndSurveyCustomer.replace("/:id/end", `/${id}/end`));
+      return;
+    }
     mutate(dataBuider);
     navigate(routesMap.EndSurveyCustomer.replace("/:id/end", `/${id}/end`)); // Thịnh, đổi đường dẫn từ /survey/end/:id sang /survey/:id/end
   }, [id, mutate, navigate, surveyData, taken_subject]);

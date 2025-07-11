@@ -129,7 +129,8 @@ const TimeLimit = ({
     if (!question?.TimeLimit && isOpen) {
       setIsOpne(false);
     }
-    if (isOpen && isBasic) {
+    console.log("question?.Order: ",isOpen, isBasic);
+    if (isBasic) {
       setIsOpne(false);
       handleUpdateQuestion("TimeLimit", 0);
     }

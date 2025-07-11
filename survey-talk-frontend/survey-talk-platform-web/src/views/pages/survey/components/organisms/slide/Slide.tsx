@@ -20,7 +20,6 @@ const Slide = ({ currentQuestionId }: Props) => {
   const config = useAppSelector((state) => state.appSlice.infoSurvey);
 
   const dispatch = useAppDispatch();
-
   const data = useMemo(
     () =>
       (surveyData?.SurveyResponses || []).find(
@@ -28,6 +27,7 @@ const Slide = ({ currentQuestionId }: Props) => {
       ),
     [currentQuestionId, surveyData?.SurveyResponses]
   );
+
   const [timer, setTimer] = useState(-1);
   const refAudio = useRef<SpeechRecognition | null>(null);
   const [isActiveAudio, setIsActiveAudio] = useState<boolean>(false);
@@ -268,7 +268,6 @@ const Slide = ({ currentQuestionId }: Props) => {
     }
   }, [data]);
 
-  console.log("check data : ", data);
 
   return (
     <div className="">

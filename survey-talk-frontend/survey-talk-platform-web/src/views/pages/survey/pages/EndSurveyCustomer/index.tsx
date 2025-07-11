@@ -1,13 +1,23 @@
 import { useAppSelector } from "@/app/hooks";
 import { useNavigate } from "react-router-dom";
 import { useGetSurveyDefaultBackgroundThemes } from "@/services/CreateSurveyTool/InputDatas/get-default-background-themes";
+import { use, useEffect } from "react";
+import SurveyTalkLoading from "@/views/components/common/loading";
 
 const EndSurveyCustomer = () => {
+  const state = useAppSelector((state) => state);
+  console.log("StateEndSurveyCustomer: ", state);
   const survey = useAppSelector((state) => state.appSlice.surveyData);
   const info = useAppSelector((state) => state.appSlice.infoSurvey);
   const navigate = useNavigate();
   const { data: bgDefaultThemes } = useGetSurveyDefaultBackgroundThemes({});
 
+
+   if (!bgDefaultThemes || !Array.isArray(bgDefaultThemes)) {
+    return (
+     <SurveyTalkLoading />
+    );
+  }
   return (
     <div
       className={`fixed top-0 left-0 w-full h-full bg-white z-50 px-[100px]`}
@@ -64,7 +74,6 @@ const EndSurveyCustomer = () => {
           ) : (
             <>
               {" "}
-              //Thịnh chỉnh lại màu theo config
               <div
                 className=" text-xl font-semibold"
                 style={{ color: info.ConfigJson.TitleColor }}

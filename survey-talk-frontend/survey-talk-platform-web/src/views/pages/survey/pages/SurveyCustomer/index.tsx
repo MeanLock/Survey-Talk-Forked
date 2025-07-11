@@ -25,13 +25,13 @@ function SurveyCustomer() {
   });
 
   const { data: bgDefaultThemes } = useGetSurveyDefaultBackgroundThemes({});
-
+  console.log("Data: ", apiData);
   useEffect(() => {
     if (apiData && !isLoadingSlide) {
       setDataResponse(apiData);
       dispatch(handleSetInfoSurvey(apiData));
-      console.log("Data: ", apiData);
 
+     
       if (apiData.data?.Version) {
         const currentParams = new URLSearchParams(searchParams);
         currentParams.set("Version", apiData.data.Version.toString());

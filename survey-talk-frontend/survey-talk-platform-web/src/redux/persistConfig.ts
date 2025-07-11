@@ -5,5 +5,5 @@ const persistConfig = {
   storage,
   whitelist: ["auth", "fake"], // Slice bạn muốn lưu trữ, ví dụ như auth chứa JWT
 };
-
+//Thịnh redux
 export default persistConfig;

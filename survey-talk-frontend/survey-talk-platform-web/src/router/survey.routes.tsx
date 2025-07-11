@@ -5,7 +5,7 @@ import SurveyCreatePage from "../views/pages/survey/survey-create-page";
 import FilterSurveyPage from "../views/pages/survey/survey-filter-take-page";
 import ProtectedRoute from "./ProtectedRoute";
 import ProtectedRouteNoMargin from "./ProtectedRouteNoMargin";
-import { SurveyCustomer } from "@/views/pages/survey/routes";
+import { EndSurveyCustomer, SurveyCustomer } from "@/views/pages/survey/routes";
 
 const SurveyPage = lazy(() => import("../views/pages/survey/survey-take-page"));
 
@@ -34,5 +34,6 @@ export const surveyRoutes: RouteObject = {
     { path: "new", element: <SurveyCreatePage /> },
     { path: ":id/editing", element: <SurveyCreatePage /> },
     { path: ":id/taking", element: <SurveyCustomer /> },
+    { path: ":id/end", element: <EndSurveyCustomer /> },
   ],
 };

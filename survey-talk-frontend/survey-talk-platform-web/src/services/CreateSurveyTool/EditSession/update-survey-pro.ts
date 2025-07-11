@@ -14,13 +14,14 @@ const update = async (payload: PayLoadType) => {
   // const { taken_subject, req } = payload;
   const dataClone = { ...payload };
   delete dataClone.taken_subject;
-
+  delete dataClone.surveyId;
   const response = await callAxiosRestApi({
     instance: loginRequiredAxiosInstance,
     method: "post",
-    url: `/survey/update?taken_subject${payload.taken_subject}`,
+    url: `Survey/response/community/surveys/${payload.surveyId}?taken_subject=${payload.taken_subject}`,
     data: dataClone,
   });
+  console.log("dataClone: ", dataClone);
   return response.data;
 };
 
