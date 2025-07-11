@@ -6,7 +6,7 @@ import { Box, CircularProgress } from "@mui/material";
 import { RouterProvider } from "react-router-dom";
 import { appRouter } from "./router";
 import { ToastContainer } from "react-toastify";
-
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 function App() {
   const [count, setCount] = useState(0);
 
@@ -36,6 +36,7 @@ function App() {
         <RouterProvider router={appRouter} />
       </Suspense>
       <ToastContainer />
+      <ReactQueryDevtools initialIsOpen={false} />
     </Box>
   );
 }

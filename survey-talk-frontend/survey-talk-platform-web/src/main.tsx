@@ -9,6 +9,11 @@ import { BrowserRouter } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { persistor, store } from "./redux/store.ts";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+
+// Tanstack
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import queryClient from "@/lib/query.ts";
+
 ModuleRegistry.registerModules([AllCommunityModule]);
 createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
@@ -18,7 +23,9 @@ createRoot(document.getElementById("root")!).render(
           "284467404982-b4j9dvoani124mce15l0mmtfucil72g0.apps.googleusercontent.com"
         }
       >
-        <App />
+        <QueryClientProvider client={queryClient}>
+          <App />
+        </QueryClientProvider>
       </GoogleOAuthProvider>
     </PersistGate>
   </Provider>

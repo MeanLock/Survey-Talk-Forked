@@ -33,7 +33,7 @@ export const _loginNav: {
     label: "Khảo sát",
     isDropDown: true,
     paths: [
-      { title: "Tạo Khảo Sát", path: "/survey/create" },
+      { title: "Tạo Khảo Sát", path: "/survey/new" },
       { title: "Danh Sách Khảo Sát", path: "/available-surveys" },
     ],
   },
