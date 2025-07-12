@@ -30,6 +30,7 @@ import TuneIcon from "@mui/icons-material/Tune";
 import { Tune } from "@mui/icons-material";
 import { SearchSurvey } from "./SearchSurvey";
 import CloseIcon from "@mui/icons-material/Close";
+import { useGetCommunitySurveys } from "@/services/Survey/SurveyList/get-community-surveys";
 
 interface AvailableSurveyProps {}
 
@@ -64,51 +65,70 @@ const AvailableSurveys: React.FC<AvailableSurveyProps> = () => {
 
   const [surveyFoundCount, setSurveyFoundCount] = useState(0);
 
+  const {
+    data: CommunitySurveysFromAPI,
+    isLoading: isLoadingCommunitySurveys,
+    isFetched,
+  } = useGetCommunitySurveys({});
+
   // HOOKS
   useEffect(() => {
-    setIsLoading(true);
-    fetch();
-  }, []);
+    // setIsLoading(true);
+    // fetch();
+    if (CommunitySurveysFromAPI) {
+      setSurveys(CommunitySurveysFromAPI);
+      setFilteredSurveys(CommunitySurveysFromAPI);
+      setSurveyFoundCount(
+        CommunitySurveysFromAPI ? CommunitySurveysFromAPI.length : 0
+      );
+      setTopics(SurveyTopics);
+      setSelectedSurvey(null);
+      setIsShowSelectedSurvey(false);
+      setSelectedTopics([]);
+      setSortMode(0);
+      setIsLoading(false);
+    }
+  }, [CommunitySurveysFromAPI]);
 
   // FUNCTIONS
-  const fetch = async () => {
-    try {
-      // CALL API, MỞ LẠI SAU KHI ĐÃ CÓ DATA
-      // const response = await callAxiosRestApi({
-      //   instance: loginRequiredAxiosInstance,
-      //   method: "get",
-      //   url: `Survey/core/community/surveys?Keyword=${Keyword}&Additional=${Additional}`,
-      // });
-      // if (response.success) {
-      //   const surveys = response.data.Surveys;
-      //   setSurveys(surveys);
-      //   setFilteredSurveys(surveys);
-      //   setSurveyFoundCount(surveys.length);
-      //   setSelectedSurvey(null);
-      //   setIsShowSelectedSurvey(false);
-      //   setSelectedTopics(null);
-      //   setSortMode(0);
-      //   setIsLoading(false);
-      // }else{
-      //   toast.error(`Lỗi khi tìm kiếm Khảo sát phù hợp, vui lòng thử lại sau!`);
-      // }
+  // const fetch = async () => {
+  //   try {
+  //     // CALL API, MỞ LẠI SAU KHI ĐÃ CÓ DATA
+  //     // const response = await callAxiosRestApi({
+  //     //   instance: loginRequiredAxiosInstance,
+  //     //   method: "get",
+  //     //   url: `Survey/core/community/surveys?Keyword=${Keyword}&Additional=${Additional}`,
+  //     // });
+  //     // if (response.success) {
+  //     //   const surveys = response.data.Surveys;
+  //     //   setSurveys(surveys);
+  //     //   setFilteredSurveys(surveys);
+  //     //   setSurveyFoundCount(surveys.length);
+  //     //   setSelectedSurvey(null);
+  //     //   setIsShowSelectedSurvey(false);
+  //     //   setSelectedTopics(null);
+  //     //   setSortMode(0);
+  //     //   setIsLoading(false);
+  //     // }else{
+  //     //   toast.error(`Lỗi khi tìm kiếm Khảo sát phù hợp, vui lòng thử lại sau!`);
+  //     // }
 
-      // FAKE CALL API NÈ
-      setTimeout(() => {
-        const surveys = SurveyListCustomer;
-        setSurveys(surveys);
-        setFilteredSurveys(surveys);
-        setSurveyFoundCount(surveys ? surveys.length : 0);
-        setSelectedSurvey(null);
-        setIsShowSelectedSurvey(false);
-        setSelectedTopics([]);
-        setSortMode(0);
-        setIsLoading(false);
-      }, 2000);
-    } catch (error) {
-      console.log("Lỗi khi lấy danh sách Khảo sát phù hợp: ", error);
-    }
-  };
+  //     // FAKE CALL API NÈ
+  //     setTimeout(() => {
+  //       const surveys = SurveyListCustomer;
+  //       setSurveys(surveys);
+  //       setFilteredSurveys(surveys);
+  //       setSurveyFoundCount(surveys ? surveys.length : 0);
+  //       setSelectedSurvey(null);
+  //       setIsShowSelectedSurvey(false);
+  //       setSelectedTopics([]);
+  //       setSortMode(0);
+  //       setIsLoading(false);
+  //     }, 2000);
+  //   } catch (error) {
+  //     console.log("Lỗi khi lấy danh sách Khảo sát phù hợp: ", error);
+  //   }
+  // };
 
   const handleShowDetail = (id: number) => {
     const survey = surveys?.filter((s) => s.Id === id)[0];
@@ -287,7 +307,7 @@ const AvailableSurveys: React.FC<AvailableSurveyProps> = () => {
 
   return (
     <div className="survey-list w-full flex flex-col items-center p-10">
-      {isLoading ? (
+      {isLoadingCommunitySurveys ? (
         <>
           <SurveyTalkLoading />
           <p className="text-2xl font-bold">

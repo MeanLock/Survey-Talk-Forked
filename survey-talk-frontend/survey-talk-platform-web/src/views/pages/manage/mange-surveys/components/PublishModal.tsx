@@ -40,10 +40,26 @@ const segmentData = {
     question:
       "Công việc đang làm/Ngành học của người làm khảo sát liên quan đến lĩnh vực nào?",
     options: [
-      "Công nghệ thông tin",
-      "Y tế",
-      "Giáo dục",
-      "Kinh doanh & Marketing",
+      "Công nghệ thông tin & Trí tuệ nhân tạo",
+      "Y tế & Chăm sóc sức khỏe",
+      "Giáo dục & Đào tạo",
+      "Kinh doanh, Marketing & Thương mại điện tử",
+      "Kỹ thuật, Cơ điện & Tự động hóa",
+      "Tài chính, Ngân hàng & Bảo hiểm",
+      "Luật pháp, Hành chính & Chính phủ",
+      "Nông nghiệp, Lâm nghiệp & Môi trường",
+      "Nghệ thuật, Thiết kế & Truyền thông",
+      "Dịch vụ, Du lịch & Khách sạn - Nhà hàng",
+      "Xây dựng, Kiến trúc & Quy hoạch",
+      "Logistics, Chuỗi cung ứng & Xuất nhập khẩu",
+      "Nhân sự & Quản trị doanh nghiệp",
+      "Tâm lý học, Xã hội học & Công tác xã hội",
+      "Thể thao, Giải trí & Sự kiện",
+      "Ngôn ngữ, Biên phiên dịch & Văn hóa",
+      "Nghiên cứu, Khoa học & Phát triển công nghệ",
+      "Bất động sản & Quản lý tài sản",
+      "An ninh mạng & Viễn thông",
+      "Toán học, Thống kê & Khoa học dữ liệu",
       "Không quan tâm",
     ],
   },
@@ -61,16 +77,22 @@ const segmentData = {
   },
   marriage: {
     question: "Tình trạng hôn nhân của người làm khảo sát?",
-    options: ["Độc thân", "Kết hôn", "Ly hôn", "Không quan tâm"],
+    options: [
+      "Độc Thân",
+      "Kết Hôn",
+      "Ly Hôn (Ly dị, Ly thân)",
+      "Góa",
+      "Không quan tâm",
+    ],
   },
   income: {
     question: "Thu nhập trung bình của người làm khảo sát?",
     options: [
-      "Dưới 3 triệu/tháng",
-      "Từ 3 đến 7 triệu/tháng",
-      "Từ 7 đến 15 triệu/tháng",
-      "Từ 15 đến 30 triệu/tháng",
-      "Trên 30 triệu/tháng",
+      "< 3 triệu / tháng",
+      "3 - 7 triệu/tháng",
+      "7 - 15 triệu/tháng",
+      "15 - 30 triệu/tháng",
+      "> 30 triệu/tháng",
       "Không quan tâm",
     ],
   },
@@ -304,14 +326,16 @@ export const PublishModal: React.FC<Props> = ({
       const response = await callAxiosRestApi({
         instance: loginRequiredAxiosInstance,
         method: "post",
-        url: `Survey/core/community/surveys/7/summary-filter-tag`,
+        url: `Survey/core/community/surveys/${survey.Id}/summary-filter-tag`,
         data: {
           SurveyTakerSegment: {
             CountryRegion: null, // Chưa làm
-            MaritalStatus: marriage === "Không quan tâm" ? null : marriage,
-            AverageIncome: income === "Không quan tâm" ? null : income,
-            EducationLevel: education === "Không quan tâm" ? null : education,
-            JobField: job === "Không quan tâm" ? null : job,
+            MaritalStatus:
+              marriage.trim() === "Không quan tâm" ? null : marriage,
+            AverageIncome: income.trim() === "Không quan tâm" ? null : income,
+            EducationLevel:
+              education.trim() === "Không quan tâm" ? null : education,
+            JobField: job.trim() === "Không quan tâm" ? null : job,
             Prompt: prompt,
             TagFilterAccuracyRate: accuracy,
           },
@@ -397,7 +421,7 @@ export const PublishModal: React.FC<Props> = ({
       const response = await callAxiosRestApi({
         instance: loginRequiredAxiosInstance,
         method: "post",
-        url: `Survey/transaction/community/surveys/7/publish-price-calcular`,
+        url: `Survey/transaction/community/surveys/${survey.Id}/publish-price-calcular`,
         data: {
           Kpi: kpi,
           RS: RS,
@@ -461,17 +485,19 @@ export const PublishModal: React.FC<Props> = ({
       const response = await callAxiosRestApi({
         instance: loginRequiredAxiosInstance,
         method: "post",
-        url: `Survey/transaction/community/surveys/7/publish`,
+        url: `Survey/transaction/community/surveys/${survey.Id}/publish`,
         data: {
           Kpi: kpi,
           EndDate: endDate,
           FilterTags: FilterTags,
           SurveyTakerSegment: {
-            CountryRegion: null,
-            MaritalStatus: marriage,
-            AverageIncome: income,
-            EducationLevel: education,
-            JobField: job,
+            CountryRegion: null, // Chưa làm
+            MaritalStatus:
+              marriage.trim() === "Không quan tâm" ? null : marriage,
+            AverageIncome: income.trim() === "Không quan tâm" ? null : income,
+            EducationLevel:
+              education.trim() === "Không quan tâm" ? null : education,
+            JobField: job.trim() === "Không quan tâm" ? null : job,
             Prompt: prompt,
             TagFilterAccuracyRate: accuracy,
           },
