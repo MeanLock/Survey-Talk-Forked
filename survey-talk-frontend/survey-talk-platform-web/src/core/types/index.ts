@@ -220,26 +220,26 @@ export type SurveyTaking = {
 };
 
 // Các Survey được lấy ra từ /api/Survey/core/community/surveys (CUSTOMER)
-// export type SurveyFromSurveyListCustomer = {
-//   Id: number;
-//   Title: string;
-//   Description: string;
-//   SurveyTopicId: number;
-//   SurveySpecificTopicId: number;
-//   StartDate: string; // FORMAT: YYYY-MM-DD
-//   EndDate: string; // FORMAT: YYYY-MM-DD
-//   SecurityModeId: number;
-//   IsAvailable: boolean;
-//   PublishedAt: string; // FORMAT: YYYY-MM-DDTH:M:SZ
-//   TakerBaseRewardPrice: number;
-//   ConfigJsonString: string;
-//   SurveyStatusId: number;
-//   SlotsLeft: number;
-//   MainImageUrl: string | null;
-//   BackgroundImageUrl: string | null;
-//   QuestionCount: number;
-//   CurrentSurveyRewardTracking: CurrentSurveyRewardTracking;
-// };
+export type SurveyFromSurveyListCustomer = {
+  Id: number;
+  Title: string;
+  Description: string;
+  SurveyTopicId: number;
+  SurveySpecificTopicId: number;
+  StartDate: string; // FORMAT: YYYY-MM-DD
+  EndDate: string; // FORMAT: YYYY-MM-DD
+  SecurityModeId: number;
+  IsAvailable: boolean;
+  PublishedAt: string; // FORMAT: YYYY-MM-DDTH:M:SZ
+  TakerBaseRewardPrice: number;
+  ConfigJsonString: string;
+  SurveyStatusId: number;
+  SlotsLeft: number;
+  MainImageUrl: string | null;
+  BackgroundImageUrl: string | null;
+  QuestionCount: number;
+  CurrentSurveyRewardTracking: CurrentSurveyRewardTracking;
+};
 
 // DATA MARKET
 export type SurveyDataMarket = {

@@ -21,7 +21,7 @@ function SurveyCustomer() {
 
   const { data: apiData, isLoading: isLoadingSlide } = useGetSlide({
     id: Number(id) || 0,
-    taking_subject: "Preview",
+    taking_subject: "Verified",
   });
 
   const { data: bgDefaultThemes } = useGetSurveyDefaultBackgroundThemes({});
@@ -31,7 +31,6 @@ function SurveyCustomer() {
       setDataResponse(apiData);
       dispatch(handleSetInfoSurvey(apiData));
 
-     
       if (apiData.data?.Version) {
         const currentParams = new URLSearchParams(searchParams);
         currentParams.set("Version", apiData.data.Version.toString());
@@ -39,7 +38,6 @@ function SurveyCustomer() {
       }
     }
   }, [apiData, dispatch, searchParams, setSearchParams]);
-
 
   useEffect(() => {
     if (isVerified) {

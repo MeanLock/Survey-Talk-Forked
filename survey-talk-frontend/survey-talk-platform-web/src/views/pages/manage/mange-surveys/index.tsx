@@ -31,6 +31,9 @@ import { SurveyMeCard } from "./SurveyMeCard";
 import { PublishModal } from "./components/PublishModal";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../../redux/rootReducer";
+import { useGetCommunitySurveys } from "@/services/Survey/SurveyList/get-community-surveys";
+import { useGetMeSurveys } from "@/services/Survey/SurveyList/get-me-surveys";
+import { useNavigate } from "react-router-dom";
 
 type Query = {
   Keyword: string | null;
@@ -42,6 +45,7 @@ const ManageSurveyPage = () => {
   // REDUX FAKE NHỚ BỎ ĐI KHI ĐÃ CÓ API
   const fake = useSelector((state: RootState) => state.fake);
   const user = useSelector((state: RootState) => state.auth.user);
+
   // STATES
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [surveys, setSurveys] = useState<SurveyList | null>(null);
@@ -56,33 +60,35 @@ const ManageSurveyPage = () => {
     Deadline: null,
     StatusId: null,
   });
+
   const [filterOption, setFilterOption] = useState<string>("All");
   const [sortOptions, setSortOptions] = useState<string>("Ngày tạo: Sớm nhất");
 
   const [showPublishModal, setShowPublishModal] = useState<boolean>(false);
 
+  const {
+    data: MeSurveysFromAPI,
+    isLoading: isLoadingMeSurveys,
+    isFetched,
+  } = useGetMeSurveys({
+    KeyWord: query.Keyword,
+    Deadline: query.Deadline,
+    StatusId: query.StatusId,
+  });
+
   // HOOKS
+  const navigate = useNavigate();
   useEffect(() => {
-    setIsLoading(true);
-    fetch();
-  }, []);
+    if (MeSurveysFromAPI) {
+      setSurveys(MeSurveysFromAPI);
+      setFilteredSurveys(MeSurveysFromAPI);
+      setSelectedSurvey(null);
+      setShowPublishModal(false);
+      setTopics(SurveyTopics);
+    }
+  }, [MeSurveysFromAPI]);
 
   // FUNCTIONS
-  const fetch = async () => {
-    try {
-      setTimeout(() => {
-        // CALL API RIGHT HERE TO FETCH
-        const response = SurveyMeData;
-        setSurveys(response);
-        setFilteredSurveys(response);
-        setTopics(SurveyTopics);
-        setIsLoading(false);
-      }, 1000);
-    } catch (error) {
-      console.log("Error while fetching surveys in manage-surveys: ", error);
-    }
-  };
-
   const handleFilter = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setFilterOption(value);
@@ -95,7 +101,9 @@ const ManageSurveyPage = () => {
     console.log("Tìm kiếm Survey với Keyword: ", query.Keyword);
   };
 
-  const handleEdit = (id: number) => {};
+  const handleEdit = (id: number) => {
+    navigate(`/survey/${id}/editing`);
+  };
   const handleViewDetail = (id: number) => {};
   const handlePublish = (id: number) => {
     const survey = surveys?.filter((s) => s.Id === id)[0];
@@ -245,7 +253,7 @@ const ManageSurveyPage = () => {
         </div>
       </div>
 
-      {isLoading ? (
+      {isLoadingMeSurveys ? (
         <div className="w-full h-52 flex items-center justify-center">
           <CircularProgress />
         </div>

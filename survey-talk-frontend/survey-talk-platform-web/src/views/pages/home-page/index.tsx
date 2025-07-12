@@ -22,6 +22,7 @@ import { CircularProgress } from "@mui/material";
 import { SurveysCarousel } from "./SurveysCarousel";
 import { clearAuthToken } from "../../../redux/auth/authSlice";
 import { requesterFake, takerFake } from "../../../core/mockData/userFake";
+import { useGetFeatureSurveys } from "@/services/Survey/Home/get-feature-surveys";
 
 const progressVisualizeSteps = [
   {
@@ -85,28 +86,35 @@ const HomePage: FC<HomePageProps> = () => {
   >(null);
 
   // HOOKS
+  const {
+    data: surveysFeatureFromAPI,
+    isLoading: isLoadingFeatureSurveys,
+    isFetched, // đảm bảo đã fetch xong
+  } = useGetFeatureSurveys({});
+
   useEffect(() => {
-    if (user) {
-      setIsLoading(true);
-      fetchSurveys();
+    if (surveysFeatureFromAPI) {
+      setSuitYouBest(surveysFeatureFromAPI.BestmatchSurveys ?? null);
+      setBigBonus(surveysFeatureFromAPI.BigbonusSurveys ?? null);
+      setBaseOnFavTopic(surveysFeatureFromAPI.FavoriteSurveys ?? null);
     }
-  }, []);
+  }, [surveysFeatureFromAPI]);
 
   // FUNCTIONS
-  const fetchSurveys = async () => {
-    try {
-      // CALL API TO GET SURVEYS FEATURES
-      const response = homeSurveysData;
-      if (response) {
-        setSuitYouBest(response.BestmatchSurveys);
-        setBigBonus(response.BigbonusSurveys);
-        setBaseOnFavTopic(response.FavoriteSurveys);
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.log("Error while fetching surveys at home: ", error);
-    }
-  };
+  // const fetchSurveys = async () => {
+  //   try {
+  //     // CALL API TO GET SURVEYS FEATURES
+  //     const response = homeSurveysData;
+  //     if (response) {
+  //       setSuitYouBest(response.BestmatchSurveys);
+  //       setBigBonus(response.BigbonusSurveys);
+  //       setBaseOnFavTopic(response.FavoriteSurveys);
+  //       setIsLoading(false);
+  //     }
+  //   } catch (error) {
+  //     console.log("Error while fetching surveys at home: ", error);
+  //   }
+  // };
 
   return (
     <div className="home-page w-full flex flex-col items-center">
@@ -117,7 +125,7 @@ const HomePage: FC<HomePageProps> = () => {
         <div className="features w-full">
           <div className="features-div w-full flex flex-col items-start p-12">
             <p className="features-div___title">Suit You Best!</p>
-            {isLoading ? (
+            {isLoadingFeatureSurveys && !isFetched ? (
               <CircularProgress />
             ) : (
               <SurveysCarousel prefix="suityoubest" data={suitYouBest} />
@@ -126,7 +134,7 @@ const HomePage: FC<HomePageProps> = () => {
 
           <div className="features-div w-full flex flex-col items-start p-12">
             <p className="features-div___title">Big bonus!</p>
-            {isLoading ? (
+            {isLoadingFeatureSurveys && !isFetched ? (
               <CircularProgress />
             ) : (
               <SurveysCarousel prefix="bigbonus" data={bigBonus} />
@@ -137,7 +145,7 @@ const HomePage: FC<HomePageProps> = () => {
             <p className="features-div___title">
               Base On Your Favorite Topics!
             </p>
-            {isLoading ? (
+            {isLoadingFeatureSurveys && !isFetched ? (
               <CircularProgress />
             ) : (
               <SurveysCarousel prefix="base" data={baseOnFavTopic} />
