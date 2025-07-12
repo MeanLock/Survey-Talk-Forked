@@ -98,45 +98,6 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
             _imageHelpers = imageHelpers;
         }
 
-        // public async Task<string> GenerateImageUrl(string folderPath, string fileName, string type)
-        // {
-        //     if (_appConfig.IMAGE_SRC == "awsS3")
-        //     {
-        //         return await _awsS3Service.GeneratePresignedUrlAsync(folderPath, fileName, type);
-        //     }
-        //     return await _fileHelpers.GetImageUrl(folderPath, fileName, type);
-        // }
-
-        // public async Task SaveBase64File(string base64Data, string folderPath, string fileName)
-        // {
-        //     if (_appConfig.IMAGE_SRC == "awsS3")
-        //     {
-        //         await _awsS3Service.UploadBase64FileAsync(base64Data, folderPath, fileName);
-        //         return;
-        //     }
-        //     await _fileHelpers.SaveBase64File(base64Data, folderPath, fileName);
-        // }
-
-        // public async Task CopyFile(string sourceFolder, string sourceFileName, string destinationFolder, string destinationFileName)
-        // {
-        //     if (_appConfig.IMAGE_SRC == "awsS3")
-        //     {
-        //         await _awsS3Service.CopyFileAsync(sourceFolder, sourceFileName, destinationFolder, destinationFileName);
-        //         return;
-        //     }
-        //     await _fileHelpers.CopyFile(sourceFolder, sourceFileName, destinationFolder, destinationFileName);
-        // }
-
-        // public async Task DeleteFolder(string folderPath)
-        // {
-        //     if (_appConfig.IMAGE_SRC == "awsS3")
-        //     {
-        //         await _awsS3Service.DeleteFolderAsync(folderPath);
-        //         return;
-        //     }
-        //     await _fileHelpers.DeleteFolder(folderPath);
-        // }
-
         public async Task<Account> GetExistAccountById(int accountId)
         {
             var account = await _unitOfWork.AccountRepository.FindByIdAsync(accountId);

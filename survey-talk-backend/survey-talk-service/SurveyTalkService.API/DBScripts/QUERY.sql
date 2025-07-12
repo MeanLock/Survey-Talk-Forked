@@ -9,30 +9,30 @@ SELECT * from TakerTagFilter
 SELECT * from SurveyTopicFavorite where accountid=6
 
 
-Delete from SurveyTakenResultTagFilter where surveyTakenResultId = 131
-Delete from SurveyResponse where surveyTakenResultId = 131
-Delete from SurveyTakenResult where id = 131
+Delete from SurveyTakenResultTagFilter where surveyTakenResultId = 14
+Delete from SurveyResponse where surveyTakenResultId = 14
+Delete from SurveyTakenResult where surveyId = 1
 
 INSERT INTO SurveyRewardTracking(surveyId, rewardPrice ,rewardXp) VALUES (6, 10000, 1331);
 
 SELECT * from SurveyTakerSegment where surveyId = 7
-SELECT * from Survey where id =7
-SELECT * from SurveyRewardTracking where surveyId = 7
+SELECT * from Survey where surveyTypeId = 1 and id = 1
+SELECT * from SurveyRewardTracking where surveyId = 10
 SELECT * from SurveyStatusTracking where surveyId = 7
 
 SELECT * from SurveyGeneralConfig 
 
 SELECT * from SurveyTagFilter where surveyId =6
 
-SELECT * from SurveyStatusTracking where surveyId = 6
+SELECT * from SurveyStatusTracking where surveyId = 7
 SELECT * from SurveyMarketVersionStatusTracking where surveyId = 12 and version =1 
 SELECT * from SurveyMarket where surveyId = 12
-SELECT * from SurveyQuestion where surveyId =10
-SELECT * from SurveyOption
+SELECT * from SurveyQuestion where surveyId =7
+SELECT * from SurveyOption order by id desc
 SELECT * from SurveyRewardTracking
-SELECT * from SurveyTakenResult where surveyId = 6
+SELECT * from SurveyTakenResult where surveyId = 3
 SELECT * from SurveyTakenResultTagFilter where surveyTakenResultId =84
-SELECT * from SurveyResponse where SurveyTakenResultId = 9
+SELECT * from SurveyResponse where SurveyTakenResultId = 1
 SELECT * from PaymentHistory
 SELECT * from AccountGeneralConfig
 

@@ -93,8 +93,24 @@ INSERT INTO SurveyFieldInputType (id, name) VALUES
 (9, N'Kiểu ngày tháng năm giờ phút (DD/MM/YYYY HH:MM)');
 
 
--- PaymentType seed data
-INSERT INTO PaymentType (id, name, operationType) VALUES
+---- PaymentType seed data
+--INSERT INTO PaymentType (id, name, operationType) VALUES
+--(1, N'Community survey publishment', N'-'),
+--(2, N'Community survey taken earn', N'+'),
+--(3, N'Data purchase', N'-'),
+--(4, N'Data selling earn', N'+'),
+--(5, N'Account balance deposits', N'+'),
+--(6, N'Account balance withdrawal', N'-');
+
+---- PaymentStatus seed data
+--INSERT INTO PaymentStatus (id, name) VALUES
+--(1, N'Processing'),
+--(2, N'Success'),
+--(3, N'Cancelled'),
+--(4, N'Error');
+
+-- TransactionType seed data
+INSERT INTO TransactionType (id, name, operationType) VALUES
 (1, N'Community survey publishment', N'-'),
 (2, N'Community survey taken earn', N'+'),
 (3, N'Data purchase', N'-'),
@@ -102,8 +118,8 @@ INSERT INTO PaymentType (id, name, operationType) VALUES
 (5, N'Account balance deposits', N'+'),
 (6, N'Account balance withdrawal', N'-');
 
--- PaymentStatus seed data
-INSERT INTO PaymentStatus (id, name) VALUES
+-- TransactionStatus seed data
+INSERT INTO TransactionStatus(id, name) VALUES
 (1, N'Processing'),
 (2, N'Success'),
 (3, N'Cancelled'),

@@ -227,5 +227,32 @@ namespace SurveyTalkService.BusinessLogic.Helpers
             return GetNowByTimeZoneId(_appConfig.TIME_ZONE);
         }
 
+        public DateTime GetDayOfWeek(DateTime date, DayOfWeek dayOfWeek)
+        {
+            int diff = (7 + (int)date.DayOfWeek - (int)dayOfWeek) % 7;
+            return date.AddDays(-diff);
+        }
+
+        public DateTime GetFirstDayOfMonthByDate(DateTime date)
+        {
+            return new DateTime(date.Year, date.Month, 1);
+        }
+
+        public DateTime GetLastDayOfMonthByDate(DateTime date)
+        {
+            return new DateTime(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month));
+        }
+
+        public DateTime GetFirstDayOfYearByDate(DateTime date)
+        {
+            return new DateTime(date.Year, 1, 1);
+        }
+
+        public DateTime GetLastDayOfYearByDate(DateTime date)
+        {
+            return new DateTime(date.Year, 12, 31);
+        }
+
+
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SurveyTalkService.BusinessLogic.Services.DbServices.FilterServices;
 using SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices;
 using SurveyTalkService.BusinessLogic.Services.DbServices.PaymentServices;
+using SurveyTalkService.BusinessLogic.Services.DbServices.ReportServices;
 
 namespace SurveyTalkService.BusinessLogic.Registrations
 {
@@ -26,9 +27,13 @@ namespace SurveyTalkService.BusinessLogic.Registrations
             services.AddScoped<SurveyResponseService>();
             services.AddScoped<SurveyTransactionService>();
 
-
             // FilterServices
             services.AddScoped<FilterTagService>();
+
+            // ReportServices
+            services.AddScoped<SurveyStatisticsService>();
+            services.AddScoped<TransactionStatisticsService>();
+            services.AddScoped<UserStatisticsService>();
 
 
 

@@ -1,4 +1,4 @@
-namespace SurveyTalkService.BusinessLogic.DTOs.Payment
+namespace SurveyTalkService.BusinessLogic.DTOs.Transaction
 {
     public class AccountBalanceDepositDTO
     {

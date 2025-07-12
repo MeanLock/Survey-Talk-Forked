@@ -14,5 +14,6 @@ namespace SurveyTalkService.DataAccess.Repositories.interfaces
         Task<IEnumerable<Account>> FindByAccountProfileAsync(AccountProfile accountProfile, bool? IsDeletedContain = false);
         bool CompareAccountProfile(AccountProfile accountProfile, AccountProfile targetAccountProfile);
         Task<bool> DeactivateAsync(int id, bool deactivate);
+        Task<int> CountAccountRegistrationByPeriodAsync(DateOnly startDate, DateOnly endDate);
     }
 }

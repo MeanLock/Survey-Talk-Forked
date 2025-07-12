@@ -7,5 +7,7 @@ namespace SurveyTalkService.DataAccess.Repositories.interfaces
     public interface ISurveyQuestionRepository
     {
         Task<IEnumerable<SurveyQuestion>> FindBySurveyIdAndIsDeletedContainAsync(int surveyId, bool isDeletedContain);
+
+        Task DeleteByIdAsync(int id, DateTime? deletedAt = null);
     }
 }

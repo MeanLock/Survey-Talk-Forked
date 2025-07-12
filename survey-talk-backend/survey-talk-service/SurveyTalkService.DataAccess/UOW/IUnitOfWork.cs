@@ -12,13 +12,14 @@ public interface IUnitOfWork
     IPasswordResetTokenRepository PasswordResetTokenRepository { get; }
     ISurveyTakenResultRepository SurveyTakenResultRepository { get; }
     ISurveyStatusTrackingRepository SurveyStatusTrackingRepository { get; }
-    IPaymentHistoryRepository PaymentHistoryRepository { get; }
     IFilterTagRepository FilterTagRepository { get; }
     ITakerTagFilterRepository TakerTagFilterRepository { get; }
     ISystemConfigProfileRepository SystemConfigProfileRepository { get; }
     ISurveyTakerSegmentRepository SurveyTakerSegmentRepository { get; }
     ISurveyTagFilterRepository SurveyTagFilterRepository { get; }
     IAccountProfileRepository AccountProfileRepository { get; }
+    IAccountBalanceTransactionRepository AccountBalanceTransactionRepository { get; }
+    ISurveyCommunityTransactionRepository SurveyCommunityTransactionRepository { get; }
 
     int Complete();
 }

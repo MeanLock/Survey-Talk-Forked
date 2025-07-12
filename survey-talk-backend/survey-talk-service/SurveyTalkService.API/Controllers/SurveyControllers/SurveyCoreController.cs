@@ -1,6 +1,7 @@
 ﻿using Duende.IdentityServer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using SurveyTalkService.API.Controllers.UserControllers;
@@ -50,7 +51,7 @@ namespace SurveyTalkService.API.Controllers.SurveyControllers
             var account = HttpContext.Items["LoggedInAccount"] as Account;
             int userId = int.Parse(User.FindFirst("id")?.Value);
             int roleId = int.Parse(User.FindFirst("role_id")?.Value);
-            var surveys = await _surveyCoreService.GetCommunitySurveys(userId, roleId);
+            var surveys = await _surveyCoreService.GetCommunitySurveys(account);
 
             return Ok(new
             {
@@ -156,7 +157,7 @@ namespace SurveyTalkService.API.Controllers.SurveyControllers
             var account = HttpContext.Items["LoggedInAccount"] as Account;
             int userId = int.Parse(User.FindFirst("id")?.Value);
             int roleId = int.Parse(User.FindFirst("role_id")?.Value);
-            var surveys = await _surveyCoreService.GetCommunitySurveys(userId, roleId);
+            var surveys = await _surveyCoreService.GetCommunitySurveys(account);
             if (!string.IsNullOrEmpty(keywords))
             {
                 surveys = surveys.Where(s => s.Title.Contains(keywords, StringComparison.OrdinalIgnoreCase)).ToList();
@@ -166,15 +167,15 @@ namespace SurveyTalkService.API.Controllers.SurveyControllers
             {
                 if (deadline == SurveyDeadlineQueryEnum.OnDeadline)
                 {
-                    surveys = surveys.Where(s => s.EndDate.HasValue && s.EndDate.Value == DateOnly.FromDateTime(_dateHelpers.GetNowByAppTimeZone())).OrderByDescending(s => s.EndDate).Take(limit ?? 10).ToList();
+                    surveys = surveys.Where(s => s.AvailableTakenResultSlot != 0 && s.SurveyStatusId == 2 && s.EndDate.HasValue && s.EndDate.Value == DateOnly.FromDateTime(_dateHelpers.GetNowByAppTimeZone())).OrderByDescending(s => s.EndDate).Take(limit ?? 10).ToList();
                 }
                 else if (deadline == SurveyDeadlineQueryEnum.NearDeadline)
                 {
-                    surveys = surveys.Where(s => s.EndDate.HasValue && s.EndDate.Value > DateOnly.FromDateTime(_dateHelpers.GetNowByAppTimeZone())).OrderByDescending(s => s.EndDate).Take(limit ?? 10).ToList();
+                    surveys = surveys.Where(s => s.AvailableTakenResultSlot != 0 && s.SurveyStatusId == 2 && s.EndDate.HasValue && s.EndDate.Value > DateOnly.FromDateTime(_dateHelpers.GetNowByAppTimeZone())).OrderByDescending(s => s.EndDate).Take(limit ?? 10).ToList();
                 }
                 else if (deadline == SurveyDeadlineQueryEnum.LateForDeadline)
                 {
-                    surveys = surveys.Where(s => s.EndDate.HasValue && s.EndDate.Value < DateOnly.FromDateTime(_dateHelpers.GetNowByAppTimeZone())).OrderByDescending(s => s.EndDate).Take(limit ?? 10).ToList();
+                    surveys = surveys.Where(s => s.AvailableTakenResultSlot != 0 && s.SurveyStatusId == 3 && s.EndDate.HasValue && s.EndDate.Value < DateOnly.FromDateTime(_dateHelpers.GetNowByAppTimeZone())).OrderByDescending(s => s.EndDate).Take(limit ?? 10).ToList();
                 }
                 else
                 {
@@ -246,6 +247,24 @@ namespace SurveyTalkService.API.Controllers.SurveyControllers
             });
         }
 
+        // GET /api/Survey/core/level-update-community-survey
+        [HttpGet("level-update-community-survey")]
+        [Authorize(Policy = "CustomerRequiredOnly")]
+        public async Task<IActionResult> GetLevelUpdateCommunitySurvey()
+        {
+            Account account = HttpContext.Items["LoggedInAccount"] as Account;
+            if (account.ProgressionSurveyCount <= 0)
+            {
+                return BadRequest("Level hiện tại không cho phép bạn làm level update survey");
+            }
+            var survey = await _surveyCoreService.GetLevelUpdateCommunitySurvey(account);
+            
+            return Ok(new
+            {
+                Survey = survey
+            });
+        }
+
         // GET /api/Survey/core/community/surveys/me
         [HttpGet("community/surveys/me")]
         [Authorize(Policy = "CustomerRequiredOnly")]
@@ -265,15 +284,15 @@ namespace SurveyTalkService.API.Controllers.SurveyControllers
             {
                 if (deadline == SurveyDeadlineQueryEnum.OnDeadline)
                 {
-                    surveys = surveys.Where(s => s.EndDate.HasValue && s.EndDate.Value == DateOnly.FromDateTime(_dateHelpers.GetNowByAppTimeZone())).OrderByDescending(s => s.EndDate).Take(limit ?? 100).ToList();
+                    surveys = surveys.Where(s => s.AvailableTakenResultSlot != 0 && s.SurveyStatusId == 2 && s.EndDate.HasValue && s.EndDate.Value == DateOnly.FromDateTime(_dateHelpers.GetNowByAppTimeZone())).OrderByDescending(s => s.EndDate).Take(limit ?? 100).ToList();
                 }
                 else if (deadline == SurveyDeadlineQueryEnum.NearDeadline)
                 {
-                    surveys = surveys.Where(s => s.EndDate.HasValue && s.EndDate.Value > DateOnly.FromDateTime(_dateHelpers.GetNowByAppTimeZone())).OrderByDescending(s => s.EndDate).Take(limit ?? 100).ToList();
+                    surveys = surveys.Where(s => s.AvailableTakenResultSlot != 0 && s.SurveyStatusId == 2 && s.EndDate.HasValue && s.EndDate.Value > DateOnly.FromDateTime(_dateHelpers.GetNowByAppTimeZone())).OrderByDescending(s => s.EndDate).Take(limit ?? 100).ToList();
                 }
                 else if (deadline == SurveyDeadlineQueryEnum.LateForDeadline)
                 {
-                    surveys = surveys.Where(s => s.EndDate.HasValue && s.EndDate.Value < DateOnly.FromDateTime(_dateHelpers.GetNowByAppTimeZone())).OrderByDescending(s => s.EndDate).Take(limit ?? 100).ToList();
+                    surveys = surveys.Where(s => s.AvailableTakenResultSlot != 0 && s.SurveyStatusId == 3 && s.EndDate.HasValue && s.EndDate.Value < DateOnly.FromDateTime(_dateHelpers.GetNowByAppTimeZone())).OrderByDescending(s => s.EndDate).Take(limit ?? 100).ToList();
                 }
                 else
                 {

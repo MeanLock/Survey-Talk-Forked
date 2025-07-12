@@ -42,6 +42,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
         private readonly IUnitOfWork _unitOfWork;
 
         // REPOSITORIES
+        private readonly IGenericRepository<Survey> _surveyGenericRepository;
         private readonly IGenericRepository<SurveyQuestion> _surveyQuestionGenericRepository;
         private readonly IGenericRepository<SurveyOption> _surveyOptionGenericRepository;
 
@@ -58,6 +59,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
 
             IGenericRepository<SurveyQuestion> surveyQuestionGenericRepository,
             IGenericRepository<SurveyOption> surveyOptionGenericRepository,
+            IGenericRepository<Survey> surveyGenericRepository,
 
             FileHelpers fileHelpers,
             ImageHelpers imageHelpers,
@@ -75,6 +77,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
 
             _surveyQuestionGenericRepository = surveyQuestionGenericRepository;
             _surveyOptionGenericRepository = surveyOptionGenericRepository;
+            _surveyGenericRepository = surveyGenericRepository;
 
             _fileHelpers = fileHelpers;
             _imageHelpers = imageHelpers;
@@ -106,8 +109,8 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                     Title = survey.Title,
                     Description = survey.Description,
                     SurveyTypeId = survey.SurveyTypeId,
-                    SurveyTopicId = survey.SurveyTopicId ?? 0,
-                    SurveySpecificTopicId = survey.SurveySpecificTopicId ?? 0,
+                    SurveyTopicId = survey.SurveyTopicId,
+                    SurveySpecificTopicId = survey.SurveySpecificTopicId,
                     MainImageBase64 = await _imageHelpers.GenerateImageBase64(_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH, survey.Id.ToString(), "main"),
                     BackgroundImageBase64 = await _imageHelpers.GenerateImageBase64(_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH, survey.Id.ToString(), "background"),
                     SurveyStatusId = (await _unitOfWork.SurveyRepository.GetLatestSurveyStatusTrackingBySurveyIdAsync(survey.Id)).SurveyStatusId,
@@ -166,95 +169,164 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
 
         public async Task UpdateSurveyByEditingSession(SurveyEditingSessionDTO surveyEditingSessionDTO)
         {
-            try
+            using (var transaction = await _appDbContext.Database.BeginTransactionAsync())
             {
-                // 1. Lấy survey từ DB
-                SurveyFilterObject surveyFilterObject = new SurveyFilterObject { };
-                var survey = await _unitOfWork.SurveyRepository.FindByIdAndFilterObjectAsync(surveyEditingSessionDTO.Id, surveyFilterObject);
-                if (survey == null)
-                    throw new Exception($"Survey {surveyEditingSessionDTO.Id} không tồn tại");
+                try
+                {
+                    // 1. Lấy survey từ DB
+                    SurveyFilterObject surveyFilterObject = new SurveyFilterObject { };
+                    var survey = await _unitOfWork.SurveyRepository.FindByIdAndFilterObjectAsync(surveyEditingSessionDTO.Id, surveyFilterObject);
+                    if (survey == null)
+                        throw new Exception($"Survey {surveyEditingSessionDTO.Id} không tồn tại");
 
-                // 2. Cập nhật các field scalar [field cập nhật]
-                survey.Title = surveyEditingSessionDTO.Title ?? survey.Title;
-                survey.Description = surveyEditingSessionDTO.Description ?? survey.Description;
-                survey.SurveyTopicId = surveyEditingSessionDTO.SurveyTopicId;
-                survey.SurveySpecificTopicId = surveyEditingSessionDTO.SurveySpecificTopicId;
-                survey.SecurityModeId = surveyEditingSessionDTO.SecurityModeId;
+                    // 2. Cập nhật các field scalar [field cập nhật]
+                    survey.Title = surveyEditingSessionDTO.Title ?? survey.Title;
+                    survey.Description = surveyEditingSessionDTO.Description ?? survey.Description;
+                    survey.SurveyTopicId = surveyEditingSessionDTO.SurveyTopicId;
+                    survey.SurveySpecificTopicId = surveyEditingSessionDTO.SurveySpecificTopicId;
+                    survey.SecurityModeId = surveyEditingSessionDTO.SecurityModeId;
+                    await _surveyGenericRepository.UpdateAsync(survey.Id, survey);
 
-                // 3. Cập nhật ảnh chính và background
-                if (surveyEditingSessionDTO.MainImageBase64 != null)
-                {
-                    await _imageHelpers.SaveBase64File(surveyEditingSessionDTO.MainImageBase64, $"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}", "main");
-                }
-                else
-                {
-                    await _imageHelpers.DeleteFile($"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}", "main");
-                }
-                if (surveyEditingSessionDTO.BackgroundImageBase64 != null)
-                {
-                    await _imageHelpers.SaveBase64File(surveyEditingSessionDTO.BackgroundImageBase64, $"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}", "background");
-                }
-                else
-                {
-                    await _imageHelpers.DeleteFile($"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}", "background");
-                }
-
-                // 4. Cập nhật ConfigJsonString
-                if (surveyEditingSessionDTO.ConfigJson != null)
-                {
-                    survey.ConfigJsonString = JsonConvert.SerializeObject(surveyEditingSessionDTO.ConfigJson);
-                }
-
-                // 5. Xử lý các question
-                var dtoQuestionIds = surveyEditingSessionDTO.Questions?.Select(q => q.Id).ToHashSet() ?? new HashSet<int>();
-                var dbQuestions = survey.SurveyQuestions.ToList();
-                // Xóa question không còn trong DTO
-                foreach (var dbQ in dbQuestions)
-                {
-                    if (!dtoQuestionIds.Contains(dbQ.Id))
+                    // 3. Cập nhật ảnh chính và background
+                    if (surveyEditingSessionDTO.MainImageBase64 != null)
                     {
-                        // Xóa file ảnh question
-                        await _imageHelpers.DeleteFolder($"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{dbQ.Id}");
-                        _appDbContext.SurveyQuestions.Remove(dbQ);
+                        await _imageHelpers.SaveBase64File(surveyEditingSessionDTO.MainImageBase64, $"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}", "main");
                     }
-                }
-                // Cập nhật hoặc thêm mới question
-                foreach (var dtoQ in surveyEditingSessionDTO.Questions ?? new List<SurveyEditingSessionQuestionDTO>())
-                {
-                    var dbQ = dbQuestions.FirstOrDefault(q => q.Id == dtoQ.Id);
-                    if (dbQ == null) // [CHỈNH LẠI] sau sẽ có id mới 
+                    else
                     {
-                        // Thêm mới question
-                        var newQ = new SurveyQuestion
-                        {
-                            SurveyId = survey.Id,
+                        await _imageHelpers.DeleteFile($"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}", "main");
+                    }
+                    if (surveyEditingSessionDTO.BackgroundImageBase64 != null)
+                    {
+                        await _imageHelpers.SaveBase64File(surveyEditingSessionDTO.BackgroundImageBase64, $"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}", "background");
+                    }
+                    else
+                    {
+                        await _imageHelpers.DeleteFile($"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}", "background");
+                    }
 
-                            QuestionTypeId = dtoQ.QuestionTypeId,
-                            IsReanswerRequired = dtoQ.IsReanswerRequired,
-                            ReferenceSurveyQuestionId = dtoQ.ReferenceSurveyQuestionId,
-                            Content = dtoQ.Content,
-                            Description = dtoQ.Description,
-                            TimeLimit = dtoQ.TimeLimit == null ? RandomNumber10To15() : dtoQ.TimeLimit.Value,
-                            IsVoiced = dtoQ.IsVoiced,
-                            Order = (byte)dtoQ.Order,
-                            Version = dtoQ.Version.HasValue ? (byte?)dtoQ.Version.Value : null,
-                            ConfigJsonString = dtoQ.ConfigJson != null ? Newtonsoft.Json.JsonConvert.SerializeObject(dtoQ.ConfigJson) : null,
-                            // SurveyOptions = new List<SurveyOption>()
-                        };
-                        await _surveyQuestionGenericRepository.CreateAsync(newQ);
-                        // Lưu ảnh question nếu có
+                    // 4. Cập nhật ConfigJsonString
+                    if (surveyEditingSessionDTO.ConfigJson != null)
+                    {
+                        survey.ConfigJsonString = JsonConvert.SerializeObject(surveyEditingSessionDTO.ConfigJson);
+                    }
+
+                    // 5. Xử lý các question
+                    var dtoQuestionIds = surveyEditingSessionDTO.Questions?.Where(q => q.Id != null).Select(q => q.Id).ToHashSet() ?? new HashSet<int?>(); // [CHỈNH LẠI] sau sẽ có id mới
+                    var dbQuestions = survey.SurveyQuestions.ToList();
+                    // Xóa question không còn trong DTO
+                    foreach (var dbQ in dbQuestions)
+                    {
+                        if (!dtoQuestionIds.Contains(dbQ.Id))
+                        {
+                            // Xóa file ảnh question
+                            await _imageHelpers.DeleteFolder($"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{dbQ.Id}");
+                            if (surveyEditingSessionDTO.SurveyStatusId == 2 && surveyEditingSessionDTO.SurveyTypeId == 2)
+                            {
+                                await _unitOfWork.SurveyQuestionRepository.DeleteByIdAsync(dbQ.Id, _dateHelpers.GetNowByAppTimeZone());
+                            }
+                            else
+                            {
+                                await _unitOfWork.SurveyQuestionRepository.DeleteByIdAsync(dbQ.Id);
+                            }
+                        }
+                    }
+                    // Cập nhật hoặc thêm mới question
+                    foreach (var dtoQ in surveyEditingSessionDTO.Questions ?? new List<SurveyEditingSessionQuestionDTO>())
+                    {
+                        var dbQ = dbQuestions.FirstOrDefault(q => q.Id == dtoQ.Id);
+                        // Console.WriteLine("Processing question with ID: " + dtoQ.Id);
+                        // Console.WriteLine("Question content: " + dtoQ.Content);
+                        // Console.WriteLine("is existing question: " + (dbQ == null ? "No" : "Yes"));
+                        if (dbQ == null) // [CHỈNH LẠI] sau sẽ có id mới 
+                        {
+                            // Thêm mới question
+                            var newQ = new SurveyQuestion
+                            {
+                                SurveyId = survey.Id,
+
+                                QuestionTypeId = dtoQ.QuestionTypeId,
+                                IsReanswerRequired = dtoQ.IsReanswerRequired,
+                                ReferenceSurveyQuestionId = dtoQ.ReferenceSurveyQuestionId,
+                                Content = dtoQ.Content,
+                                Description = dtoQ.Description,
+                                TimeLimit = dtoQ.TimeLimit == null ? RandomNumber10To15() : dtoQ.TimeLimit.Value,
+                                IsVoiced = dtoQ.IsVoiced,
+                                Order = (byte)dtoQ.Order,
+                                Version = dtoQ.Version.HasValue ? (byte?)dtoQ.Version.Value : null,
+                                ConfigJsonString = dtoQ.ConfigJson != null ? Newtonsoft.Json.JsonConvert.SerializeObject(dtoQ.ConfigJson) : null,
+                                // SurveyOptions = new List<SurveyOption>()
+                            };
+                            await _surveyQuestionGenericRepository.CreateAsync(newQ);
+                            // Lưu ảnh question nếu có
+                            if (dtoQ.MainImageBase64 != null)
+                            {
+                                await _imageHelpers.SaveBase64File(dtoQ.MainImageBase64, $"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{newQ.Id}", "main");
+                            }
+                            // Thêm mới option cho question mới
+                            foreach (var dtoO in dtoQ.Options ?? new List<SurveyEditingSessionOptionDTO>())
+                            {
+                                if (dtoO.Id == null) // [CHỈNH LẠI] sau sẽ có id mới
+                                {
+                                    var newO = new SurveyOption
+                                    {
+                                        SurveyQuestionId = newQ.Id,
+                                        Content = dtoO.Content,
+                                        Order = (byte)dtoO.Order
+                                    };
+                                    await _surveyOptionGenericRepository.CreateAsync(newO);
+                                    // Lưu ảnh option nếu có
+                                    if (dtoO.MainImageBase64 != null)
+                                    {
+                                        await _imageHelpers.SaveBase64File(dtoO.MainImageBase64, $"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{newQ.Id}\\option_{newO.Id}", "main");
+                                    }
+                                }
+                            }
+                            continue;
+                        }
+                        dbQ.QuestionTypeId = dtoQ.QuestionTypeId;
+                        dbQ.IsReanswerRequired = dtoQ.IsReanswerRequired;
+                        dbQ.ReferenceSurveyQuestionId = dtoQ.ReferenceSurveyQuestionId;
+                        dbQ.Content = dtoQ.Content;
+                        dbQ.Description = dtoQ.Description;
+                        dbQ.TimeLimit = dtoQ.TimeLimit == null ? RandomNumber10To15() : dtoQ.TimeLimit.Value;
+                        dbQ.IsVoiced = dtoQ.IsVoiced;
+                        dbQ.Order = (byte)dtoQ.Order;
+                        if (dtoQ.ConfigJson != null)
+                            dbQ.ConfigJsonString = JsonConvert.SerializeObject(dtoQ.ConfigJson);
+                        // Xử lý ảnh question
                         if (dtoQ.MainImageBase64 != null)
                         {
-                            await _imageHelpers.SaveBase64File(dtoQ.MainImageBase64, $"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{newQ.Id}", "main");
+                            await _imageHelpers.SaveBase64File(dtoQ.MainImageBase64, $"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{dbQ.Id}", "main");
                         }
-                        // Thêm mới option cho question mới
+                        else
+                        {
+                            await _imageHelpers.DeleteFile($"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{dbQ.Id}", "main");
+                        }
+                        await _surveyQuestionGenericRepository.UpdateAsync(dbQ.Id, dbQ);
+
+                        // Xử lý option
+                        var dtoOptionIds = dtoQ.Options?.Where(o => o.Id != null).Select(o => o.Id).ToHashSet() ?? new HashSet<int?>(); // [CHỈNH LẠI] sau sẽ có id mới
+                        var dbOptions = dbQ.SurveyOptions.ToList();
+                        // Xóa option không còn trong DTO
+                        foreach (var dbO in dbOptions)
+                        {
+                            if (!dtoOptionIds.Contains(dbO.Id))
+                            {
+                                await _imageHelpers.DeleteFolder($"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{dbQ.Id}\\option_{dbO.Id}");
+                                _appDbContext.SurveyOptions.Remove(dbO);
+                            }
+                        }
+                        // Cập nhật hoặc thêm mới option
                         foreach (var dtoO in dtoQ.Options ?? new List<SurveyEditingSessionOptionDTO>())
                         {
-                            if (dtoO.Id == null) // [CHỈNH LẠI] sau sẽ có id mới
+                            var dbO = dbOptions.FirstOrDefault(o => o.Id == dtoO.Id);
+                            if (dbO == null)
                             {
+                                // Thêm mới option nếu cần
                                 var newO = new SurveyOption
                                 {
-                                    SurveyQuestionId = newQ.Id,
+                                    SurveyQuestionId = dbQ.Id,
                                     Content = dtoO.Content,
                                     Order = (byte)dtoO.Order
                                 };
@@ -262,84 +334,35 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                                 // Lưu ảnh option nếu có
                                 if (dtoO.MainImageBase64 != null)
                                 {
-                                    await _imageHelpers.SaveBase64File(dtoO.MainImageBase64, $"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{newQ.Id}\\option_{newO.Id}", "main");
+                                    await _imageHelpers.SaveBase64File(dtoO.MainImageBase64, $"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{dbQ.Id}\\option_{newO.Id}", "main");
                                 }
+                                continue;
                             }
-                        }
-                        continue;
-                    }
-                    dbQ.QuestionTypeId = dtoQ.QuestionTypeId;
-                    dbQ.IsReanswerRequired = dtoQ.IsReanswerRequired;
-                    dbQ.ReferenceSurveyQuestionId = dtoQ.ReferenceSurveyQuestionId;
-                    dbQ.Content = dtoQ.Content;
-                    dbQ.Description = dtoQ.Description;
-                    dbQ.TimeLimit = dtoQ.TimeLimit == null ? RandomNumber10To15() : dtoQ.TimeLimit.Value;
-                    dbQ.IsVoiced = dtoQ.IsVoiced;
-                    dbQ.Order = (byte)dtoQ.Order;
-                    if (dtoQ.ConfigJson != null)
-                        dbQ.ConfigJsonString = JsonConvert.SerializeObject(dtoQ.ConfigJson);
-                    // Xử lý ảnh question
-                    if (dtoQ.MainImageBase64 != null)
-                    {
-                        await _imageHelpers.SaveBase64File(dtoQ.MainImageBase64, $"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{dbQ.Id}", "main");
-                    }
-                    else
-                    {
-                        await _imageHelpers.DeleteFile($"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{dbQ.Id}", "main");
-                    }
-                    // Xử lý option
-                    var dtoOptionIds = dtoQ.Options?.Select(o => o.Id).ToHashSet() ?? new HashSet<int>();
-                    var dbOptions = dbQ.SurveyOptions.ToList();
-                    // Xóa option không còn trong DTO
-                    foreach (var dbO in dbOptions)
-                    {
-                        if (!dtoOptionIds.Contains(dbO.Id))
-                        {
-                            await _imageHelpers.DeleteFolder($"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{dbQ.Id}\\option_{dbO.Id}");
-                            _appDbContext.SurveyOptions.Remove(dbO);
-                        }
-                    }
-                    // Cập nhật hoặc thêm mới option
-                    foreach (var dtoO in dtoQ.Options ?? new List<SurveyEditingSessionOptionDTO>())
-                    {
-                        var dbO = dbOptions.FirstOrDefault(o => o.Id == dtoO.Id);
-                        if (dbO == null)
-                        {
-                            // Thêm mới option nếu cần
-                            var newO = new SurveyOption
-                            {
-                                SurveyQuestionId = dbQ.Id,
-                                Content = dtoO.Content,
-                                Order = (byte)dtoO.Order
-                            };
-                            await _surveyOptionGenericRepository.CreateAsync(newO);
-                            // Lưu ảnh option nếu có
+                            dbO.Content = dtoO.Content;
+                            dbO.Order = (byte)dtoO.Order;
                             if (dtoO.MainImageBase64 != null)
                             {
-                                await _imageHelpers.SaveBase64File(dtoO.MainImageBase64, $"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{dbQ.Id}\\option_{newO.Id}", "main");
+                                await _imageHelpers.SaveBase64File(dtoO.MainImageBase64, $"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{dbQ.Id}\\option_{dbO.Id}", "main");
                             }
-                            continue;
-                        }
-                        dbO.Content = dtoO.Content;
-                        dbO.Order = (byte)dtoO.Order;
-                        if (dtoO.MainImageBase64 != null)
-                        {
-                            await _imageHelpers.SaveBase64File(dtoO.MainImageBase64, $"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{dbQ.Id}\\option_{dbO.Id}", "main");
-                        }
-                        else
-                        {
-                            await _imageHelpers.DeleteFile($"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{dbQ.Id}\\option_{dbO.Id}", "main");
+                            else
+                            {
+                                await _imageHelpers.DeleteFile($"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{dbQ.Id}\\option_{dbO.Id}", "main");
+                            }
+                            await _surveyOptionGenericRepository.UpdateAsync(dbO.Id, dbO);
                         }
                     }
+                    await transaction.CommitAsync();
                 }
-                await _appDbContext.SaveChangesAsync();
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    Console.WriteLine("\n\n\n" + ex.StackTrace + "\n\n\n");
+                    Console.WriteLine("\n" + ex.Message + "\n");
+                    throw new Exception("Lỗi cập nhật phiên chỉnh sửa survey, lỗi: " + ex.Message);
+                }
+
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine("\n" + ex.Message + "\n");
-                Console.WriteLine("\n" + ex.StackTrace + "\n");
-                throw new HttpRequestException("Lỗi cập nhật phiên chỉnh sửa survey, lỗi: " + ex.Message);
-            }
+
         }
 
 
@@ -357,6 +380,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
             {
                 backgroundImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.SURVEY_DEFAULT_BACKGROUND_IMAGE_PATH, surveyConfigJson.DefaultBackgroundImageId.ToString(), "main");
             }
+
             var dto = new SurveyTakingSessionDTO
             {
                 Id = survey.Id,
@@ -364,19 +388,19 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                 Title = survey.Title,
                 Description = survey.Description,
                 SurveyTypeId = survey.SurveyTypeId,
-                SurveyTopicId = survey.SurveyTopicId ?? 0,
-                SurveySpecificTopicId = survey.SurveySpecificTopicId ?? 0,
+                SurveyTopicId = survey.SurveyTopicId,
+                SurveySpecificTopicId = survey.SurveySpecificTopicId,
                 MainImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH, survey.Id.ToString(), "main"),
                 BackgroundImageUrl = backgroundImageUrl,
-                SurveyStatusId = survey.SurveyStatusTrackings.OrderByDescending(sst => sst.CreatedAt).FirstOrDefault()?.SurveyStatusId ?? 0,
+                SurveyStatusId = survey.SurveyStatusTrackings.OrderByDescending(sst => sst.CreatedAt).FirstOrDefault()?.SurveyStatusId,
                 Version = survey.SurveyTypeId == 3 ? version : null,
-                MarketSurveyVersionStatusId = survey.SurveyMarketVersionStatusTrackings.OrderByDescending(smt => smt.CreatedAt).FirstOrDefault()?.SurveyStatusId ?? 0,
+                MarketSurveyVersionStatusId = survey.SurveyMarketVersionStatusTrackings.OrderByDescending(smt => smt.CreatedAt).FirstOrDefault()?.SurveyStatusId,
                 SecurityModeId = survey.SecurityModeId,
                 ConfigJson = JsonConvert.DeserializeObject<SurveyTakingSessionConfigJsonDTO>(survey.ConfigJsonString),
                 Questions = (await Task.WhenAll(survey.SurveyQuestions.Select(async sq => new SurveyTakingSessionQuestionDTO
                 {
                     Id = sq.Id,
-                    QuestionTypeId = sq.QuestionTypeId,
+                    QuestionTypeId = sq.QuestionTypeId != null ? sq.QuestionTypeId.Value : 1,
                     Version = sq.Version,
                     MainImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH, $"{survey.Id}/question_{sq.Id}", "main"),
                     Content = sq.Content,
@@ -394,8 +418,11 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                     }))).ToList()
                 }))).ToList()
             };
-
             return dto;
+
+
+
+
         }
 
         /////////////////////////////////////////////////////////////
@@ -493,11 +520,12 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
 
         public async Task<SurveySessionUpdateTriggerResponseDTO> UpdateSurveyEditingSessionAutoTrigger(int surveyId, SurveyEditingSessionDTO surveyEditingSessionDTO, int userId)
         {
-            
+
             if (surveyEditingSessionDTO == null)
             {
                 throw new ForbiddenException("không tìm thất phiên chỉnh sửa tự động");
-            }else if (surveyEditingSessionDTO.Id != surveyId)
+            }
+            else if (surveyEditingSessionDTO.Id != surveyId)
             {
                 Console.WriteLine("id phiên chỉnh sửa không khớp, survey id: " + surveyId.ToString() + " và phiên chỉnh sửa id: " + surveyEditingSessionDTO.Id.ToString());
                 throw new ForbiddenException("id phiên chỉnh sửa không khớp");
@@ -585,11 +613,12 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
 
                 if (currentSurveyStatus.SurveyStatusId == 2 && surveyEditingSessionDTO.Questions.Where(q => q.Id == null).ToList().Count > 0)  //[CHỈNH LẠI] sau này sẽ kiểm tra ID question có tồn tại hay không
                 {
-                    return new SurveySessionUpdateTriggerResponseDTO
-                    {
-                        Message = "không được phép thêm câu hỏi mới vào survey đã đăng",
-                        IsSuccess = false
-                    };
+                    // return new SurveySessionUpdateTriggerResponseDTO
+                    // {
+                    //     Message = "không được phép thêm câu hỏi mới vào survey đã đăng",
+                    //     IsSuccess = false
+                    // };
+                    throw new ForbiddenException("không được phép thêm câu hỏi mới vào survey đã đăng");
                 }
 
                 try
@@ -706,7 +735,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                             throw new Exception("không tìm thấy survey theo điều kiện và có id " + surveyId.ToString());
                         }
                     }
-                    else if (TakingSubject == SurveyTakingSubjectEnum.Verified)
+                    else if (TakingSubject == SurveyTakingSubjectEnum.Verified || TakingSubject == SurveyTakingSubjectEnum.LevelUpdate)
                     {
                         Account account = await _unitOfWork.AccountRepository.FindByIdAsync(userId);
                         if (account.RoleId != 4)

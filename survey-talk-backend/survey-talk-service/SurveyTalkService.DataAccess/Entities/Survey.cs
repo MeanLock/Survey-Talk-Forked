@@ -61,6 +61,8 @@ public partial class Survey
 
     public virtual SurveySecurityMode? SecurityMode { get; set; }
 
+    public virtual ICollection<SurveyCommunityTransaction> SurveyCommunityTransactions { get; set; } = new List<SurveyCommunityTransaction>();
+
     public virtual ICollection<SurveyFeedback> SurveyFeedbacks { get; set; } = new List<SurveyFeedback>();
 
     public virtual ICollection<SurveyMarketVersionStatusTracking> SurveyMarketVersionStatusTrackings { get; set; } = new List<SurveyMarketVersionStatusTracking>();

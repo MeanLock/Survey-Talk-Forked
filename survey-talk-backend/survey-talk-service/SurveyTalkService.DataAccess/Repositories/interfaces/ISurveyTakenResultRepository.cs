@@ -10,5 +10,6 @@ namespace SurveyTalkService.DataAccess.Repositories.interfaces
         Task<IEnumerable<SurveyTakenResult>> FindBySurveyIdAsync(int surveyId, bool? IsInvalidTakenResultContain = null);
         Task<IEnumerable<SurveyTakenResult>> FindByTakerIdAsync(int takerId, int? limit = null);
         Task<SurveyTakenResult> FindByTakerIdAndSurveyIdAsync(int takerId, int surveyId);
+        Task<int> CountBySurveyIdAsync(int surveyId, bool? isInvalidTakenResultContain = null);
     }
 }

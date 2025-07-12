@@ -49,7 +49,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
         private readonly IGenericRepository<SurveyTagFilter> _surveyTagFilterGenericRepository;
         private readonly IGenericRepository<SurveyStatusTracking> _surveyStatusTrackingGenericRepository;
         private readonly IGenericRepository<SurveyRewardTracking> _surveyRewardTrackingGenericRepository;
-        private readonly IGenericRepository<PaymentHistory> _paymentHistoryGenericRepository;
+        private readonly IGenericRepository<SurveyCommunityTransaction> _surveyCommunityTransactionGenericRepository;
 
         // AWS SERVICE
         private readonly AWSS3Service _awsS3Service;
@@ -69,7 +69,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
             IGenericRepository<SurveyTagFilter> surveyTagFilterGenericRepository,
             IGenericRepository<SurveyStatusTracking> surveyStatusTrackingGenericRepository,
             IGenericRepository<SurveyRewardTracking> surveyRewardTrackingGenericRepository,
-            IGenericRepository<PaymentHistory> paymentHistoryGenericRepository,
+            IGenericRepository<SurveyCommunityTransaction> surveyCommunityTransactionGenericRepository,
 
             FileHelpers fileHelpers,
             DateHelpers dateHelpers,
@@ -92,7 +92,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
             _surveyTagFilterGenericRepository = surveyTagFilterGenericRepository;
             _surveyStatusTrackingGenericRepository = surveyStatusTrackingGenericRepository;
             _surveyRewardTrackingGenericRepository = surveyRewardTrackingGenericRepository;
-            _paymentHistoryGenericRepository = paymentHistoryGenericRepository;
+            _surveyCommunityTransactionGenericRepository = surveyCommunityTransactionGenericRepository;
 
             _fileHelpers = fileHelpers;
             _filePathConfig = filePathConfig;
@@ -223,14 +223,17 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                     await _accountGenericRepository.UpdateAsync(account.Id, account);
 
                     // Lưu PaymentHistory
-                    var paymentHistory = new PaymentHistory
+                    var surveyCommunityTransaction = new SurveyCommunityTransaction
                     {
                         AccountId = userId,
                         Amount = totalPrice,
-                        PaymentStatusId = 2,
-                        PaymentTypeId = 1
+                        SurveyId = surveyId,
+                        Profit = profitPrice,
+                        TransactionStatusId = 2,
+                        TransactionTypeId = 1,
+                        
                     };
-                    await _paymentHistoryGenericRepository.CreateAsync(paymentHistory);
+                    await _surveyCommunityTransactionGenericRepository.CreateAsync(surveyCommunityTransaction);
 
 
                     // Cập nhật survey

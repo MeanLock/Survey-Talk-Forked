@@ -15,11 +15,11 @@ public partial class DataPurchase
 
     public DateTime PurchasedAt { get; set; }
 
-    public decimal PurchasedPrice { get; set; }
-
     public virtual Account Buyer { get; set; } = null!;
 
-    public virtual ICollection<DataPurchaseDetail> DataPurchaseDetails { get; set; } = new List<DataPurchaseDetail>();
-
     public virtual Survey MarketSurvey { get; set; } = null!;
+
+    public virtual ICollection<SurveyMarketTransaction> SurveyMarketTransactions { get; set; } = new List<SurveyMarketTransaction>();
+
+    public virtual ICollection<SurveyResponse> SurveyResponses { get; set; } = new List<SurveyResponse>();
 }

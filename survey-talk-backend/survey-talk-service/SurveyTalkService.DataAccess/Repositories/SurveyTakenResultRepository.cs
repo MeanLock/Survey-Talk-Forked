@@ -54,6 +54,7 @@ namespace SurveyTalkService.DataAccess.Repositories
             var query = _appDbContext.SurveyTakenResults
                 .Include(str => str.Taker)
                 .Include(str => str.SurveyResponses)
+                .ThenInclude(str => str.SurveyQuestion)
                 .Where(str => str.SurveyId == surveyId);
 
             if (IsInvalidTakenResultContain == false)
@@ -91,6 +92,19 @@ namespace SurveyTalkService.DataAccess.Repositories
                 .Include(str => str.SurveyResponses)
                 .Include(str => str.SurveyTakenResultTagFilters)
                 .FirstOrDefaultAsync(str => str.TakerId == takerId && str.SurveyId == surveyId);
+        }
+
+        public async Task<int> CountBySurveyIdAsync(int surveyId, bool? isInvalidTakenResultContain = null)
+        {
+            var query = _appDbContext.SurveyTakenResults
+                .Where(str => str.SurveyId == surveyId);
+
+            if (isInvalidTakenResultContain == false)
+            {
+                query = query.Where(str => str.IsValid == true);
+            }
+
+            return await query.CountAsync();
         }
     }
 }

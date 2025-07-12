@@ -3,7 +3,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
-using SurveyTalkService.BusinessLogic.DTOs.FilterTags;
+using SurveyTalkService.BusinessLogic.DTOs.FilterTag;
 using SurveyTalkService.Common.AppConfigurations.App.interfaces;
 
 namespace SurveyTalkService.BusinessLogic.Services.EmbeddingVectorServices

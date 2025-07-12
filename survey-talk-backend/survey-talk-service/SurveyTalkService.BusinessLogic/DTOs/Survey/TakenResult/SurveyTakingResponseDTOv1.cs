@@ -2,13 +2,13 @@ using System.Collections.Generic;
 
 namespace SurveyTalkService.BusinessLogic.DTOs.Survey.TakenResult.V1
 {
-    public class SurveyResponseDTO
+    public class SurveyTakingResponseDTO
     {
         public bool IsValid { get; set; }
-        public SurveyResponseValueJsonDTO? ValueJson { get; set; }
+        public SurveyTakingResponseValueJsonDTO? ValueJson { get; set; }
     }
 
-    public class SurveyResponseValueJsonDTO
+    public class SurveyTakingResponseValueJsonDTO
     {
         public SurveyResponseQuestionContentDTO? QuestionContent { get; set; }
         public SurveyResponseQuestionResponseDTO? QuestionResponse { get; set; }

@@ -9,13 +9,13 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.Session
         public string? Title { get; set; }
         public string? Description { get; set; }
         public int SurveyTypeId { get; set; }
-        public int SurveyTopicId { get; set; }
-        public int SurveySpecificTopicId { get; set; }
+        public int? SurveyTopicId { get; set; }
+        public int? SurveySpecificTopicId { get; set; }
         public string? MainImageUrl { get; set; }
         public string? BackgroundImageUrl { get; set; }
-        public int SurveyStatusId { get; set; }
+        public int? SurveyStatusId { get; set; }
         public int? Version { get; set; }
-        public int MarketSurveyVersionStatusId { get; set; }
+        public int? MarketSurveyVersionStatusId { get; set; }
         public int? SecurityModeId { get; set; }
         public SurveyTakingSessionConfigJsonDTO? ConfigJson { get; set; }
         public List<SurveyTakingSessionQuestionDTO>? Questions { get; set; }

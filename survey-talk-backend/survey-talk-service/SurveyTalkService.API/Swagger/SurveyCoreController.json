@@ -49,6 +49,12 @@
     },
     {
         "method": "GET",
+        "url": "/api/Survey/core/level-update-community-survey",
+        "description": "Lấy 1 level update survey cho account",
+        "completed": true // CHỜ TEST
+    },
+    {
+        "method": "GET",
         "url": "/api/Survey/core/community/surveys/me",
         "description": "Lấy danh sách survey đã tạo (REQUESTER)",
         "completed": true // CHỜ TEST, CHƯA CÓ HANDLE QUERY, thiếu chỉ lấy taken result từ lần publish gần nhất

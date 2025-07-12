@@ -1,4 +1,4 @@
-namespace SurveyTalkService.BusinessLogic.DTOs.FilterTags
+namespace SurveyTalkService.BusinessLogic.DTOs.FilterTag
 {
 
     public class FilterTagDTO

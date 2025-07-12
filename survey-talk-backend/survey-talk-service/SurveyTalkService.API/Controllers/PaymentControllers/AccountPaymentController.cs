@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Net.payOS.Types;
 using SurveyTalkService.API.Filters.ExceptionFilters;
-using SurveyTalkService.BusinessLogic.DTOs.Payment;
+using SurveyTalkService.BusinessLogic.DTOs.Transaction;
 using SurveyTalkService.BusinessLogic.Services.DbServices.PaymentServices;
 using SurveyTalkService.BusinessLogic.Services.DbServices.UserServices;
 using SurveyTalkService.DataAccess.Entities;

@@ -21,7 +21,7 @@ using SurveyTalkService.BusinessLogic.Services.OpenAIServices._4oMini;
 using SurveyTalkService.BusinessLogic.Services.EmbeddingVectorServices;
 using SurveyTalkService.DataAccess.Entities.postgres;
 using Pgvector;
-using SurveyTalkService.BusinessLogic.DTOs.FilterTags;
+using SurveyTalkService.BusinessLogic.DTOs.FilterTag;
 using Microsoft.EntityFrameworkCore;
 using SurveyTalkService.Common.AppConfigurations.BusinessSetting.interfaces;
 using Duende.IdentityServer.Extensions;
@@ -67,7 +67,8 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
         private readonly IGenericRepository<SurveyTagFilter> _surveyTagFilterGenericRepository;
         private readonly IGenericRepository<SurveyTakenResultTagFilter> _surveyTakenResultTagFilterGenericRepository;
         private readonly IGenericRepository<SurveyStatusTracking> _surveyStatusTrackingGenericRepository;
-        private readonly IGenericRepository<PaymentHistory> _paymentHistoryGenericRepository;
+        private readonly IGenericRepository<AccountBalanceTransaction> _accountBalanceTransactionGenericRepository;
+        private readonly IGenericRepository<SurveyCommunityTransaction> _surveyCommunityTransactionGenericRepository;
 
         // AWS SERVICE
         private readonly AWSS3Service _awsS3Service;
@@ -101,7 +102,8 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
             IGenericRepository<SurveyTagFilter> surveyTagFilterGenericRepository,
             IGenericRepository<SurveyTakenResultTagFilter> surveyTakenResultTagFilterGenericRepository,
             IGenericRepository<SurveyStatusTracking> surveyStatusTrackingGenericRepository,
-            IGenericRepository<PaymentHistory> paymentHistoryGenericRepository,
+            IGenericRepository<AccountBalanceTransaction> paymentHistoryGenericRepository,
+            IGenericRepository<SurveyCommunityTransaction> surveyCommunityTransactionGenericRepository,
 
 
             FileHelpers fileHelpers,
@@ -136,7 +138,8 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
             _surveyTagFilterGenericRepository = surveyTagFilterGenericRepository;
             _surveyTakenResultTagFilterGenericRepository = surveyTakenResultTagFilterGenericRepository;
             _surveyStatusTrackingGenericRepository = surveyStatusTrackingGenericRepository;
-            _paymentHistoryGenericRepository = paymentHistoryGenericRepository;
+            _accountBalanceTransactionGenericRepository = paymentHistoryGenericRepository;
+            _surveyCommunityTransactionGenericRepository = surveyCommunityTransactionGenericRepository;
 
             _fileHelpers = fileHelpers;
             _imageHelpers = imageHelpers;
@@ -173,7 +176,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
 
         /////////////////////////////////////////////////////////////
 
-        public async Task TakeFilterSurveyResponse(int surveyId, int userId, SurveyResponseRequestDTO surveyResponseRequestDTO)
+        public async Task TakeFilterSurveyResponse(int surveyId, int userId, SurveyTakingResponseRequestDTO surveyResponseRequestDTO, SurveyTakenSubjectEnum TakenSubject)
         {
             var summarizedFilterTags = new List<SummarizedFilterTagDTO>();
             var vectorEncodedFilterTags = new List<EmbeddingVectorFilterTagDTO>();
@@ -239,8 +242,9 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                     }
 
                     Account account = await _unitOfWork.AccountRepository.FindByIdAsync(userId);
-                    // account.IsFilterSurveyRequired = false;
-                    // account.LastFilterSurveyTakenAt = _dateHelpers.GetNowByAppTimeZone();
+                    account.IsFilterSurveyRequired = false;
+                    account.LastFilterSurveyTakenAt = _dateHelpers.GetNowByAppTimeZone();
+
                     // Console.WriteLine("1111111111111111111111111111: " + (account.AccountProfile == null ? "null" : account.AccountProfile.AccountId));
                     // // Console.WriteLine("account.IsFilterSurveyRequired: " + account.IsFilterSurveyRequired + " - account.LastFilterSurveyTakenAt: " + account.LastFilterSurveyTakenAt);
                     // var entityType = _appDbContext.Model.FindEntityType(typeof(AccountProfile));
@@ -266,7 +270,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                             Name = f.SurveyTopic.Name,
                         },
                     }).ToList();
-                    var filterSurveyResponseObjects = new List<SurveyResponseValueJsonDTO>();
+                    var filterSurveyResponseObjects = new List<SurveyTakingResponseValueJsonDTO>();
                     foreach (var response in surveyResponseRequestDTO.SurveyResponses)
                     {
                         filterSurveyResponseObjects.Add(response.ValueJson);
@@ -384,7 +388,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
         }
 
 
-        public async Task<CommunitySurveyTakenResultResponseDTO> TakeCommunitySurveyResponse(int surveyId, int userId, SurveyResponseRequestDTO surveyResponseRequestDTO, SurveyTakenSubjectEnum TakenSubject)
+        public async Task<CommunitySurveyTakenResultResponseDTO> TakeCommunitySurveyResponse(int surveyId, int userId, SurveyTakingResponseRequestDTO surveyResponseRequestDTO, SurveyTakenSubjectEnum TakenSubject)
         {
             var summarizedSurveyTakenResultFilterTags = new List<SummarizedFilterTagDTO>();
             var summarizedTakerAdditionalFilterTags = new List<SummarizedFilterTagDTO>();
@@ -482,12 +486,6 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                         };
                         await _surveyStatusTrackingGenericRepository.CreateAsync(newSurveyStatusTracking);
 
-                        // Console.WriteLine("\n\n\n\nsurvey.SurveyTakenResults.Count(): " + survey.SurveyTakenResults.Count() + " - survey.Kpi: " + survey.Kpi);
-                        // foreach (var takenResult in newSurveyTakenResults)
-                        // {
-                        //     Console.WriteLine("takenResult.Id: " + takenResult.Id);
-                        // }
-
 
                         if (newSurveyTakenResults.Count() > survey.Kpi)
                         {
@@ -536,27 +534,56 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                 try
                 {
                     Account account = await _unitOfWork.AccountRepository.FindByIdAsync(userId);
+                    int currentLevel = account.Level;
                     if (isValid == true)
                     {
                         await this.TrackingOnline(account.Id);
                         decimal levelBonusRate = (decimal)systemConfigProfile.AccountLevelSettingConfigs.Where(c => c.Level == account.Level).Select(c => c.BonusRate).FirstOrDefault();
                         account.Balance += moneyEarned * (decimal)survey.AllocLevelAmount * levelBonusRate;
                         account.Xp += xpEarned;
+
+                        // tính toán lại level
+                        if (TakenSubject == SurveyTakenSubjectEnum.Verified)
+                        {
+                            int currentXpLevelThreshold = currentLevel * systemConfigProfile.AccountGeneralConfig.XpLevelThreshold;
+                            if (account.Xp > currentXpLevelThreshold && account.ProgressionSurveyCount == 0)
+                            {
+                                account.ProgressionSurveyCount = systemConfigProfile.AccountLevelSettingConfigs.Where(c => c.Level == currentLevel + 1).Select(c => c.ProgressionSurveyCount).FirstOrDefault();
+                            }
+                        }
+                        else if (TakenSubject == SurveyTakenSubjectEnum.LevelUpdate)
+                        {
+                            account.ProgressionSurveyCount -= 1;
+                            if (account.ProgressionSurveyCount == 0)
+                            {
+                                account.Level += 1;
+                                int currentXpLevelThreshold = account.Level * systemConfigProfile.AccountGeneralConfig.XpLevelThreshold;
+                                if (account.Xp > currentXpLevelThreshold)
+                                {
+                                    account.ProgressionSurveyCount = systemConfigProfile.AccountLevelSettingConfigs.Where(al => al.Level == account.Level).Select(c => c.ProgressionSurveyCount).FirstOrDefault();
+                                }
+                            }
+                        }
+
                         await _accountGenericRepository.UpdateAsync(userId, account);
-                        var newPaymentHistory = new PaymentHistory
+
+                        var newSurveyCommunityTransaction = new SurveyCommunityTransaction
                         {
                             AccountId = userId,
                             Amount = moneyEarned * (decimal)survey.AllocLevelAmount * levelBonusRate,
-                            PaymentStatusId = 2,
-                            PaymentTypeId = 2, 
+                            TransactionStatusId = 2,
+                            TransactionTypeId = 2,
+                            SurveyId = surveyId
                         };
-                        await _paymentHistoryGenericRepository.CreateAsync(newPaymentHistory);
+                        await _surveyCommunityTransactionGenericRepository.CreateAsync(newSurveyCommunityTransaction);
+
+
                     }
 
 
 
                     // lấy communitySurveyTakenResult để đưa vào 
-                    var communitySurveyResponseObjects = new List<SurveyResponseValueJsonDTO>();
+                    var communitySurveyResponseObjects = new List<SurveyTakingResponseValueJsonDTO>();
                     foreach (var response in surveyResponseRequestDTO.SurveyResponses)
                     {
                         communitySurveyResponseObjects.Add(response.ValueJson);
@@ -702,499 +729,147 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
 
 
 
+        public async Task<List<CommunityResponseSummaryListItemDTO>> GetCommunitySurveyResponse(int surveyId, Account account)
+        {
+            try
+            {
+                var surveyFilterObject = new SurveyFilterObject
+                {
+                    RequesterId = account.Id,
+                    IsDeletedContain = false,
+                    SurveyTypeId = 2,
+                    SurveyStatusIds = new List<int> { 2, 3, 4, 5 },
+                    IsEndDateExceededContain = true
+                };
+
+                var survey = await _unitOfWork.SurveyRepository.FindByIdAndFilterObjectAsync(surveyId, surveyFilterObject);
+                if (survey == null)
+                {
+                    throw new Exception("survey không tồn tại hoặc không thể lấy dữ liệu khảo sát ở thời điểm hiện tại");
+                }
+
+                var communitySurveyTakenResults = await _unitOfWork.SurveyTakenResultRepository.FindBySurveyIdAsync(surveyId, false);
+
+                var questionResponseSummaryLists = new List<CommunityResponseSummaryListItemDTO>();
+
+                foreach (var takenResult in communitySurveyTakenResults)
+                {
+                    var questionResponseSummaryList = new CommunityResponseSummaryListItemDTO
+                    {
+                        Questions = (await Task.WhenAll(takenResult.SurveyResponses.Select(async r => new CommunityResponseSummarySurveyQuestionDTO
+                        {
+                            Id = r.SurveyQuestion.Id,
+                            SurveyId = r.SurveyQuestion.SurveyId,
+                            QuestionTypeId = r.SurveyQuestion.QuestionTypeId ?? 0,
+                            Content = r.SurveyQuestion.Content,
+                            Description = r.SurveyQuestion.Description,
+                            TimeLimit = r.SurveyQuestion.TimeLimit,
+                            IsVoiced = r.SurveyQuestion.IsVoiced,
+                            Order = r.SurveyQuestion.Order,
+                            ConfigJsonString = r.SurveyQuestion.ConfigJsonString,
+                            DeletedAt = r.SurveyQuestion.DeletedAt,
+                            MainImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH, survey.Id.ToString() + "/question_" + r.SurveyQuestion.Id, "main"),
+                            Options = (await Task.WhenAll(r.SurveyQuestion.SurveyOptions.Select(async o => new CommunityResponseSummarySurveyOptionDTO
+                            {
+                                Id = o.Id,
+                                Content = o.Content,
+                                Order = o.Order,
+                                SurveyQuestionId = r.SurveyQuestion.Id,
+                                MainImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH, survey.Id.ToString() + "/question_" + r.SurveyQuestion.Id + "/option_" + o.Id, "main")
+                            }))).ToList()
+                        }))).ToList(),
+                        Responses = takenResult.SurveyResponses.Select(r => new CommunityResponseSummarySurveyResponseDTO
+                        {
+                            Id = r.Id,
+                            ValueJsonString = r.ValueJsonString,
+                            IsValid = r.IsValid,
+                            SurveyQuestionId = r.SurveyQuestionId,
+                            SurveyTakenResultId = r.SurveyTakenResultId,
+                        }).ToList()
+                    };
+                    questionResponseSummaryLists.Add(questionResponseSummaryList);
+                }
+
+                return questionResponseSummaryLists;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("\n" + ex.StackTrace + "\n");
+                throw new HttpRequestException("Lấy kết quả khảo sát thất bại, lí do: " + ex.Message);
+            }
+
+        }
+
+        public async Task<List<FilterResponseSummaryListItemDTO>> GetFilterSurveyResponseSummary(int surveyId)
+        {
+            try
+            {
+                SurveyFilterObject surveyFilterObject = new SurveyFilterObject
+                {
+                    SurveyTypeId = 1,
+                    SurveyStatusIds = new List<int> { 1, 2, 3, 4, 5 }, // Only get surveys with status "Draft"
+                    IsDeletedContain = true,
+                };
+
+                var survey = await _unitOfWork.SurveyRepository.FindByIdAndFilterObjectAsync(surveyId, surveyFilterObject);
+                if (survey == null)
+                {
+                    throw new Exception("survey không tồn tại hoặc không thể lấy dữ liệu khảo sát ở thời điểm hiện tại");
+                }
+
+                var filterSurveyTakenResults = await _unitOfWork.SurveyTakenResultRepository.FindBySurveyIdAsync(surveyId, false);
+
+                var questionResponseSummaryLists = new List<FilterResponseSummaryListItemDTO>();
+
+                foreach (var takenResult in filterSurveyTakenResults)
+                {
+                    var questionResponseSummaryList = new FilterResponseSummaryListItemDTO
+                    {
+                        Questions = (await Task.WhenAll(takenResult.SurveyResponses.Select(async r => new FilterResponseSummarySurveyQuestionDTO
+                        {
+                            Id = r.SurveyQuestion.Id,
+                            SurveyId = r.SurveyQuestion.SurveyId,
+                            QuestionTypeId = r.SurveyQuestion.QuestionTypeId ?? 0,
+                            Content = r.SurveyQuestion.Content,
+                            Description = r.SurveyQuestion.Description,
+                            Order = r.SurveyQuestion.Order,
+                            ConfigJsonString = r.SurveyQuestion.ConfigJsonString,
+                            DeletedAt = r.SurveyQuestion.DeletedAt,
+                            MainImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH, survey.Id.ToString() + "/question_" + r.SurveyQuestion.Id, "main"),
+                            Options = (await Task.WhenAll(r.SurveyQuestion.SurveyOptions.Select(async o => new FilterResponseSummarySurveyOptionDTO
+                            {
+                                Id = o.Id,
+                                Content = o.Content,
+                                Order = o.Order,
+                                SurveyQuestionId = r.SurveyQuestion.Id,
+                                MainImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH, survey.Id.ToString() + "/question_" + r.SurveyQuestion.Id + "/option_" + o.Id, "main")
+                            }))).ToList()
+                        }))).ToList(),
+                        Responses = takenResult.SurveyResponses.Select(r => new FilterResponseSummarySurveyResponseDTO
+                        {
+                            Id = r.Id,
+                            ValueJsonString = r.ValueJsonString,
+                            IsValid = r.IsValid,
+                            SurveyQuestionId = r.SurveyQuestionId,
+                            SurveyTakenResultId = r.SurveyTakenResultId,
+                        }).ToList()
+                    };
+                    questionResponseSummaryLists.Add(questionResponseSummaryList);
+                }
+
+                return questionResponseSummaryLists;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("\n" + ex.StackTrace + "\n");
+                throw new HttpRequestException("Lấy kết quả khảo sát thất bại, lí do: " + ex.Message);
+            }
+
+        }
 
 
-
-        // public async Task<Account> GetExistAccount(int id)
-        // {
-        //     return await _appDbContext.Accounts.Include(account => account.Role)
-        //         .Include(account => account.JobType)
-        //         .FirstOrDefaultAsync(account => account.Id == id);
-        // }
 
         // ///////////////////////////////////////////////////////////
-
-        // public async Task<JArray> GetStaffAccounts()
-        // {
-        //     List<int> roles = new List<int>([2, 3]);
-        //     var staffs = await _appDbContext.Accounts
-        //         .AsNoTracking()
-        //         .Include(account => account.Role)
-        //         .Include(account => account.JobType)
-        //         .Where(account => roles.Contains(account.RoleId))
-        //         .ToListAsync();
-
-        //     // IEnumerable<Account> resultList = heads.Concat(assignees);
-
-        //     var result = await Task.WhenAll(staffs.Select(async item =>
-        //     {
-        //         string folderPath = _filePathConfig.ACCOUNt_IMAGE_PATH;
-        //         return new
-        //         {
-        //             Account = new
-        //             {
-        //                 Id = item.Id,
-        //                 FullName = item.FullName,
-        //                 Email = item.Email,
-        //                 DateOfBirth = item.DateOfBirth,
-        //                 Address = item.Address,
-        //                 Phone = item.Phone,
-        //                 RoleId = item.RoleId,
-        //                 JobTypeId = item.JobTypeId,
-        //                 ImageUrl = await GenerateImageUrl(_filePathConfig.ACCOUNt_IMAGE_PATH, item.Id.ToString(), "main"),
-        //                 IsDeactivated = item.IsDeactivated,
-        //                 CreatedAt = item.CreatedAt,
-        //             },
-        //             Role = new
-        //             {
-        //                 Id = item.Role.Id,
-        //                 Name = item.Role.Name
-        //             },
-        //             JobType = new
-        //             {
-        //                 Id = item.JobType.Id,
-        //                 Name = item.JobType.Name
-        //             }
-        //         };
-        //     }));
-        //     return JArray.FromObject(
-        //         result
-        //         , new JsonSerializer
-        //         {
-        //             ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-        //         });
-        // }
-
-        // public async Task CreateStaffAccount(dynamic staffAccount)
-        // {
-        //     Account account = await _unitOfWork.AccountRepository.FindByEmail(staffAccount.Email.ToString());
-        //     if (account != null)
-        //     {
-        //         // throw new HttpRequestException("Email đã tồn tại");
-        //         throw new HttpRequestException("Email is already exist, email: " + staffAccount.Email.ToString());
-        //     }
-
-        //     using (var transaction = await _appDbContext.Database.BeginTransactionAsync())
-        //     {
-        //         try
-        //         {
-        //             account = new Account
-        //             {
-        //                 Email = staffAccount.Email,
-        //                 Password = _bcryptHelpers.HashPassword(staffAccount.Password.ToString()),
-        //                 FullName = staffAccount.FullName.ToString(),
-        //                 RoleId = staffAccount.RoleId,
-        //                 JobTypeId = staffAccount.JobTypeId,
-        //                 DateOfBirth = staffAccount.DateOfBirth,
-        //                 Address = staffAccount.Address,
-        //                 Phone = staffAccount.Phone,
-        //             };
-
-        //             await _accountRepository.CreateAsync(account);
-        //             if (staffAccount.Image != null && staffAccount.Image != "")
-        //             {
-        //                 string folderPath = _filePathConfig.ACCOUNt_IMAGE_PATH + "\\" + account.Id;
-        //                 string data = staffAccount.Image.ToString();
-        //                 await SaveBase64File(data, folderPath, "main");
-        //             }
-        //             else
-        //             {
-        //                 string folderPath = _filePathConfig.ACCOUNt_IMAGE_PATH + "\\" + account.Id;
-        //                 await CopyFile(_filePathConfig.ACCOUNt_IMAGE_PATH, "unknown", folderPath, "main");
-        //             }
-
-        //             await transaction.CommitAsync();
-        //         }
-        //         catch (Exception ex)
-        //         {
-        //             await transaction.RollbackAsync();
-        //             Console.WriteLine("\n" + ex.Message + "\n");
-        //             throw new HttpRequestException("Failed to create staff account: " + ex.Message);
-        //         }
-        //     }
-        // }
-
-        // public async Task<JObject> GetStaffDetail(int accountId)
-        // {
-        //     var account = await _unitOfWork.AccountRepository.FindById(accountId);
-
-
-        //     if (account == null)
-        //     {
-        //         throw new HttpRequestException("Account is not exist, id: " + accountId.ToString());
-        //     }
-        //     if (account.RoleId != 2 && account.RoleId != 3)
-        //     {
-        //         throw new HttpRequestException("Account is not Staff, id: " + accountId.ToString());
-        //     }
-
-        //     return JObject.FromObject(new
-        //     {
-        //         Account = new
-        //         {
-        //             Id = account.Id,
-        //             FullName = account.FullName,
-        //             Email = account.Email,
-        //             DateOfBirth = account.DateOfBirth,
-        //             Address = account.Address,
-        //             Phone = account.Phone,
-        //             RoleId = account.RoleId,
-        //             JobTypeId = account.JobTypeId,
-        //             ImageUrrl = await GenerateImageUrl(_filePathConfig.ACCOUNt_IMAGE_PATH, account.Id.ToString(), "main"),
-        //             IsDeactivated = account.IsDeactivated,
-        //             CreatedAt = account.CreatedAt,
-        //         },
-        //         Role = new
-        //         {
-        //             Id = account.Role.Id,
-        //             Name = account.Role.Name
-        //         },
-        //         JobType = new
-        //         {
-        //             Id = account.JobType.Id,
-        //             Name = account.JobType.Name
-        //         }
-        //     }, new JsonSerializer
-        //     {
-        //         ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-        //     });
-        // }
-
-        // public async Task UpdateStaffAccount(int accountId, dynamic staffAccount)
-        // {
-        //     var account = await _unitOfWork.AccountRepository.FindById(accountId);
-
-        //     if (account == null)
-        //     {
-        //         throw new HttpRequestException("Account is not exist, id: " + accountId.ToString());
-        //     }
-
-        //     var existinngEmail = await _unitOfWork.AccountRepository.FindByEmail(staffAccount.Email.ToString());
-        //     if (existinngEmail != null && existinngEmail.Id != accountId)
-        //     {
-        //         throw new HttpRequestException("Email is already exist, email: " + staffAccount.Email.ToString());
-        //     }
-
-        //     if (account.RoleId != 2 && account.RoleId != 3)
-        //     {
-        //         throw new HttpRequestException("Account is not Staff, id: " + accountId.ToString());
-        //     }
-
-
-        //     using (var transaction = await _appDbContext.Database.BeginTransactionAsync())
-        //     {
-        //         try
-        //         {
-        //             account.FullName = staffAccount.FullName;
-        //             account.JobTypeId = staffAccount.JobTypeId;
-        //             account.DateOfBirth = staffAccount.DateOfBirth;
-        //             account.Address = staffAccount.Address;
-        //             account.Phone = staffAccount.Phone;
-        //             account.Email = staffAccount.Email;
-
-        //             await _accountRepository.UpdateAsync(account.Id, account);
-
-        //             if (staffAccount.Image != null && staffAccount.Image != "")
-        //             {
-        //                 string folderPath = _filePathConfig.ACCOUNt_IMAGE_PATH + "\\" + account.Id;
-        //                 string data = staffAccount.Image.ToString();
-
-        //                 await SaveBase64File(data, folderPath, "main");
-        //             }
-
-        //             await transaction.CommitAsync();
-        //         }
-        //         catch (Exception ex)
-        //         {
-        //             await transaction.RollbackAsync();
-        //             Console.WriteLine("\n\n\n" + ex.Message + "\n\n\n");
-        //             throw new HttpRequestException("Failed to update staff account: " + ex.Message);
-        //         }
-        //     }
-
-        // }
-
-        // public async Task DeactivateAccount(int accountId, bool deactivate, string type)
-        // {
-        //     var account = await _unitOfWork.AccountRepository.FindById(accountId);
-
-
-        //     if (account == null)
-        //     {
-        //         throw new HttpRequestException("Account is not exist, id: " + accountId.ToString());
-        //     }
-
-        //     if (type == "staff" && account.RoleId != 2 && account.RoleId != 3)
-        //     {
-        //         throw new HttpRequestException("Account is not Staff, id: " + accountId.ToString());
-        //     }
-        //     else if (type == "member" && account.RoleId != 4)
-        //     {
-        //         throw new HttpRequestException("Account is not Campus Member, id: " + accountId.ToString());
-        //     }
-
-        //     try
-        //     {
-        //         if (type == "staff")
-        //         {
-        //             if (account.RoleId == 3)
-        //             {
-        //                 var serviceRequests = await _unitOfWork.ServiceRequestRepository.FindByAssignedAssigneeId(accountId);
-        //                 foreach (var serviceRequest in serviceRequests)
-        //                 {
-        //                     if (serviceRequest.RequestStatusId != 7 && serviceRequest.RequestStatusId != 8 && serviceRequest.RequestStatusId != 9)
-        //                     {
-        //                         serviceRequest.RequestStatusId = 4;
-        //                         await _serviceRequestRepository.UpdateAsync(serviceRequest.Id, serviceRequest);
-        //                     }
-        //                 }
-        //             }
-        //             else if (account.RoleId == 2)
-        //             {
-        //                 var majors = await _unitOfWork.AssigneeFacilityMajorAssignmentRepository.FindByAccountId(accountId);
-        //                 foreach (var major in majors)
-        //                 {
-        //                     var majorAssignments = (await _unitOfWork.AssigneeFacilityMajorAssignmentRepository.FindByFacilityMajorId(major.FacilityMajorId)).Where(x => x.IsHead == true && x.Account.IsDeactivated == false && x.AccountId != accountId);
-        //                     foreach (var majorAssignment in majorAssignments)
-        //                     {
-        //                         Console.WriteLine(majorAssignment.Account.Id + " " + majorAssignment.Account.IsDeactivated);
-        //                     }
-        //                     if (majorAssignments.Count() < 1)
-        //                     {
-        //                         throw new HttpRequestException("Failed to deactivate account, there must be at least 1 head in major id " + major.FacilityMajorId);
-        //                     }
-        //                 }
-
-        //             }
-        //         }
-        //         await _unitOfWork.AccountRepository.Deactivate(accountId, deactivate);
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         Console.WriteLine("\n\n\n" + ex.Message + "\n\n\n");
-        //         throw new HttpRequestException("Failed to deactivate account: " + ex.Message);
-        //     }
-        // }
-
-        // public async Task<JArray> GetMemberAccounts()
-        // {
-
-        //     List<int> roles = new List<int>([4]);
-        //     var staffs = await _appDbContext.Accounts
-        //         .AsNoTracking()
-        //         .Include(account => account.Role)
-        //         .Include(account => account.JobType)
-        //         .Where(account => roles.Contains(account.RoleId))
-        //         .ToListAsync();
-
-        //     var result = await Task.WhenAll(staffs.Select(async item =>
-        //     {
-        //         string folderPath = _filePathConfig.ACCOUNt_IMAGE_PATH;
-        //         return new
-        //         {
-        //             Account = new
-        //             {
-        //                 Id = item.Id,
-        //                 FullName = item.FullName,
-        //                 Email = item.Email,
-        //                 DateOfBirth = item.DateOfBirth,
-        //                 Address = item.Address,
-        //                 Phone = item.Phone,
-        //                 RoleId = item.RoleId,
-        //                 JobTypeId = item.JobTypeId,
-        //                 ImageUrl = await GenerateImageUrl(_filePathConfig.ACCOUNt_IMAGE_PATH, item.Id.ToString(), "main"),
-        //                 IsDeactivated = item.IsDeactivated,
-        //                 CreatedAt = item.CreatedAt,
-        //             },
-        //             Role = new
-        //             {
-        //                 Id = item.Role.Id,
-        //                 Name = item.Role.Name
-        //             },
-        //             JobType = new
-        //             {
-        //                 Id = item.JobType.Id,
-        //                 Name = item.JobType.Name
-        //             }
-        //         };
-        //     }));
-        //     return JArray.FromObject(
-        //         result
-        //         , new JsonSerializer
-        //         {
-        //             ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-        //         });
-        // }
-
-        // public async Task CreateMemberAccount(dynamic memberAccount)
-        // {
-        //     Account account = await _unitOfWork.AccountRepository.FindByEmail(memberAccount.Email.ToString());
-        //     if (account != null)
-        //     {
-        //         throw new HttpRequestException("Email is already exist, email: " + memberAccount.Email.ToString());
-        //     }
-
-        //     using (var transaction = await _appDbContext.Database.BeginTransactionAsync())
-        //     {
-        //         try
-        //         {
-        //             account = new Account
-        //             {
-        //                 Email = memberAccount.Email,
-        //                 Password = _bcryptHelpers.HashPassword(memberAccount.Password.ToString()),
-        //                 FullName = memberAccount.FullName.ToString(),
-        //                 RoleId = 4,
-        //                 JobTypeId = memberAccount.JobTypeId,
-        //                 DateOfBirth = memberAccount.DateOfBirth,
-        //                 Address = memberAccount.Address,
-        //                 Phone = memberAccount.Phone,
-        //             };
-
-        //             await _accountRepository.CreateAsync(account);
-        //             if (memberAccount.Image != null && memberAccount.Image != "")
-        //             {
-        //                 string folderPath = _filePathConfig.ACCOUNt_IMAGE_PATH + "\\" + account.Id;
-        //                 string data = memberAccount.Image.ToString();
-        //                 await SaveBase64File(data, folderPath, "main");
-        //             }
-        //             else
-        //             {
-        //                 string folderPath = _filePathConfig.ACCOUNt_IMAGE_PATH + "\\" + account.Id;
-        //                 await CopyFile(_filePathConfig.ACCOUNt_IMAGE_PATH, "unknown", folderPath, "main");
-        //             }
-
-        //             await transaction.CommitAsync();
-        //         }
-        //         catch (Exception ex)
-        //         {
-        //             await transaction.RollbackAsync();
-        //             Console.WriteLine("\n" + ex.Message + "\n");
-        //             throw new HttpRequestException("Failed to create member account: " + ex.Message);
-        //         }
-        //     }
-        // }
-
-
-        // public async Task<JObject> GetMemberDetail(int accountId)
-        // {
-        //     var account = await _unitOfWork.AccountRepository.FindById(accountId);
-
-
-        //     if (account == null)
-        //     {
-        //         throw new HttpRequestException("Account is not exist, id: " + accountId.ToString());
-        //     }
-        //     if (account.RoleId != 4)
-        //     {
-        //         throw new HttpRequestException("Account is not Campus Member, id: " + accountId.ToString());
-        //     }
-
-        //     return JObject.FromObject(new
-        //     {
-        //         Account = new
-        //         {
-        //             Id = account.Id,
-        //             FullName = account.FullName,
-        //             Email = account.Email,
-        //             DateOfBirth = account.DateOfBirth,
-        //             Address = account.Address,
-        //             Phone = account.Phone,
-        //             RoleId = account.RoleId,
-        //             JobTypeId = account.JobTypeId,
-        //             ImageUrl = await GenerateImageUrl(_filePathConfig.ACCOUNt_IMAGE_PATH, account.Id.ToString(), "main"),
-        //             IsDeactivated = account.IsDeactivated,
-        //             CreatedAt = account.CreatedAt,
-        //         },
-        //         Role = new
-        //         {
-        //             Id = account.Role.Id,
-        //             Name = account.Role.Name
-        //         },
-        //         JobType = new
-        //         {
-        //             Id = account.JobType.Id,
-        //             Name = account.JobType.Name
-        //         }
-        //     }, new JsonSerializer
-        //     {
-        //         ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-        //     });
-        // }
-
-        // public async Task UpdateMemberAccount(int accountId, dynamic memberAccount)
-        // {
-        //     var account = await _unitOfWork.AccountRepository.FindById(accountId);
-
-        //     if (account == null)
-        //     {
-        //         // throw new HttpRequestException("Tài khoản không tồn tại");
-        //         throw new HttpRequestException("Account is not exist, id: " + accountId.ToString());
-        //     }
-
-        //     var existinngEmail = await _unitOfWork.AccountRepository.FindByEmail(memberAccount.Email.ToString());
-        //     if (existinngEmail != null && existinngEmail.Id != accountId)
-        //     {
-        //         // throw new HttpRequestException("Email đã tồn tại");
-        //         throw new HttpRequestException("Email is already exist, email: " + memberAccount.Email.ToString());
-        //     }
-
-        //     if (account.RoleId != 4)
-        //     {
-        //         // throw new HttpRequestException("Tài khoản không phải là member");
-        //         throw new HttpRequestException("Account is not Campus Member, id: " + accountId.ToString());
-        //     }
-
-        //     using (var transaction = await _appDbContext.Database.BeginTransactionAsync())
-        //     {
-        //         try
-        //         {
-        //             account.FullName = memberAccount.FullName;
-        //             account.JobTypeId = memberAccount.JobTypeId;
-        //             account.DateOfBirth = memberAccount.DateOfBirth;
-        //             account.Address = memberAccount.Address;
-        //             account.Phone = memberAccount.Phone;
-        //             account.Email = memberAccount.Email;
-
-        //             await _accountRepository.UpdateAsync(account.Id, account);
-
-        //             if (memberAccount.Image != null && memberAccount.Image != "")
-        //             {
-        //                 string folderPath = _filePathConfig.ACCOUNt_IMAGE_PATH + "\\" + account.Id;
-        //                 string data = memberAccount.Image.ToString();
-
-        //                 await SaveBase64File(data, folderPath, "main");
-        //             }
-
-        //             await transaction.CommitAsync();
-        //         }
-        //         catch (Exception ex)
-        //         {
-        //             await transaction.RollbackAsync();
-        //             Console.WriteLine("\n\n\n" + ex.Message + "\n\n\n");
-        //             throw new HttpRequestException("Failed to update member account: " + ex.Message);
-        //         }
-        //     }
-        // }
-
-        // public async Task<JArray> GetRoles()
-        // {
-        //     var roles = await _roleRepository.FindAllAsync();
-
-        //     return JArray.FromObject(roles, new JsonSerializer
-        //     {
-        //         ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-        //     });
-        // }
-
-        // public async Task<JArray> GetJobTypes()
-        // {
-        //     var jobTypes = await _jobTypeRepository.FindAllAsync();
-
-        //     return JArray.FromObject(jobTypes, new JsonSerializer
-        //     {
-        //         ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-        //     });
-        // }
 
 
 

@@ -43,6 +43,8 @@ public partial class Account
 
     public DateTime UpdatedAt { get; set; }
 
+    public virtual ICollection<AccountBalanceTransaction> AccountBalanceTransactions { get; set; } = new List<AccountBalanceTransaction>();
+
     public virtual ICollection<AccountOnlineTracking> AccountOnlineTrackings { get; set; } = new List<AccountOnlineTracking>();
 
     public virtual AccountProfile? AccountProfile { get; set; }
@@ -53,11 +55,13 @@ public partial class Account
 
     public virtual ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
 
-    public virtual ICollection<PaymentHistory> PaymentHistories { get; set; } = new List<PaymentHistory>();
-
     public virtual Role Role { get; set; } = null!;
 
+    public virtual ICollection<SurveyCommunityTransaction> SurveyCommunityTransactions { get; set; } = new List<SurveyCommunityTransaction>();
+
     public virtual ICollection<SurveyFeedback> SurveyFeedbacks { get; set; } = new List<SurveyFeedback>();
+
+    public virtual ICollection<SurveyMarketTransaction> SurveyMarketTransactions { get; set; } = new List<SurveyMarketTransaction>();
 
     public virtual ICollection<SurveyTakenResult> SurveyTakenResults { get; set; } = new List<SurveyTakenResult>();
 

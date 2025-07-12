@@ -18,6 +18,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Account> Accounts { get; set; }
 
+    public virtual DbSet<AccountBalanceTransaction> AccountBalanceTransactions { get; set; }
+
     public virtual DbSet<AccountGeneralConfig> AccountGeneralConfigs { get; set; }
 
     public virtual DbSet<AccountLevelSettingConfig> AccountLevelSettingConfigs { get; set; }
@@ -30,23 +32,17 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<DataPurchase> DataPurchases { get; set; }
 
-    public virtual DbSet<DataPurchaseDetail> DataPurchaseDetails { get; set; }
-
     public virtual DbSet<FilterTag> FilterTags { get; set; }
 
     public virtual DbSet<FilterTagType> FilterTagTypes { get; set; }
 
     public virtual DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
-    public virtual DbSet<PaymentHistory> PaymentHistories { get; set; }
-
-    public virtual DbSet<PaymentStatus> PaymentStatuses { get; set; }
-
-    public virtual DbSet<PaymentType> PaymentTypes { get; set; }
-
     public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<Survey> Surveys { get; set; }
+
+    public virtual DbSet<SurveyCommunityTransaction> SurveyCommunityTransactions { get; set; }
 
     public virtual DbSet<SurveyDefaultBackgroundTheme> SurveyDefaultBackgroundThemes { get; set; }
 
@@ -61,6 +57,8 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<SurveyMarketConfig> SurveyMarketConfigs { get; set; }
 
     public virtual DbSet<SurveyMarketResponseVersion> SurveyMarketResponseVersions { get; set; }
+
+    public virtual DbSet<SurveyMarketTransaction> SurveyMarketTransactions { get; set; }
 
     public virtual DbSet<SurveyMarketVersionStatusTracking> SurveyMarketVersionStatusTrackings { get; set; }
 
@@ -104,6 +102,10 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<TakerTagFilter> TakerTagFilters { get; set; }
 
+    public virtual DbSet<TransactionStatus> TransactionStatuses { get; set; }
+
+    public virtual DbSet<TransactionType> TransactionTypes { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         
@@ -114,7 +116,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Account>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Account__3213E83FF08F9E47");
+            entity.HasKey(e => e.Id).HasName("PK__Account__3213E83FEA4A73EA");
 
             entity.ToTable("Account", tb => tb.HasTrigger("trg_Account_Update"));
 
@@ -173,9 +175,43 @@ public partial class AppDbContext : DbContext
                 .HasConstraintName("FK__Account__roleId__3F115E1A");
         });
 
+        modelBuilder.Entity<AccountBalanceTransaction>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__AccountB__3213E83FD6BA0B57");
+
+            entity.ToTable("AccountBalanceTransaction");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.AccountId).HasColumnName("accountId");
+            entity.Property(e => e.Amount)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("amount");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(CONVERT([datetime],(sysdatetimeoffset() AT TIME ZONE 'N. Central Asia Standard Time')))")
+                .HasColumnType("datetime")
+                .HasColumnName("createdAt");
+            entity.Property(e => e.TransactionStatusId).HasColumnName("transactionStatusId");
+            entity.Property(e => e.TransactionTypeId).HasColumnName("transactionTypeId");
+
+            entity.HasOne(d => d.Account).WithMany(p => p.AccountBalanceTransactions)
+                .HasForeignKey(d => d.AccountId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__AccountBa__accou__0B5CAFEA");
+
+            entity.HasOne(d => d.TransactionStatus).WithMany(p => p.AccountBalanceTransactions)
+                .HasForeignKey(d => d.TransactionStatusId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__AccountBa__trans__0D44F85C");
+
+            entity.HasOne(d => d.TransactionType).WithMany(p => p.AccountBalanceTransactions)
+                .HasForeignKey(d => d.TransactionTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__AccountBa__trans__0C50D423");
+        });
+
         modelBuilder.Entity<AccountGeneralConfig>(entity =>
         {
-            entity.HasKey(e => e.ConfigProfileId).HasName("PK__AccountG__D540A124DD4D1E45");
+            entity.HasKey(e => e.ConfigProfileId).HasName("PK__AccountG__D540A124BEE55FA6");
 
             entity.ToTable("AccountGeneralConfig");
 
@@ -213,7 +249,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<AccountOnlineTracking>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__AccountO__3213E83F198BC74E");
+            entity.HasKey(e => e.Id).HasName("PK__AccountO__3213E83F6B5F1830");
 
             entity.ToTable("AccountOnlineTracking");
 
@@ -234,7 +270,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<AccountProfile>(entity =>
         {
-            entity.HasKey(e => e.AccountId).HasName("PK__AccountP__F267251EECE89045");
+            entity.HasKey(e => e.AccountId).HasName("PK__AccountP__F267251E16028AB1");
 
             entity.ToTable("AccountProfile");
 
@@ -268,7 +304,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<AccountVerification>(entity =>
         {
-            entity.HasKey(e => e.AccountId).HasName("PK__AccountV__F267251EBA6B1A77");
+            entity.HasKey(e => e.AccountId).HasName("PK__AccountV__F267251EE8B84095");
 
             entity.ToTable("AccountVerification");
 
@@ -289,7 +325,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<DataPurchase>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__DataPurc__3213E83FA9CEBD6F");
+            entity.HasKey(e => e.Id).HasName("PK__DataPurc__3213E83FFD4DD507");
 
             entity.ToTable("DataPurchase");
 
@@ -300,9 +336,6 @@ public partial class AppDbContext : DbContext
                 .HasDefaultValueSql("(CONVERT([datetime],(sysdatetimeoffset() AT TIME ZONE 'N. Central Asia Standard Time')))")
                 .HasColumnType("datetime")
                 .HasColumnName("purchasedAt");
-            entity.Property(e => e.PurchasedPrice)
-                .HasColumnType("decimal(18, 2)")
-                .HasColumnName("purchasedPrice");
             entity.Property(e => e.Version).HasColumnName("version");
 
             entity.HasOne(d => d.Buyer).WithMany(p => p.DataPurchases)
@@ -314,34 +347,30 @@ public partial class AppDbContext : DbContext
                 .HasForeignKey(d => d.MarketSurveyId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__DataPurch__marke__45BE5BA9");
-        });
 
-        modelBuilder.Entity<DataPurchaseDetail>(entity =>
-        {
-            entity.HasKey(e => new { e.DataPurchaseId, e.SurveyResponseId });
-
-            entity.ToTable("DataPurchaseDetail");
-
-            entity.Property(e => e.DataPurchaseId).HasColumnName("dataPurchaseId");
-            entity.Property(e => e.SurveyResponseId).HasColumnName("surveyResponseId");
-            entity.Property(e => e.PurchasedPrice)
-                .HasColumnType("decimal(18, 2)")
-                .HasColumnName("purchasedPrice");
-
-            entity.HasOne(d => d.DataPurchase).WithMany(p => p.DataPurchaseDetails)
-                .HasForeignKey(d => d.DataPurchaseId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__DataPurch__dataP__46B27FE2");
-
-            entity.HasOne(d => d.SurveyResponse).WithMany(p => p.DataPurchaseDetails)
-                .HasForeignKey(d => d.SurveyResponseId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__DataPurch__surve__47A6A41B");
+            entity.HasMany(d => d.SurveyResponses).WithMany(p => p.DataPurchases)
+                .UsingEntity<Dictionary<string, object>>(
+                    "DataPurchaseDetail",
+                    r => r.HasOne<SurveyResponse>().WithMany()
+                        .HasForeignKey("SurveyResponseId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK__DataPurch__surve__47A6A41B"),
+                    l => l.HasOne<DataPurchase>().WithMany()
+                        .HasForeignKey("DataPurchaseId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK__DataPurch__dataP__46B27FE2"),
+                    j =>
+                    {
+                        j.HasKey("DataPurchaseId", "SurveyResponseId");
+                        j.ToTable("DataPurchaseDetail");
+                        j.IndexerProperty<int>("DataPurchaseId").HasColumnName("dataPurchaseId");
+                        j.IndexerProperty<int>("SurveyResponseId").HasColumnName("surveyResponseId");
+                    });
         });
 
         modelBuilder.Entity<FilterTag>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__FilterTa__3213E83FF592953F");
+            entity.HasKey(e => e.Id).HasName("PK__FilterTa__3213E83F9D0A92F0");
 
             entity.ToTable("FilterTag");
 
@@ -365,7 +394,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<FilterTagType>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__FilterTa__3213E83FAF62E0C8");
+            entity.HasKey(e => e.Id).HasName("PK__FilterTa__3213E83F1BCEA833");
 
             entity.ToTable("FilterTagType");
 
@@ -379,11 +408,11 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<PasswordResetToken>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Password__3213E83F97B6BC0D");
+            entity.HasKey(e => e.Id).HasName("PK__Password__3213E83FF151F129");
 
             entity.ToTable("PasswordResetToken");
 
-            entity.HasIndex(e => e.Token, "UQ__Password__CA90DA7A5C385411").IsUnique();
+            entity.HasIndex(e => e.Token, "UQ__Password__CA90DA7A80DEB869").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.AccountId).HasColumnName("accountId");
@@ -405,74 +434,9 @@ public partial class AppDbContext : DbContext
                 .HasConstraintName("FK__PasswordR__accou__498EEC8D");
         });
 
-        modelBuilder.Entity<PaymentHistory>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__PaymentH__3213E83F4E861E2B");
-
-            entity.ToTable("PaymentHistory");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.AccountId).HasColumnName("accountId");
-            entity.Property(e => e.Amount)
-                .HasColumnType("decimal(18, 2)")
-                .HasColumnName("amount");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(CONVERT([datetime],(sysdatetimeoffset() AT TIME ZONE 'N. Central Asia Standard Time')))")
-                .HasColumnType("datetime")
-                .HasColumnName("createdAt");
-            entity.Property(e => e.PaymentStatusId).HasColumnName("paymentStatusId");
-            entity.Property(e => e.PaymentTypeId).HasColumnName("paymentTypeId");
-
-            entity.HasOne(d => d.Account).WithMany(p => p.PaymentHistories)
-                .HasForeignKey(d => d.AccountId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PaymentHi__accou__4A8310C6");
-
-            entity.HasOne(d => d.PaymentStatus).WithMany(p => p.PaymentHistories)
-                .HasForeignKey(d => d.PaymentStatusId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PaymentHi__payme__4C6B5938");
-
-            entity.HasOne(d => d.PaymentType).WithMany(p => p.PaymentHistories)
-                .HasForeignKey(d => d.PaymentTypeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PaymentHi__payme__4B7734FF");
-        });
-
-        modelBuilder.Entity<PaymentStatus>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__PaymentS__3213E83F40071BA5");
-
-            entity.ToTable("PaymentStatus");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.Name)
-                .HasMaxLength(50)
-                .HasColumnName("name");
-        });
-
-        modelBuilder.Entity<PaymentType>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__PaymentT__3213E83F6030E273");
-
-            entity.ToTable("PaymentType");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.Name)
-                .HasMaxLength(50)
-                .HasColumnName("name");
-            entity.Property(e => e.OperationType)
-                .HasMaxLength(20)
-                .HasColumnName("operationType");
-        });
-
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Role__3213E83F58A75739");
+            entity.HasKey(e => e.Id).HasName("PK__Role__3213E83F2F455A3A");
 
             entity.ToTable("Role");
 
@@ -486,7 +450,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Survey>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Survey__3213E83F0B1360D8");
+            entity.HasKey(e => e.Id).HasName("PK__Survey__3213E83F16B4B603");
 
             entity.ToTable("Survey", tb => tb.HasTrigger("trg_Survey_Update"));
 
@@ -567,9 +531,52 @@ public partial class AppDbContext : DbContext
                 .HasConstraintName("FK__Survey__surveyTy__4E53A1AA");
         });
 
+        modelBuilder.Entity<SurveyCommunityTransaction>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__SurveyCo__3213E83F9DF5967B");
+
+            entity.ToTable("SurveyCommunityTransaction");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.AccountId).HasColumnName("accountId");
+            entity.Property(e => e.Amount)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("amount");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(CONVERT([datetime],(sysdatetimeoffset() AT TIME ZONE 'N. Central Asia Standard Time')))")
+                .HasColumnType("datetime")
+                .HasColumnName("createdAt");
+            entity.Property(e => e.Profit)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("profit");
+            entity.Property(e => e.SurveyId).HasColumnName("surveyId");
+            entity.Property(e => e.TransactionStatusId).HasColumnName("transactionStatusId");
+            entity.Property(e => e.TransactionTypeId).HasColumnName("transactionTypeId");
+
+            entity.HasOne(d => d.Account).WithMany(p => p.SurveyCommunityTransactions)
+                .HasForeignKey(d => d.AccountId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__SurveyCom__accou__04AFB25B");
+
+            entity.HasOne(d => d.Survey).WithMany(p => p.SurveyCommunityTransactions)
+                .HasForeignKey(d => d.SurveyId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__SurveyCom__surve__05A3D694");
+
+            entity.HasOne(d => d.TransactionStatus).WithMany(p => p.SurveyCommunityTransactions)
+                .HasForeignKey(d => d.TransactionStatusId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__SurveyCom__trans__078C1F06");
+
+            entity.HasOne(d => d.TransactionType).WithMany(p => p.SurveyCommunityTransactions)
+                .HasForeignKey(d => d.TransactionTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__SurveyCom__trans__0697FACD");
+        });
+
         modelBuilder.Entity<SurveyDefaultBackgroundTheme>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyDe__3213E83F1E4CAF4B");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyDe__3213E83F97F6DD92");
 
             entity.ToTable("SurveyDefaultBackgroundTheme");
 
@@ -619,7 +626,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyFieldInputType>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyFi__3213E83F5C45BCDE");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyFi__3213E83FB5CEB328");
 
             entity.ToTable("SurveyFieldInputType");
 
@@ -633,7 +640,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyGeneralConfig>(entity =>
         {
-            entity.HasKey(e => e.ConfigProfileId).HasName("PK__SurveyGe__D540A124DEBE71FF");
+            entity.HasKey(e => e.ConfigProfileId).HasName("PK__SurveyGe__D540A1242461F63E");
 
             entity.ToTable("SurveyGeneralConfig");
 
@@ -691,7 +698,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyMarketConfig>(entity =>
         {
-            entity.HasKey(e => e.ConfigProfileId).HasName("PK__SurveyMa__D540A124D5831433");
+            entity.HasKey(e => e.ConfigProfileId).HasName("PK__SurveyMa__D540A124A4E5B677");
 
             entity.ToTable("SurveyMarketConfig");
 
@@ -721,9 +728,52 @@ public partial class AppDbContext : DbContext
                 .HasConstraintName("FK__SurveyMar__surve__56E8E7AB");
         });
 
+        modelBuilder.Entity<SurveyMarketTransaction>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__SurveyMa__3213E83F9490C51E");
+
+            entity.ToTable("SurveyMarketTransaction");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.AccountId).HasColumnName("accountId");
+            entity.Property(e => e.Amount)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("amount");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(CONVERT([datetime],(sysdatetimeoffset() AT TIME ZONE 'N. Central Asia Standard Time')))")
+                .HasColumnType("datetime")
+                .HasColumnName("createdAt");
+            entity.Property(e => e.DataPurchaseId).HasColumnName("dataPurchaseId");
+            entity.Property(e => e.Profit)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("profit");
+            entity.Property(e => e.TransactionStatusId).HasColumnName("transactionStatusId");
+            entity.Property(e => e.TransactionTypeId).HasColumnName("transactionTypeId");
+
+            entity.HasOne(d => d.Account).WithMany(p => p.SurveyMarketTransactions)
+                .HasForeignKey(d => d.AccountId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__SurveyMar__accou__7E02B4CC");
+
+            entity.HasOne(d => d.DataPurchase).WithMany(p => p.SurveyMarketTransactions)
+                .HasForeignKey(d => d.DataPurchaseId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__SurveyMar__dataP__7EF6D905");
+
+            entity.HasOne(d => d.TransactionStatus).WithMany(p => p.SurveyMarketTransactions)
+                .HasForeignKey(d => d.TransactionStatusId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__SurveyMar__trans__00DF2177");
+
+            entity.HasOne(d => d.TransactionType).WithMany(p => p.SurveyMarketTransactions)
+                .HasForeignKey(d => d.TransactionTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__SurveyMar__trans__7FEAFD3E");
+        });
+
         modelBuilder.Entity<SurveyMarketVersionStatusTracking>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyMa__3213E83F3083392D");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyMa__3213E83F3164DABC");
 
             entity.ToTable("SurveyMarketVersionStatusTracking");
 
@@ -749,7 +799,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyOption>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyOp__3213E83FEFCCEC67");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyOp__3213E83F997B00DA");
 
             entity.ToTable("SurveyOption");
 
@@ -763,12 +813,12 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.SurveyQuestion).WithMany(p => p.SurveyOptions)
                 .HasForeignKey(d => d.SurveyQuestionId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__SurveyOpt__surve__59C55456");
+                .HasConstraintName("FK__SurveyOpt__surve__6CD828CA");
         });
 
         modelBuilder.Entity<SurveyQuestion>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyQu__3213E83F9D9BC5EB");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyQu__3213E83F2EAE63B7");
 
             entity.ToTable("SurveyQuestion");
 
@@ -800,8 +850,7 @@ public partial class AppDbContext : DbContext
 
             entity.HasOne(d => d.QuestionType).WithMany(p => p.SurveyQuestions)
                 .HasForeignKey(d => d.QuestionTypeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__SurveyQue__quest__5BAD9CC8");
+                .HasConstraintName("FK__SurveyQue__quest__6EC0713C");
 
             entity.HasOne(d => d.ReferenceSurveyQuestion).WithMany(p => p.InverseReferenceSurveyQuestion)
                 .HasForeignKey(d => d.ReferenceSurveyQuestionId)
@@ -810,12 +859,12 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Survey).WithMany(p => p.SurveyQuestions)
                 .HasForeignKey(d => d.SurveyId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__SurveyQue__surve__5AB9788F");
+                .HasConstraintName("FK__SurveyQue__surve__6DCC4D03");
         });
 
         modelBuilder.Entity<SurveyQuestionType>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyQu__3213E83FB2D6AE78");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyQu__3213E83FFFD64818");
 
             entity.ToTable("SurveyQuestionType");
 
@@ -836,7 +885,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyResponse>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyRe__3213E83F5BAF4BD5");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyRe__3213E83F56F5AC7B");
 
             entity.ToTable("SurveyResponse");
 
@@ -849,7 +898,7 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.SurveyQuestion).WithMany(p => p.SurveyResponses)
                 .HasForeignKey(d => d.SurveyQuestionId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__SurveyRes__surve__5E8A0973");
+                .HasConstraintName("FK__SurveyRes__surve__719CDDE7");
 
             entity.HasOne(d => d.SurveyTakenResult).WithMany(p => p.SurveyResponses)
                 .HasForeignKey(d => d.SurveyTakenResultId)
@@ -859,7 +908,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyRewardTracking>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyRe__3213E83F1B340A70");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyRe__3213E83F99E01540");
 
             entity.ToTable("SurveyRewardTracking");
 
@@ -882,7 +931,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveySecurityMode>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveySe__3213E83F8D21F5F6");
+            entity.HasKey(e => e.Id).HasName("PK__SurveySe__3213E83F50C59BD1");
 
             entity.ToTable("SurveySecurityMode");
 
@@ -918,7 +967,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveySpecificTopic>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveySp__3213E83FADB0CF23");
+            entity.HasKey(e => e.Id).HasName("PK__SurveySp__3213E83FDDFEDCC3");
 
             entity.ToTable("SurveySpecificTopic");
 
@@ -936,7 +985,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyStatus>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveySt__3213E83F4A757F39");
+            entity.HasKey(e => e.Id).HasName("PK__SurveySt__3213E83F1CC2DE73");
 
             entity.ToTable("SurveyStatus");
 
@@ -950,7 +999,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyStatusTracking>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveySt__3213E83FDF0BD1B2");
+            entity.HasKey(e => e.Id).HasName("PK__SurveySt__3213E83F17FAB5FD");
 
             entity.ToTable("SurveyStatusTracking");
 
@@ -996,7 +1045,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyTakenResult>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyTa__3213E83F6014C1E1");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyTa__3213E83F1F92A343");
 
             entity.ToTable("SurveyTakenResult");
 
@@ -1083,7 +1132,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyTimeRateConfig>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyTi__3213E83F8131F67E");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyTi__3213E83F3EF92543");
 
             entity.ToTable("SurveyTimeRateConfig");
 
@@ -1101,7 +1150,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyTopic>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyTo__3213E83F2E58AC0E");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyTo__3213E83FD06892A5");
 
             entity.ToTable("SurveyTopic");
 
@@ -1124,17 +1173,17 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Account).WithMany(p => p.SurveyTopicFavorites)
                 .HasForeignKey(d => d.AccountId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__SurveyTop__accou__6CD828CA");
+                .HasConstraintName("FK__SurveyTop__accou__6DCC4D03");
 
             entity.HasOne(d => d.SurveyTopic).WithMany(p => p.SurveyTopicFavorites)
                 .HasForeignKey(d => d.SurveyTopicId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__SurveyTop__surve__6DCC4D03");
+                .HasConstraintName("FK__SurveyTop__surve__6CD828CA");
         });
 
         modelBuilder.Entity<SurveyType>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyTy__3213E83FF062FBB3");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyTy__3213E83FC74F9E35");
 
             entity.ToTable("SurveyType");
 
@@ -1148,7 +1197,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SystemConfigProfile>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SystemCo__3213E83F9029943D");
+            entity.HasKey(e => e.Id).HasName("PK__SystemCo__3213E83F631D0F14");
 
             entity.ToTable("SystemConfigProfile", tb => tb.HasTrigger("trg_SystemConfigProfile_Update"));
 
@@ -1187,6 +1236,37 @@ public partial class AppDbContext : DbContext
                 .HasForeignKey(d => d.TakerId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__TakerTagF__taker__6EC0713C");
+        });
+
+        modelBuilder.Entity<TransactionStatus>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Transact__3213E83F106B87C5");
+
+            entity.ToTable("TransactionStatus");
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
+            entity.Property(e => e.Name)
+                .HasMaxLength(50)
+                .HasColumnName("name");
+        });
+
+        modelBuilder.Entity<TransactionType>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Transact__3213E83FEAE05E19");
+
+            entity.ToTable("TransactionType");
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
+            entity.Property(e => e.Name)
+                .HasMaxLength(50)
+                .HasColumnName("name");
+            entity.Property(e => e.OperationType)
+                .HasMaxLength(20)
+                .HasColumnName("operationType");
         });
 
         OnModelCreatingPartial(modelBuilder);

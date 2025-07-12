@@ -15,11 +15,11 @@ public partial class SurveyResponse
 
     public string ValueJsonString { get; set; } = null!;
 
-    public virtual ICollection<DataPurchaseDetail> DataPurchaseDetails { get; set; } = new List<DataPurchaseDetail>();
-
     public virtual ICollection<SurveyMarketResponseVersion> SurveyMarketResponseVersions { get; set; } = new List<SurveyMarketResponseVersion>();
 
     public virtual SurveyQuestion SurveyQuestion { get; set; } = null!;
 
     public virtual SurveyTakenResult SurveyTakenResult { get; set; } = null!;
+
+    public virtual ICollection<DataPurchase> DataPurchases { get; set; } = new List<DataPurchase>();
 }

@@ -216,7 +216,7 @@ CREATE TABLE SurveyStatusTracking (
 CREATE TABLE SurveyQuestion (
     id INT IDENTITY PRIMARY KEY,
     surveyId INT NOT NULL REFERENCES Survey(id),
-    questionTypeId INT NOT NULL REFERENCES SurveyQuestionType(id),
+    questionTypeId INT NULL REFERENCES SurveyQuestionType(id),
     content NVARCHAR(500) NOT NULL,
     description NVARCHAR(500) NULL,
     timeLimit INT NULL DEFAULT(10),

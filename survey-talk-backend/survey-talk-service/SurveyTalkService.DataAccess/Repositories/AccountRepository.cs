@@ -94,23 +94,23 @@ namespace SurveyTalkService.DataAccess.Repositories
             // in tất cả ra
             Console.WriteLine($"CountryRegions: {string.Join(", ", countryRegions ?? new string[] { "null" })}");
             Console.WriteLine($"TargetCountryRegions: {string.Join(", ", targetCountryRegions ?? new string[] { "null" })}");
-            Console.WriteLine("kêt quả so sánh: " + 
+            Console.WriteLine("kêt quả so sánh: " +
                 (countryRegions == null || targetCountryRegions == null || countryRegions.Any(cr => targetCountryRegions.Contains(cr))));
             Console.WriteLine($"MaritalStatuses: {string.Join(", ", maritalStatuses ?? new string[] { "null" })}");
             Console.WriteLine($"TargetMaritalStatuses: {string.Join(", ", targetMaritalStatuses ?? new string[] { "null" })}");
-            Console.WriteLine("kêt quả so sánh: " + 
+            Console.WriteLine("kêt quả so sánh: " +
                 (maritalStatuses == null || targetMaritalStatuses == null || maritalStatuses.Any(ms => targetMaritalStatuses.Contains(ms))));
             Console.WriteLine($"AverageIncomes: {string.Join(", ", averageIncomes ?? new string[] { "null" })}");
             Console.WriteLine($"TargetAverageIncomes: {string.Join(", ", targetAverageIncomes ?? new string[] { "null" })}");
-            Console.WriteLine("kêt quả so sánh: " + 
+            Console.WriteLine("kêt quả so sánh: " +
                 (averageIncomes == null || targetAverageIncomes == null || averageIncomes.Any(ai => targetAverageIncomes.Contains(ai))));
             Console.WriteLine($"EducationLevels: {string.Join(", ", educationLevels ?? new string[] { "null" })}");
             Console.WriteLine($"TargetEducationLevels: {string.Join(", ", targetEducationLevels ?? new string[] { "null" })}");
-            Console.WriteLine("kêt quả so sánh: " + 
+            Console.WriteLine("kêt quả so sánh: " +
                 (educationLevels == null || targetEducationLevels == null || educationLevels.Any(el => targetEducationLevels.Contains(el))));
             Console.WriteLine($"JobFields: {string.Join(", ", jobFields ?? new string[] { "null" })}");
             Console.WriteLine($"TargetJobFields: {string.Join(", ", targetJobFields ?? new string[] { "null" })}");
-            Console.WriteLine("kêt quả so sánh: " + 
+            Console.WriteLine("kêt quả so sánh: " +
                 (jobFields == null || targetJobFields == null || jobFields.Any(jf => targetJobFields.Contains(jf))));
 
 
@@ -119,7 +119,7 @@ namespace SurveyTalkService.DataAccess.Repositories
                 && (averageIncomes == null || targetAverageIncomes == null || averageIncomes.Any(ai => targetAverageIncomes.Contains(ai)))
                 && (educationLevels == null || targetEducationLevels == null || educationLevels.Any(el => targetEducationLevels.Contains(el)))
                 && (jobFields == null || targetJobFields == null || jobFields.Any(jf => targetJobFields.Contains(jf)));
-            
+
         }
 
         public async Task<bool> DeactivateAsync(int id, bool deactivate)
@@ -143,6 +143,14 @@ namespace SurveyTalkService.DataAccess.Repositories
 
             var rowsAffected = await _appDbContext.SaveChangesAsync();
             return rowsAffected > 1;
+        }
+        
+        public async Task<int> CountAccountRegistrationByPeriodAsync(DateOnly startDate, DateOnly endDate)
+        {
+            return await _appDbContext.Accounts
+                .Where(account => DateOnly.FromDateTime(account.CreatedAt.Date) >= startDate &&
+                                  DateOnly.FromDateTime(account.CreatedAt.Date) <= endDate)
+                .CountAsync();
         }
     }
 }

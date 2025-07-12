@@ -25,13 +25,14 @@ namespace SurveyTalkService.DataAccess.Registrations
             services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
             services.AddScoped<ISurveyTakenResultRepository, SurveyTakenResultRepository>();
             services.AddScoped<ISurveyStatusTrackingRepository, SurveyStatusTrackingRepository>();
-            services.AddScoped<IPaymentHistoryRepository, PaymentHistoryRepository>();
             services.AddScoped<IFilterTagRepository, FilterTagRepository>();
             services.AddScoped<ITakerTagFilterRepository, TakerTagFilterRepository>();
             services.AddScoped<ISystemConfigProfileRepository, SystemConfigProfileRepository>();
             services.AddScoped<ISurveyTakerSegmentRepository, SurveyTakerSegmentRepository>();
             services.AddScoped<ISurveyTagFilterRepository, SurveyTagFilterRepository>();
             services.AddScoped<IAccountProfileRepository, AccountProfileRepository>();
+            services.AddScoped<IAccountBalanceTransactionRepository, AccountBalanceTransactionRepository>();
+            services.AddScoped<ISurveyCommunityTransactionRepository, SurveyCommunityTransactionRepository>();
 
             return services;
         }

@@ -53,7 +53,7 @@ namespace SurveyTalkService.DataAccess.Repositories
                 .Include(s => s.SurveySpecificTopic)
                 .ThenInclude(s => s.SurveyTopic)
                 .Include(s => s.SecurityMode)
-                // .Include(s => s.SurveyStatusTrackings)
+                .Include(s => s.SurveyStatusTrackings)
                 .Include(s => s.SurveyRewardTrackings)
                 // .Include(s => s.SurveyTakenResults)
                 // .ThenInclude(srt => srt.Taker)
@@ -81,6 +81,7 @@ namespace SurveyTalkService.DataAccess.Repositories
                         (surveyFilterObject.IsDeletedContain == false && s.DeletedAt == null))
                     &&
                     (surveyFilterObject.IsEndDateExceededContain == null ||
+                        (surveyFilterObject.IsEndDateExceededContain == true) ||
                         (surveyFilterObject.IsEndDateExceededContain == false && s.EndDate >= today))
                 );
             if (survey == null)
@@ -151,7 +152,7 @@ namespace SurveyTalkService.DataAccess.Repositories
                 .Include(s => s.SurveyTopic)
                 .Include(s => s.SurveySpecificTopic)
                 .Include(s => s.SecurityMode)
-                // .Include(s => s.SurveyStatusTrackings)
+                .Include(s => s.SurveyStatusTrackings)
                 .Include(s => s.SurveyRewardTrackings)
                 // .Include(s => s.SurveyTakenResults)
                 // .ThenInclude(srt => srt.Taker)
@@ -169,6 +170,7 @@ namespace SurveyTalkService.DataAccess.Repositories
                         (surveyFilterObject.IsDeletedContain == true) ||
                         (surveyFilterObject.IsDeletedContain == false && survey.DeletedAt == null))
                     && (surveyFilterObject.IsEndDateExceededContain == null ||
+                        (surveyFilterObject.IsEndDateExceededContain == true) ||
                         (surveyFilterObject.IsEndDateExceededContain == false && survey.EndDate >= today))
                 ))
                 {
@@ -214,5 +216,23 @@ namespace SurveyTalkService.DataAccess.Repositories
             }
             return result;
         }
+
+        // public async Task<decimal> GetProfitByTypeAndPeriodAsync(int surveyTypeId, DateOnly startDate, DateOnly endDate)
+        // {
+        //     var surveys = await _appDbContext.Surveys
+        //         .Where(s => s.StartDate >= startDate && s.EndDate <= endDate && s.ProfitPrice != null && s.SurveyTypeId == surveyTypeId)
+        //         .ToListAsync();
+
+        //     decimal totalProfit = 0;
+
+        //     foreach (var survey in surveys)
+        //     {
+        //         if (survey.ProfitPrice.HasValue)
+        //         {
+        //             totalProfit += survey.ProfitPrice.Value;
+        //         }
+        //     }
+        //     return totalProfit;
+        // }
     }
 }

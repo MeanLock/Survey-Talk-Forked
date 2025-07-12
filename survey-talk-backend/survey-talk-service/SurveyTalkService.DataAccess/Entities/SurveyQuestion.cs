@@ -9,7 +9,7 @@ public partial class SurveyQuestion
 
     public int SurveyId { get; set; }
 
-    public int QuestionTypeId { get; set; }
+    public int? QuestionTypeId { get; set; }
 
     public string Content { get; set; } = null!;
 
@@ -33,7 +33,7 @@ public partial class SurveyQuestion
 
     public virtual ICollection<SurveyQuestion> InverseReferenceSurveyQuestion { get; set; } = new List<SurveyQuestion>();
 
-    public virtual SurveyQuestionType QuestionType { get; set; } = null!;
+    public virtual SurveyQuestionType? QuestionType { get; set; }
 
     public virtual SurveyQuestion? ReferenceSurveyQuestion { get; set; }
 

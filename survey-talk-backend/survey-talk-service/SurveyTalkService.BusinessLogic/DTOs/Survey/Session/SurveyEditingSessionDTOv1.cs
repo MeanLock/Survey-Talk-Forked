@@ -9,8 +9,8 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.Session.V1
         public string? Title { get; set; } // [field cập nhật]
         public string? Description { get; set; } // [field cập nhật]
         public int SurveyTypeId { get; set; }  // [kiểm tra bước 1]
-        public int SurveyTopicId { get; set; } // [field cập nhật]
-        public int SurveySpecificTopicId { get; set; } // [field cập nhật]
+        public int? SurveyTopicId { get; set; } // [field cập nhật]
+        public int? SurveySpecificTopicId { get; set; } // [field cập nhật]
         public string? MainImageBase64 { get; set; } // [field cập nhật]
         public string? BackgroundImageBase64 { get; set; } // [field cập nhật]
         public int? SurveyStatusId { get; set; }
@@ -40,8 +40,8 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.Session.V1
 
     public class SurveyEditingSessionQuestionDTO
     {
-        public int Id { get; set; } 
-        public int QuestionTypeId { get; set; } // [field cập nhật]
+        public int? Id { get; set; } 
+        public int? QuestionTypeId { get; set; } // [field cập nhật]
         public string? MainImageBase64 { get; set; } // [field cập nhật]
         public int? Version { get; set; }
         public bool? IsReanswerRequired { get; set; } // [field cập nhật]
@@ -107,7 +107,7 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.Session.V1
 
     public class SurveyEditingSessionOptionDTO
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public string? Content { get; set; } // [field cập nhật]
         public int Order { get; set; } // [field cập nhật]
         public string? MainImageBase64 { get; set; } // [field cập nhật]

@@ -1,5 +1,11 @@
 [
     {
+        "method": "GET",
+        "url": "/api/Survey/response/filter/surveys/{SurveyId}",
+        "description": "summary: Lấy summary của filter survey (MANAGER, ADMIN)",
+        "completed": true
+    },
+    {
         "method": "POST",
         "url": "/api/Survey/response/filter/surveys/{SurveyId}",
         "description": "Ghi nhận response cho filter survey",
@@ -9,7 +15,7 @@
         "method": "GET",
         "url": "/api/Survey/response/community/surveys/{SurveyId}",
         "description": "Lấy summary của community survey (REQUESTER)",
-        "completed": false
+        "completed": true
     },
     {
         "method": "POST",

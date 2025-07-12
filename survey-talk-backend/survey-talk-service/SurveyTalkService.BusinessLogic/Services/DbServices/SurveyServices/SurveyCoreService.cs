@@ -17,7 +17,7 @@ using SurveyTalkService.BusinessLogic.DTOs.Survey.Filters;
 using SurveyTalkService.BusinessLogic.DTOs.Survey;
 using SurveyTalkService.BusinessLogic.DTOs.Survey.Details;
 using SurveyTalkService.BusinessLogic.DTOs.Survey.JsonConfigs;
-using SurveyTalkService.BusinessLogic.DTOs.FilterTags;
+using SurveyTalkService.BusinessLogic.DTOs.FilterTag;
 using SurveyTalkService.BusinessLogic.Services.EmbeddingVectorServices;
 using SurveyTalkService.BusinessLogic.DTOs.Survey.Publishment;
 
@@ -160,6 +160,10 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
         {
             try
             {
+                if (surveys == null || !surveys.Any())
+                {
+                    return new List<T>();
+                }
                 var result = new List<T>();
                 if (typeof(T) == typeof(FilterSurveyListItemDTO))
                 {
@@ -214,7 +218,8 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                                 DeletedAt = survey.DeletedAt ?? null,
                                 CreatedAt = survey.CreatedAt,
                                 UpdatedAt = survey.UpdatedAt
-                            }
+                            },
+                            CurrentTakenResultCount = await _unitOfWork.SurveyTakenResultRepository.CountBySurveyIdAsync(survey.Id, false)
                         };
                         result.Add((T)(object)filterSurvey);
                     }
@@ -234,7 +239,11 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                         {
                             backgroundImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.SURVEY_DEFAULT_BACKGROUND_IMAGE_PATH, surveyConfigJson.DefaultBackgroundImageId.ToString(), "main");
                         }
-                        var filterSurvey = new CommunitySurveyListItemDTO
+                        int currentTakenResultCount = await _unitOfWork.SurveyTakenResultRepository.CountBySurveyIdAsync(survey.Id, false);
+                        int surveyStatusId = survey.SurveyStatusTrackings
+                            .OrderByDescending(sst => sst.CreatedAt)
+                            .FirstOrDefault()?.SurveyStatusId ?? 1;
+                        var communitySurvey = new CommunitySurveyListItemDTO
                         {
                             Id = survey.Id,
                             Title = survey.Title,
@@ -246,9 +255,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                             SecurityModeId = survey.SecurityModeId,
                             IsAvailable = survey.IsAvailable,
                             PublishedAt = survey.PublishedAt ?? null,
-                            SurveyStatusId = survey.SurveyStatusTrackings
-                                .OrderByDescending(sst => sst.CreatedAt)
-                                .FirstOrDefault()?.SurveyStatusId ?? 1,
+                            SurveyStatusId = surveyStatusId,
                             MainImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH, survey.Id.ToString(), "main"),
                             BackgroundImageUrl = backgroundImageUrl,
                             QuestionCount = surveyQuestions.Count(),
@@ -273,6 +280,8 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                                 CreatedAt = survey.CreatedAt,
                                 UpdatedAt = survey.UpdatedAt
                             },
+                            CurrentTakenResultCount = currentTakenResultCount,
+                            AvailableTakenResultSlot = surveyStatusId != 1 ? ((survey.Kpi ?? 0) - currentTakenResultCount) : 0,
                             CurrentSurveyRewardTracking = survey.SurveyRewardTrackings.Select(srt => new SurveyRewardTracking
                             {
                                 Id = srt.Id,
@@ -284,7 +293,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                                 .FirstOrDefault(),
 
                         };
-                        result.Add((T)(object)filterSurvey);
+                        result.Add((T)(object)communitySurvey);
                     }
                 }
                 // else if (typeof(T) == typeof(OtherDTO)) { ... }
@@ -296,6 +305,145 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                 throw new Exception("không xác định");
             }
         }
+
+        public async Task<T?> GenerateSurveyListItemIntoDTO<T>(Survey survey, bool isSurveyPrivateDataTaken = false) where T : class
+        {
+            try
+            {
+                if (survey == null)
+                {
+                    return null;
+                }
+                if (typeof(T) == typeof(FilterSurveyListItemDTO))
+                {
+                    var surveyQuestions = await _unitOfWork.SurveyQuestionRepository.FindBySurveyIdAndIsDeletedContainAsync(survey.Id, false);
+                    SurveyConfigJsonDTO surveyConfigJson = (JObject.Parse(survey.ConfigJsonString)).ToObject<SurveyConfigJsonDTO>();
+                    string backgroundImageUrl = "";
+                    if (surveyConfigJson.IsUseBackgroundImageBase64 == true)
+                    {
+                        backgroundImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH, survey.Id.ToString(), "background");
+                    }
+                    else
+                    {
+                        backgroundImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.SURVEY_DEFAULT_BACKGROUND_IMAGE_PATH, surveyConfigJson.DefaultBackgroundImageId.ToString(), "main");
+                    }
+                    var filterSurvey = new FilterSurveyListItemDTO
+                    {
+                        Id = survey.Id,
+                        Title = survey.Title,
+                        Description = survey.Description,
+                        SurveyTopicId = survey.SurveyTopicId,
+                        SurveySpecificTopicId = survey.SurveySpecificTopicId,
+                        StartDate = survey.StartDate ?? null,
+                        EndDate = survey.EndDate ?? null,
+                        SecurityModeId = survey.SecurityModeId,
+                        IsAvailable = survey.IsAvailable,
+                        PublishedAt = survey.PublishedAt ?? null,
+                        SurveyStatusId = survey.SurveyStatusTrackings
+                            .OrderByDescending(sst => sst.CreatedAt)
+                            .FirstOrDefault()?.SurveyStatusId ?? 1,
+                        MainImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH, survey.Id.ToString(), "main"),
+                        BackgroundImageUrl = backgroundImageUrl,
+                        QuestionCount = surveyQuestions.Count(),
+                        TakerBaseRewardPrice = (double)(survey.TakerBaseRewardPrice ?? 0),
+                        ConfigJsonString = survey.ConfigJsonString,
+                        SurveyPrivateData = isSurveyPrivateDataTaken == false ? null :
+                        new SurveyPrivateDataDTO
+                        {
+                            RequesterId = survey.RequesterId,
+                            SurveyTypeId = survey.SurveyTypeId,
+                            Kpi = survey.Kpi ?? 0,
+                            TheoryPrice = (double)(survey.TheoryPrice ?? 0),
+                            ExtraPrice = (double)(survey.ExtraPrice ?? 0),
+                            ProfitPrice = (double)(survey.ProfitPrice ?? 0),
+                            AllocBaseAmount = (double)(survey.AllocBaseAmount ?? 0),
+                            AllocTimeAmount = (double)(survey.AllocTimeAmount ?? 0),
+                            AllocLevelAmount = (double)(survey.AllocLevelAmount ?? 0),
+                            MaxXp = survey.MaxXp ?? 0,
+                            DeletedAt = survey.DeletedAt ?? null,
+                            CreatedAt = survey.CreatedAt,
+                            UpdatedAt = survey.UpdatedAt
+                        },
+                        CurrentTakenResultCount = await _unitOfWork.SurveyTakenResultRepository.CountBySurveyIdAsync(survey.Id, false)
+                    };
+                    return filterSurvey as T;
+                }
+                else if (typeof(T) == typeof(CommunitySurveyListItemDTO))
+                {
+                    var surveyQuestions = await _unitOfWork.SurveyQuestionRepository.FindBySurveyIdAndIsDeletedContainAsync(survey.Id, false);
+                    SurveyConfigJsonDTO surveyConfigJson = (JObject.Parse(survey.ConfigJsonString)).ToObject<SurveyConfigJsonDTO>();
+                    string backgroundImageUrl = "";
+                    if (surveyConfigJson.IsUseBackgroundImageBase64 == true)
+                    {
+                        backgroundImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH, survey.Id.ToString(), "background");
+                    }
+                    else
+                    {
+                        backgroundImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.SURVEY_DEFAULT_BACKGROUND_IMAGE_PATH, surveyConfigJson.DefaultBackgroundImageId.ToString(), "main");
+                    }
+                    int currentTakenResultCount = await _unitOfWork.SurveyTakenResultRepository.CountBySurveyIdAsync(survey.Id, false);
+                    int surveyStatusId = survey.SurveyStatusTrackings
+                        .OrderByDescending(sst => sst.CreatedAt)
+                        .FirstOrDefault()?.SurveyStatusId ?? 1;
+                    var communitySurvey = new CommunitySurveyListItemDTO
+                    {
+                        Id = survey.Id,
+                        Title = survey.Title,
+                        Description = survey.Description,
+                        SurveyTopicId = survey.SurveyTopicId,
+                        SurveySpecificTopicId = survey.SurveySpecificTopicId,
+                        StartDate = survey.StartDate ?? null,
+                        EndDate = survey.EndDate ?? null,
+                        SecurityModeId = survey.SecurityModeId,
+                        IsAvailable = survey.IsAvailable,
+                        PublishedAt = survey.PublishedAt ?? null,
+                        SurveyStatusId = surveyStatusId,
+                        MainImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH, survey.Id.ToString(), "main"),
+                        BackgroundImageUrl = backgroundImageUrl,
+                        QuestionCount = surveyQuestions.Count(),
+                        TakerBaseRewardPrice = (double)(survey.TakerBaseRewardPrice ?? 0),
+                        ConfigJsonString = survey.ConfigJsonString,
+                        SurveyPrivateData = isSurveyPrivateDataTaken == false ? null :
+                        new SurveyPrivateDataDTO
+                        {
+                            RequesterId = survey.RequesterId,
+                            SurveyTypeId = survey.SurveyTypeId,
+                            Kpi = survey.Kpi ?? 0,
+                            TheoryPrice = (double)(survey.TheoryPrice ?? 0),
+                            ExtraPrice = (double)(survey.ExtraPrice ?? 0),
+                            ProfitPrice = (double)(survey.ProfitPrice ?? 0),
+                            AllocBaseAmount = (double)(survey.AllocBaseAmount ?? 0),
+                            AllocTimeAmount = (double)(survey.AllocTimeAmount ?? 0),
+                            AllocLevelAmount = (double)(survey.AllocLevelAmount ?? 0),
+                            MaxXp = survey.MaxXp ?? 0,
+                            DeletedAt = survey.DeletedAt ?? null,
+                            CreatedAt = survey.CreatedAt,
+                            UpdatedAt = survey.UpdatedAt
+                        },
+                        CurrentTakenResultCount = currentTakenResultCount,
+                        AvailableTakenResultSlot = surveyStatusId != 1 ? ((survey.Kpi ?? 0) - currentTakenResultCount) : 0,
+                        CurrentSurveyRewardTracking = survey.SurveyRewardTrackings.Select(srt => new SurveyRewardTracking
+                        {
+                            Id = srt.Id,
+                            SurveyId = srt.SurveyId,
+                            RewardPrice = srt.RewardPrice,
+                            RewardXp = srt.RewardXp,
+                            CreatedAt = srt.CreatedAt
+                        }).OrderByDescending(sst => sst.CreatedAt)
+                            .FirstOrDefault(),
+                    };
+                    return communitySurvey as T;
+                }
+                // else if (typeof(T) == typeof(OtherDTO)) { ... }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("\n" + ex.StackTrace + "\n");
+                throw new Exception("không xác định");
+            }
+        }
+
 
         public async Task<T> GenerateSurveyDetailIntoDTO<T>(Survey survey, bool isSurveyPrivateDataTaken = false) where T : class
         {
@@ -335,6 +483,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                         QuestionCount = surveyQuestions.Count(),
                         TakerBaseRewardPrice = (double)(survey.TakerBaseRewardPrice ?? 0),
                         ConfigJsonString = survey.ConfigJsonString,
+                        CurrentTakenResultCount = await _unitOfWork.SurveyTakenResultRepository.CountBySurveyIdAsync(survey.Id, false),
                         Questions = JArray.FromObject(
                             await Task.WhenAll(surveyQuestions.Select(async sq =>
                             {
@@ -402,6 +551,10 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                     {
                         backgroundImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.SURVEY_DEFAULT_BACKGROUND_IMAGE_PATH, surveyConfigJson.DefaultBackgroundImageId.ToString(), "main");
                     }
+                    int currentTakenResultCount = await _unitOfWork.SurveyTakenResultRepository.CountBySurveyIdAsync(survey.Id, false);
+                    int surveyStatusId = survey.SurveyStatusTrackings
+                            .OrderByDescending(sst => sst.CreatedAt)
+                            .FirstOrDefault()?.SurveyStatusId ?? 1;
                     var communitySurveyDetail = new CommunitySurveyDetailDTO
                     {
                         Id = survey.Id,
@@ -422,6 +575,8 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                         QuestionCount = surveyQuestions.Count(),
                         TakerBaseRewardPrice = (double)(survey.TakerBaseRewardPrice ?? 0),
                         ConfigJsonString = survey.ConfigJsonString,
+                        CurrentTakenResultCount = currentTakenResultCount,
+                        AvailableTakenResultSlot = surveyStatusId != 1 ? ((survey.Kpi ?? 0) - currentTakenResultCount) : 0,
                         Questions = JArray.FromObject(
                             await Task.WhenAll(surveyQuestions.Select(async sq =>
                             {
@@ -684,6 +839,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                     SurveyTypeId = 1, // Filter survey type id
                     SurveyStatusIds = new List<int> { 1, 2, 3, 4, 5 }, // Only get surveys with status "Draft"
                     IsDeletedContain = true,
+                    IsAvailable = true,
                 };
                 bool isSurveyPrivateDataTaken = true;
 
@@ -720,7 +876,6 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                     SurveyTypeId = 1,
                     SurveyStatusIds = new List<int> { 1, 2, 3, 4, 5 }, // Only get surveys with status "Draft"
                     IsDeletedContain = true,
-                    // IsInvalidTakenResultContain = true
                 };
                 // var survey = await _unitOfWork.SurveyRepository.FindByIdAndFilterObjectAsync(surveyId, surveyFilterObject);
                 var survey = await GetExistSurveyByIdAndFilterObject(surveyId, surveyFilterObject);
@@ -803,7 +958,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
             }
         }
 
-        public async Task<List<CommunitySurveyListItemDTO>> GetCommunitySurveys(int userId, int roleId)
+        public async Task<List<CommunitySurveyListItemDTO>> GetCommunitySurveys(Account account)
         {
             try
             {
@@ -811,11 +966,11 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                 {
                     SurveyTypeId = 2,
                     IsDeletedContain = false,
-                    SurveyStatusIds = new List<int> { 2 }
+                    SurveyStatusIds = new List<int> { 2, 3 }
                 };
                 bool isSurveyPrivateDataTaken = true;
 
-                if (roleId == 4)
+                if (account.RoleId == 4)
                 {
                     surveyFilterObject = new SurveyFilterObject
                     {
@@ -831,19 +986,22 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                 var surveys = await _unitOfWork.SurveyRepository.FindByFilterObjectAsync(surveyFilterObject);
 
 
-                if (roleId == 4)
+                if (account.RoleId == 4)
                 {
-
-                    var account = await _unitOfWork.AccountRepository.FindByIdAsync(userId);
+                    List<SurveyTakenResult> surveyTakenResults = await _surveyTakenResultGenericRepository.FindAll(str => str.TakerId == account.Id && str.IsValid == true).ToListAsync();
+                    surveys = surveys
+                        .Where(s => !surveyTakenResults.Any(str => str.SurveyId == s.Id) && s.RequesterId != account.Id)
+                        .ToList();
 
                     var accountTagFilters = await _postgresDbContext.TakerEmbeddingVectorTagFilters
-                        .Where(x => x.TakerId == userId)
+                        .Where(x => x.TakerId == account.Id)
                         .Select(x => new EmbeddingVectorFilterTagDTO
                         {
                             FilterTagId = x.FilterTagId,
                             EmbeddingVector = x.EmbeddingVector != null ? x.EmbeddingVector.ToArray() : null
                         })
                         .ToListAsync();
+
                     // Lấy danh sách SurveyEmbeddingVectorTagFilters theo surveyId từ danh sách surveys và rồi group lại theo CandidateEmbeddingVectorFilterTagsDTO
                     var surveyTagFilters = new List<CandidateEmbeddingVectorFilterTagsDTO>();
                     foreach (var survey in surveys)
@@ -957,6 +1115,97 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
             }
         }
 
+        public async Task<CommunitySurveyListItemDTO> GetLevelUpdateCommunitySurvey(Account account)
+        {
+            try
+            {
+                SurveyFilterObject surveyFilterObject = new SurveyFilterObject
+                {
+                    SurveyTypeId = 2, // Filter survey type id
+                    SurveyStatusIds = new List<int> { 2 }, // Only get surveys with status "Draft"
+                    IsDeletedContain = false,
+                    IsAvailable = true, // Only get available surveys
+                    IsEndDateExceededContain = false, // Only get surveys that have not ended
+                };
+                bool isSurveyPrivateDataTaken = false;
+
+                var surveys = await _unitOfWork.SurveyRepository.FindByFilterObjectAsync(surveyFilterObject);
+                // Console.WriteLine("surveys.Counttttttttttttttttttttt: " + surveys.Count());
+                List<SurveyTakenResult> surveyTakenResults = await _surveyTakenResultGenericRepository.FindAll(str => str.TakerId == account.Id && str.IsValid == true).ToListAsync();
+                surveys = surveys
+                    .Where(s => !surveyTakenResults.Any(str => str.SurveyId == s.Id) && s.RequesterId != account.Id)
+                    .ToList();
+
+                var accountTagFilters = await _postgresDbContext.TakerEmbeddingVectorTagFilters
+                    .Where(x => x.TakerId == account.Id)
+                    .Select(x => new EmbeddingVectorFilterTagDTO
+                    {
+                        FilterTagId = x.FilterTagId,
+                        EmbeddingVector = x.EmbeddingVector != null ? x.EmbeddingVector.ToArray() : null
+                    })
+                    .ToListAsync();
+
+                var surveyTagFilters = new List<CandidateEmbeddingVectorFilterTagsDTO>();
+                foreach (var survey in surveys)
+                {
+                    var compareAccountProfile = new AccountProfile
+                    {
+                        CountryRegion = survey.SurveyTakerSegment.CountryRegion,
+                        AverageIncome = survey.SurveyTakerSegment.AverageIncome,
+                        EducationLevel = survey.SurveyTakerSegment.EducationLevel,
+                        JobField = survey.SurveyTakerSegment.JobField,
+                        MaritalStatus = survey.SurveyTakerSegment.MaritalStatus
+                    };
+
+                    if (_unitOfWork.AccountRepository.CompareAccountProfile(account.AccountProfile, compareAccountProfile) == false)
+                    {
+                        continue;
+                    }
+                    Console.WriteLine("survey.Id: " + survey.Id);
+
+                    var embeddingSurveyTagFilters = await _postgresDbContext.SurveyEmbeddingVectorTagFilters
+                        .Where(x => x.SurveyId == survey.Id)
+                        .Select(x => new EmbeddingVectorFilterTagDTO
+                        {
+                            FilterTagId = x.FilterTagId,
+                            EmbeddingVector = x.EmbeddingVector != null ? x.EmbeddingVector.ToArray() : null
+                        })
+                        .ToListAsync();
+                    surveyTagFilters.Add(new CandidateEmbeddingVectorFilterTagsDTO
+                    {
+                        CandidateId = survey.Id,
+                        EmbeddingVectorFilterTags = embeddingSurveyTagFilters,
+                        CandidateTagFilterAccuracyRate = survey.SurveyTakerSegment.TagFilterAccuracyRate
+                    });
+                }
+                List<FilterTagSimilarityComparisonResultDTO> matchedSurvey = _surveyEmbeddingVectorService.FilterCandidatesByTagSimilarityByCandidateAccuracy(
+                    new FilterTagSimilarityComparisonRequestDTO
+                    {
+                        TargetEmbeddingVectorFilterTags = accountTagFilters,
+                        CandidateEmbeddingVectorFilterTags = surveyTagFilters,
+                        MinScore = _embeddingVectorModelConfig.MinScore,
+                        MaxScore = _embeddingVectorModelConfig.MaxScore
+                    });
+
+                List<int> matchedSurveyIds = matchedSurvey.Select(x => x.CandidateId).ToList();
+                surveys = surveys.Where(s => matchedSurveyIds.Contains(s.Id))
+                                        // .OrderByDescending(s => matchedSurvey.First(x => x.CandidateId == s.Id).SimilarityScore)
+                                        .OrderBy(s => s.EndDate)
+                                        .ToList();
+                // GenerateSurveyListItemIntoDTO
+
+
+                var levelUpdatesurvey = await GenerateSurveyListItemIntoDTO<CommunitySurveyListItemDTO>(surveys.FirstOrDefault(), isSurveyPrivateDataTaken);
+                return levelUpdatesurvey;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("\n" + ex.Message + "\n");
+                Console.WriteLine("\n" + ex.StackTrace + "\n");
+                throw new HttpRequestException("Lấy danh sách filter surveys thất bại, lỗi: " + ex.Message);
+            }
+        }
+
         public async Task<List<CommunitySurveyListItemDTO>> GetOwnCommunitySurveys(int accountId)
         {
             try
@@ -1030,7 +1279,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                         (survey.TakerBaseRewardPrice ?? 0) +
                         (survey.AllocTimeAmount ?? 0) * (decimal)daysPassed / (totalDays ?? 1);
                     var rewardXp = totalDays.HasValue && totalDays.Value != 0
-                        ? (int)Math.Floor(surveyUpdateData.MaxXp * ((decimal)((1 - daysPassed) / totalDays ?? 1)))
+                        ? (int)Math.Floor((decimal)surveyUpdateData.MaxXp * ((decimal)((1 - daysPassed) / totalDays ?? 1)))
                         : 0;
                     var newSurveyRewardTracking = new SurveyRewardTracking
                     {
@@ -1270,7 +1519,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
 
                 // [CÁCH 1]
                 // List<int> matchedAccountIds = (await _surveyEmbeddingVectorService.GetSimilarCandidateIdsByEmbeddingVectorFilterTagsWithTargetAccuracyAsync(
-                //     new FilterTagSimilarityComparisonRequestDTO
+                //     new FilterTagSimilarityRequestDTO
                 //     {
                 //         TargetEmbeddingVectorFilterTags = targetEmbeddingVectorFilterTags,
                 //         CandidateEmbeddingVectorFilterTags = candidateEmbeddingVectorFilterTags,
@@ -1447,6 +1696,8 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
         }
+
+
 
 
 

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using SurveyTalkService.BusinessLogic.DTOs.FilterTags;
+using SurveyTalkService.BusinessLogic.DTOs.FilterTag;
 
 namespace SurveyTalkService.BusinessLogic.DTOs.Survey.Publishment
 {

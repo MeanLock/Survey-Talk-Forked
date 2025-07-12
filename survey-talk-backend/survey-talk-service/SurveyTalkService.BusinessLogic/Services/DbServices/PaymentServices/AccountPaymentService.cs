@@ -13,7 +13,7 @@ using SurveyTalkService.DataAccess.Entities;
 using SurveyTalkService.Common.AppConfigurations.Payos.interfaces;
 using Net.payOS;
 using Net.payOS.Types;
-using SurveyTalkService.BusinessLogic.DTOs.Payment;
+using SurveyTalkService.BusinessLogic.DTOs.Transaction;
 
 namespace SurveyTalkService.BusinessLogic.Services.DbServices.PaymentServices
 {
@@ -41,7 +41,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.PaymentServices
 
         // REPOSITORIES
         IGenericRepository<Account> _accountGenericRepository;  
-        IGenericRepository<PaymentHistory> _paymentHistoryGenericRepository;
+        IGenericRepository<AccountBalanceTransaction> _accountBalanceTransactionGenericRepository;
 
 
 
@@ -53,7 +53,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.PaymentServices
             IUnitOfWork unitOfWork,
 
             IGenericRepository<Account> accountGenericRepository,
-            IGenericRepository<PaymentHistory> paymentHistoryGenericRepository,
+            IGenericRepository<AccountBalanceTransaction> accountBalanceTransactionGenericRepository,
 
             FileHelpers fileHelpers,
             IFilePathConfig filePathConfig,
@@ -68,7 +68,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.PaymentServices
             _unitOfWork = unitOfWork;
 
             _accountGenericRepository = accountGenericRepository;
-            _paymentHistoryGenericRepository = paymentHistoryGenericRepository;
+            _accountBalanceTransactionGenericRepository = accountBalanceTransactionGenericRepository;
 
             _fileHelpers = fileHelpers;
             _filePathConfig = filePathConfig;
@@ -97,17 +97,17 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.PaymentServices
 
 
 
-                    PaymentHistory paymentHistory = new PaymentHistory
+                    AccountBalanceTransaction accountBalanceTransaction = new AccountBalanceTransaction
                     {
                         AccountId = accountId,
                         Amount = accountBalanceDepositDTO.Amount,
-                        PaymentTypeId = 5,
-                        PaymentStatusId = 1,
+                        TransactionTypeId = 5,
+                        TransactionStatusId = 1,
                     };
 
                     // Save payment history to the database
-                    PaymentHistory newPaymentHistory = await _paymentHistoryGenericRepository.CreateAsync(paymentHistory);
-                    long orderCode = newPaymentHistory.Id;
+                    AccountBalanceTransaction newAccountBalanceTransaction = await _accountBalanceTransactionGenericRepository.CreateAsync(accountBalanceTransaction);
+                    long orderCode = newAccountBalanceTransaction.Id;
 
                     PaymentData paymentData = new PaymentData(orderCode, (int)accountBalanceDepositDTO.Amount, $"SURVEYTALK NAP TIEN",
                                              [], accountBalanceDepositDTO.CancelUrl, accountBalanceDepositDTO.ReturnUrl);
@@ -148,29 +148,29 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.PaymentServices
                     // Console.WriteLine("\n\n\n" + JsonConvert.SerializeObject(webhookBody, Formatting.Indented) + "\n\n\n");
 
                     // Retrieve the payment history record
-                    PaymentHistory? paymentHistory = await _unitOfWork.PaymentHistoryRepository.FindByIdAsync((int)webhookBody.data.orderCode);
-                    if (paymentHistory == null)
+                    AccountBalanceTransaction? accountBalanceTransaction = await _unitOfWork.AccountBalanceTransactionRepository.FindByIdAsync((int)webhookBody.data.orderCode);
+                    if (accountBalanceTransaction == null)
                     {
                         throw new HttpRequestException("Payment history not found.");
                     }
 
                     if (webhookBody.code == "00")
                     {
-                        paymentHistory.PaymentStatusId = 2; 
+                        accountBalanceTransaction.TransactionStatusId = 2; 
                     }
                     else
                     {
-                        paymentHistory.PaymentStatusId = 4; 
+                        accountBalanceTransaction.TransactionStatusId = 4; 
                     }
 
-                    await _paymentHistoryGenericRepository.UpdateAsync(paymentHistory.Id, paymentHistory);
+                    await _accountBalanceTransactionGenericRepository.UpdateAsync(accountBalanceTransaction.Id, accountBalanceTransaction);
 
-                    if(paymentHistory.PaymentTypeId == 5) { 
-                    paymentHistory.Account.Balance += paymentHistory.Amount;
-                    }else if(paymentHistory.PaymentTypeId == 6) {
-                        paymentHistory.Account.Balance -= paymentHistory.Amount;
+                    if(accountBalanceTransaction.TransactionTypeId == 5) { 
+                    accountBalanceTransaction.Account.Balance += accountBalanceTransaction.Amount;
+                    }else if(accountBalanceTransaction.TransactionTypeId == 6) {
+                        accountBalanceTransaction.Account.Balance -= accountBalanceTransaction.Amount;
                     }
-                    await _accountGenericRepository.UpdateAsync(paymentHistory.Account.Id, paymentHistory.Account);
+                    await _accountGenericRepository.UpdateAsync(accountBalanceTransaction.Account.Id, accountBalanceTransaction.Account);
 
                     // Commit the transaction
                     await transaction.CommitAsync();

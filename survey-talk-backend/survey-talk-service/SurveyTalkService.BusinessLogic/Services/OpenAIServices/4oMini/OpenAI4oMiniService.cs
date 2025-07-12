@@ -14,7 +14,7 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using SurveyTalkService.DataAccess.Entities;
-using SurveyTalkService.BusinessLogic.DTOs.FilterTags;
+using SurveyTalkService.BusinessLogic.DTOs.FilterTag;
 using SurveyTalkService.BusinessLogic.DTOs.Survey;
 using System.Diagnostics;
 using Newtonsoft.Json;

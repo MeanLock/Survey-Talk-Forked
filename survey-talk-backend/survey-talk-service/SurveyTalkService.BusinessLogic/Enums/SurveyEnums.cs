@@ -4,13 +4,15 @@ namespace SurveyTalkService.BusinessLogic.Enums
     {
         Verified = 1,
         Preview = 2,
-        Guest = 3
+        Guest = 3,
+        LevelUpdate = 3,
     }
 
     public enum SurveyTakenSubjectEnum
     {
         Verified = 1,
-        Guest = 2
+        Guest = 2,
+        LevelUpdate = 3,
     }
 
     public enum SurveyDeadlineQueryEnum
@@ -24,6 +26,6 @@ namespace SurveyTalkService.BusinessLogic.Enums
     {
         SuitYouBest = 1,
         BigBonus = 2,
-        SuitYourFavorite = 4
+        SuitYourFavorite = 3
     }
 }

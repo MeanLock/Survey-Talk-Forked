@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SurveyTalkService.DataAccess.Entities;
 
-public partial class PaymentHistory
+public partial class AccountBalanceTransaction
 {
     public int Id { get; set; }
 
@@ -11,15 +11,15 @@ public partial class PaymentHistory
 
     public decimal Amount { get; set; }
 
-    public int PaymentTypeId { get; set; }
+    public int TransactionTypeId { get; set; }
 
-    public int PaymentStatusId { get; set; }
+    public int TransactionStatusId { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
     public virtual Account Account { get; set; } = null!;
 
-    public virtual PaymentStatus PaymentStatus { get; set; } = null!;
+    public virtual TransactionStatus TransactionStatus { get; set; } = null!;
 
-    public virtual PaymentType PaymentType { get; set; } = null!;
+    public virtual TransactionType TransactionType { get; set; } = null!;
 }

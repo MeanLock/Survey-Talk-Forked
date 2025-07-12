@@ -10,7 +10,7 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.Filters
         public bool? IsAvailable { get; set; }
         public bool? IsDeletedContain { get; set; }
         // public bool? IsInvalidTakenResultContain { get; set; }
-        public bool? IsEndDateExceededContain { get; set; }
+        public bool? IsEndDateExceededContain { get; set; } 
         public List<int>? SurveyStatusIds { get; set; } = new(); 
         public List<int>? SurveyMarketVersionStatusIds { get; set; } = new();
         public int? Version { get; set; }
