@@ -58,13 +58,43 @@ const getAuthUserFromLocalStorage = (): any | null => {
   return null;
 }
 
+const setAuthTokenToPersistLocalStorage = (token: string) => {
+  try {
+    const persistedStateString = localStorage.getItem("persist:root");
+    const persistedState = persistedStateString
+      ? JSON.parse(persistedStateString)
+      : {};
+    const auth = persistedState.auth ? JSON.parse(persistedState.auth) : {};
+    auth.token = token;
+    persistedState.auth = JSON.stringify(auth);
+    localStorage.setItem("persist:root", JSON.stringify(persistedState));
+  } catch (error) {
+    console.error("Error setting token to local storage:", error);
+  }
+};
 
+const setAuthUserToPersistLocalStorage = (user: any) => {
+  try {
+    const persistedStateString = localStorage.getItem("persist:root");
+    const persistedState = persistedStateString
+      ? JSON.parse(persistedStateString)
+      : {};
+    const auth = persistedState.auth ? JSON.parse(persistedState.auth) : {};
+    auth.user = user; // Lưu toàn bộ thông tin user
+    persistedState.auth = JSON.stringify(auth);
+    localStorage.setItem("persist:root", JSON.stringify(persistedState));
+  } catch (error) {
+    console.error("Error setting user to local storage:", error);
+  }
+};
 
 const LocalStorageUtil = {
   getAuthTokenFromPersistLocalStorage,
   getAuthUserFromPersistLocalStorage,
   getAuthTokenFromLocalStorage,
-  getAuthUserFromLocalStorage
+  getAuthUserFromLocalStorage,
+  setAuthTokenToPersistLocalStorage,
+  setAuthUserToPersistLocalStorage,
 }
 
 export { LocalStorageUtil }

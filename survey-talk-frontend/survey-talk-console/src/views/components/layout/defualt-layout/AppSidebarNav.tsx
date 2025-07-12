@@ -40,7 +40,9 @@ export const AppSidebarNav = ({ items }: AppSidebarNavProps) => {
               <span className="nav-icon-bullet"></span>
             </span>
           )}
-        {name && name}
+          <span className="nav-text">{name}</span>
+
+        {/* {name && name} */}
         {badge && (
           <CBadge color={badge.color} className="ms-auto" size="sm">
             {badge.text}
@@ -56,7 +58,7 @@ export const AppSidebarNav = ({ items }: AppSidebarNavProps) => {
     return (
       <Component as="div" key={index}>
         {rest.to || rest.href ? (
-          <CNavLink
+          <CNavLink 
             {...(rest.to && { as: NavLink })}
             {...(rest.href && { target: '_blank', rel: 'noopener noreferrer' })}
             {...rest}
@@ -83,7 +85,7 @@ export const AppSidebarNav = ({ items }: AppSidebarNavProps) => {
   }
 
   return (
-    <CSidebarNav>
+    <CSidebarNav className="app-sidebar__nav">
       {items &&
         items.map((item, index) => (item.items ? navGroup(item, index) : navItem(item, index)))}
     </CSidebarNav>

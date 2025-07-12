@@ -6,25 +6,24 @@ import { callGraphQLMutation, callGraphQLQuery } from "../../api/graphql/main/ap
 import { callAxiosRestApi } from "../../api/rest-api/main/api-call";
 
 
-export const login = async (instance: AxiosInstance, data : {
-    username: string,
-    password: string,
-} | any) => {
-
-    const bodyData = {
-        login: {
-            Email : data.username,
-            Password : data.password,
-        }
-    }
+export const getCustomerAccounts = async (instance: AxiosInstance) => {  
 
     const response = await callAxiosRestApi({
         instance: instance,
-        method: "post",
-        url: "/User/auth/login",
-        data: bodyData,
-    }, "Đăng nhập");
+        method: "get",
+        url: "/User/accounts/customer",
+    });
 
-    console.log("Rest API Response:", response);
+    return response;
+}
+
+export const getManagerAccounts = async (instance: AxiosInstance) => {  
+
+    const response = await callAxiosRestApi({
+        instance: instance,
+        method: "get",
+        url: "/User/accounts/staff",
+    });
+
     return response;
 }

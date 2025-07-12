@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   CContainer,
@@ -9,7 +9,6 @@ import {
   CDropdownToggle,
   CHeader,
   CHeaderNav,
-  CHeaderToggler,
   CNavLink,
   CNavItem,
   useColorModes,
@@ -21,7 +20,6 @@ import {
   cilContrast,
   cilEnvelopeOpen,
   cilList,
-  cilMenu,
   cilMoon,
   cilSun,
 } from '@coreui/icons'
@@ -33,17 +31,20 @@ import { RootState } from '../../../../redux/root-reducer'
 import { AuthState, clearAuthToken } from '../../../../redux/auth/auth.slice'
 import { JwtUtil } from '../../../../core/utils/jwt.util'
 import { setUi } from '../../../../redux/ui/ui.slice'
+import routes from '../../../../routes'
 
 const AppHeader = () => {
   const headerRef = useRef<HTMLDivElement>(null)
-  const authSlice = useSelector((state : RootState) => state.auth);
-  const uiSlice = useSelector((state : RootState) => state.ui);
+  const authSlice = useSelector((state: RootState) => state.auth);
+  const uiSlice = useSelector((state: RootState) => state.ui);
 
   const dispatch = useDispatch()
+  const location = useLocation()
 
   const [user, setUser] = useState<AuthState["user"]>(null);
-
   const { colorMode, setColorMode } = useColorModes("")
+  const [screenName, setScreenName] = useState<string>('Dashboard')
+
 
 
   useEffect(() => {
@@ -53,17 +54,33 @@ const AppHeader = () => {
     })
   }, [])
 
+  const getScreenName = useCallback((pathname: string): string => {
+    const route = routes.find(route => {
+      const pattern = route.path.replace(/:\w+/g, '[^/]+');
+      const regex = new RegExp(`^${pattern}$`);
+      return regex.test(pathname);
+    });
+
+    if (route?.parent) {
+      const parentRoute = routes.find(r => r.path === route.parent);
+      return parentRoute?.name || route?.name || 'Dashboard';
+    }
+    return route?.name || 'Dashboard';
+  }, []);
+
   useEffect(() => {
     if (authSlice && authSlice.token && JwtUtil.isTokenNotExpired(authSlice.token)) {
       setUser(authSlice.user);
+      setScreenName(getScreenName(location.pathname))
     }
-  }, [authSlice]);
+  }, [authSlice, location.pathname, getScreenName]);
 
   useEffect(() => {
     if (uiSlice && uiSlice.theme) {
       setColorMode(uiSlice.theme);
     }
-  },[uiSlice]);
+  }, [location.pathname, authSlice]);
+
 
   const handleColorModeChange = (mode: string) => {
     setColorMode(mode);
@@ -74,29 +91,13 @@ const AppHeader = () => {
     dispatch(clearAuthToken());
   }
 
+
   return (
-    <CHeader position="sticky" className="mb-4 p-0" ref={headerRef}>
+    <CHeader position="sticky" className="app-header mb-4 p-0" ref={headerRef}>
       <CContainer className="border-bottom px-4" fluid>
-        <CHeaderToggler
-          onClick={() => 
-            //dispatch({ type: 'set', sidebarShow: !sidebarShow })
-            dispatch(setUi({ sidebarShow: !uiSlice.sidebarShow }))
-          }
-          style={{ marginInlineStart: '-14px' }}
-        >
-          <CIcon icon={cilMenu} size="lg" />
-        </CHeaderToggler>
         <CHeaderNav className="d-none d-md-flex">
-          <CNavItem>
-            <CNavLink to="/dashboard" as={NavLink}>
-              Dashboard
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">Users</CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">Settings</CNavLink>
+          <CNavItem className="app-header__title ms-2">
+            {screenName}
           </CNavItem>
         </CHeaderNav>
         <CHeaderNav className="ms-auto">
@@ -168,11 +169,11 @@ const AppHeader = () => {
         {user ? (
           <CHeaderNav >
             <AppHeaderDropdown user={user} />
-            <CNavItem className='mx-3'>
-              <CButton onClick={handleLogout} title='logout' className='bg-danger btn-sm fw-bold'>
+            <CNavItem className='mx-3 d-flex align-items-center'>
+              <CButton onClick={handleLogout} title='logout' className='bg-danger btn-sm fw-bold '>
                 LOG OUT
                 {/* <SignOut className='fw-bold' size={25} color="hotpink" weight="bold" /> */}
-                <IconNfcOff stroke={1} accentHeight={12} width={100} height={100} />
+                <IconNfcOff stroke={1} accentHeight={12} width={20} height={20} />
               </CButton>
             </CNavItem>
           </CHeaderNav>

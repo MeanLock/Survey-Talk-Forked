@@ -8,6 +8,7 @@ import './scss/style.scss'
 // We use those styles to show code examples, you should remove them in your application.
 import './scss/examples.scss'
 import { RootState } from './redux/root-reducer'
+  import { ToastContainer } from 'react-toastify';
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./views/components/layout/defualt-layout/index'))
@@ -64,6 +65,7 @@ const App = () => {
           <Route path="*" element={<DefaultLayout />} />
         </Routes>
       </Suspense>
+<ToastContainer />
     </HashRouter>
   )
 }

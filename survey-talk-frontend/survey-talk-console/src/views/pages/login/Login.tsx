@@ -19,12 +19,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../../../redux/root-reducer'
 import { clearAuthToken, setAuthToken } from '../../../redux/auth/auth.slice'
 import { JwtUtil } from '../../../core/utils/jwt.util'
-import { login } from '../../../core/services/account/account.service'
 import { publicAxiosInstance } from '../../../core/api/rest-api/config/instances/v2'
+import { login } from '../../../core/services/auth/auth.service'
+import { toast } from 'react-toastify'
 
 const Login = () => {
 
-  const username = useRef<HTMLInputElement>(null);
+  const email = useRef<HTMLInputElement>(null);
   const password = useRef<HTMLInputElement>(null);
 
   const dispatch = useDispatch();
@@ -52,11 +53,7 @@ const Login = () => {
       if (user.role_id == 1) {
         navigate('/dashboard');
       } else if (user.role_id == 2) {
-        navigate('/orders_sale_staff/table');
-      } else if (user.role_id == 3) {
-        navigate('/orders_design_staff/table');
-      } else if (user.role_id == 4) {
-        navigate('/orders_production_staff/table');
+        navigate('/community-survey');
       }
     }
   }, [authSlice])
@@ -72,35 +69,33 @@ const Login = () => {
     } else {
       event.preventDefault();
       setDisabled(true);
-      if (username.current?.value == "" || password.current?.value == "") {
+      if (email.current?.value == "" || password.current?.value == "") {
         setDisabled(false);
         return;
       }
       const login_information = {
-        username: username.current?.value,
+        email: email.current?.value,
         password: password.current?.value
       }
 
-
       let response = await login(publicAxiosInstance, login_information);
-      if (response.success) {
-        const user = JwtUtil.decodeToken(response.data.Token);
-        dispatch(setAuthToken({ 
-          token: response.data.Token, 
+
+      if (response.success && response.data) {
+        const user = JwtUtil.decodeToken(response.data.AccessToken);
+        dispatch(setAuthToken({
+          token: response.data.AccessToken,
           user: user
         }));
-
         if (user.role_id == 1) {
           navigate('/dashboard');
+          toast.success("Login successful!");
         } else if (user.role_id == 2) {
-          navigate('/orders_sale_staff/table');
-        } else if (user.role_id == 3) {
-          navigate('/orders_design_staff/table');
-        } else if (user.role_id == 4) {
-          navigate('/orders_production_staff/table');
+          navigate('/community-survey');
+          toast.success("Login successful!");
         }
       } else {
         console.log(response.message);
+        toast.error(response.message.content || "Login failed. Please try again.");
       }
       setDisabled(false)
     }
@@ -125,7 +120,7 @@ const Login = () => {
                       <CInputGroupText>
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
-                      <CFormInput ref={username} placeholder="Username" autoComplete="username" />
+                      <CFormInput ref={email} placeholder="Email" autoComplete="email" />
                     </CInputGroup>
                     <CInputGroup className="mb-4">
                       <CInputGroupText>
