@@ -57,7 +57,7 @@ const HandleSlide = ({ dataResponse, setIsRefetch, takingSubject }: Props) => {
   const { mutate } = useUpdateSurveyPro({
     mutationConfig: {
       // Do nothing on success
-      onSuccess() {},
+      onSuccess() { },
     },
   });
 
@@ -87,12 +87,12 @@ const HandleSlide = ({ dataResponse, setIsRefetch, takingSubject }: Props) => {
       ?.ConfigJson as Record<string, any>;
     // Get the jump logics of the current question
     const jump: JumpLogic[] = (configJson?.JumpLogics || []) as JumpLogic[];
-
+    console.log("jump nè", configJson);
     // If there are jump logics, go through each logic and check if the conditions are met
     if (jump.length) {
       for (const logic of jump) {
         let result: boolean | null = null;
-
+        console.log("logic", logic);
         // Go through each condition of the logic
         for (let i = 0; i < logic.Conditions.length; i++) {
           const cond = logic.Conditions[i];
@@ -155,18 +155,23 @@ const HandleSlide = ({ dataResponse, setIsRefetch, takingSubject }: Props) => {
             }
           }
         }
-
         if (result) {
           let targetIndex = -1;
-          for (let i = surveyData.SurveyResponses.length - 1; i >= 0; i--) {
-            if (
-              surveyData.SurveyResponses[i].ValueJson.QuestionContent.Id ===
-              logic.TargetQuestionId
-            ) {
-              targetIndex = i;
-              break;
+          if (logic.TargetQuestionId === null) {
+            handleEnd();
+            return;
+          } else {
+            for (let i = surveyData.SurveyResponses.length - 1; i >= 0; i--) {
+              if (
+                surveyData.SurveyResponses[i].ValueJson.QuestionContent.Id ===
+                logic.TargetQuestionId
+              ) {
+                targetIndex = i;
+                break;
+              }
             }
           }
+
 
           if (targetIndex !== -1) {
             const target = surveyData.SurveyResponses[targetIndex];
@@ -212,8 +217,8 @@ const HandleSlide = ({ dataResponse, setIsRefetch, takingSubject }: Props) => {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const { JumpLogics, ...rest } = (i.ValueJson.QuestionContent
                 .ConfigJson || {}) as {
-                [key: string]: any;
-              };
+                  [key: string]: any;
+                };
               return rest;
             })(),
             Options: i.ValueJson.QuestionContent.Options,
