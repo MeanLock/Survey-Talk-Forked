@@ -26,6 +26,7 @@ import { Level } from "./Level";
 import type { RootState } from "../../../../redux/rootReducer";
 import { clearFakeData } from "../../../../redux/fake/fakeSlice";
 import { requesterFake, takerFake } from "../../../../core/mockData/userFake";
+import DefaultAvatar from "@/assets/Image/Customers/default.jpg"
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
@@ -66,11 +67,9 @@ export const DefaultLayoutHeader: React.FC<DefaultLayoutHeaderProps> = ({
   const navigate = useNavigate();
   const auth = useSelector((state: RootState) => state.auth);
 
-  // TASK FAKE DATA, PHẢI BỎ KHI ĐÃ CÓ API
-  const fake = useSelector((state: RootState) => state.fake);
-
   useEffect(() => {
     setValue(window.location.pathname);
+    console.log("Member: ", member);
     if (auth.token && JwtUtil.isTokenValid(auth.token)) {
       setIsLogin(true);
     } else {
@@ -135,11 +134,7 @@ export const DefaultLayoutHeader: React.FC<DefaultLayoutHeaderProps> = ({
               </div>
               <IconButton onClick={handleMenuOpen}>
                 <img
-                  src={
-                    member?.FullName === "Hoàng Minh Lộc"
-                      ? takerFake.MainImageUrl
-                      : requesterFake.MainImageUrl
-                  }
+                  src={member?.MainImageUrl ? member.MainImageUrl : DefaultAvatar}
                   alt={member?.FullName}
                   className="w-[48px] h-[48px] rounded-full"
                 />
@@ -149,8 +144,8 @@ export const DefaultLayoutHeader: React.FC<DefaultLayoutHeaderProps> = ({
                 <p className="user-profile__full-name">{member?.FullName}</p>
                 <Level
                   //TASK FAKE DATA, PHẢI BỎ KHI ĐÃ CÓ API
-                  xp={auth.user?.Xp}
-                  level={auth.user?.Level}
+                  xp={member ? member.Xp : null}
+                  level={member ? member.Level : null}
                   // xp={member ? member.Xp : null}
                   // level={member ? member.Level : null}
                 />

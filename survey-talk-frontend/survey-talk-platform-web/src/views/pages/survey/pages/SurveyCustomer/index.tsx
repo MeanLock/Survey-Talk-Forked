@@ -19,9 +19,11 @@ function SurveyCustomer() {
 
   const { id } = useParams();
 
+  const takingSubject = searchParams.get("taking_subject");
+
   const { data: apiData, isLoading: isLoadingSlide } = useGetSlide({
     id: Number(id) || 0,
-    taking_subject: "Verified",
+    taking_subject: takingSubject ? takingSubject : "Preview",
   });
 
   const { data: bgDefaultThemes } = useGetSurveyDefaultBackgroundThemes({});
@@ -96,6 +98,7 @@ function SurveyCustomer() {
           <HandleSlide
             setIsRefetch={setIsRefetch}
             dataResponse={dataResponse}
+            takingSubject={takingSubject ? takingSubject : "Preview"}
           />
         </div>
       </div>

@@ -91,7 +91,7 @@ const SurveyNew = () => {
 
   const isTrigger = useMemo(() => formData?.SurveyStatusId !== 2, [formData]);
 
-  const { data } = useGetSurvey({ id: Number(id) || 0 });
+  // const { data } = useGetSurvey({ id: Number(id) || 0 });
 
   // DATA LẤY RA TỪ KHI MỚI LOAD
   // 1. Default Background Themes
@@ -482,12 +482,12 @@ const SurveyNew = () => {
   //     }
   //   }, []);
 
-  useEffect(() => {
-    if (!id || !data) return;
-    setFormData(data.data);
-    // setIsDisable(data?.data?.IsPause);
-    latestDataRef.current = data.data;
-  }, [id, data]);
+  // useEffect(() => {
+  //   if (!id || !data) return;
+  //   setFormData(data.data);
+  //   // setIsDisable(data?.data?.IsPause);
+  //   latestDataRef.current = data.data;
+  // }, [id, data]);
 
   useEffect(() => {
     if (!isTrigger) return;

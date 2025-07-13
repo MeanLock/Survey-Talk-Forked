@@ -34,9 +34,11 @@ type JumpLogic = {
 type Props = {
   dataResponse: SurveyType | null;
   setIsRefetch: Dispatch<SetStateAction<boolean>>;
+  takingSubject: string;
 };
 
-const HandleSlide = ({ dataResponse, setIsRefetch }: Props) => {
+
+const HandleSlide = ({ dataResponse, setIsRefetch, takingSubject }: Props) => {
   const [current, setCurrent] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [searchParams] = useSearchParams();
@@ -45,42 +47,57 @@ const HandleSlide = ({ dataResponse, setIsRefetch }: Props) => {
     [searchParams]
   );
 
-
+  // Get the survey data from the app state
   const surveyData = useAppSelector((state) => state.appSlice.surveyData);
   console.log("surveyData", surveyData);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
+  // Function to update the survey data on the server
   const { mutate } = useUpdateSurveyPro({
     mutationConfig: {
-      onSuccess() { },
+      // Do nothing on success
+      onSuccess() {},
     },
   });
 
+  /**
+   * Handle the next button click
+   */
   const handleNext = useCallback(() => {
+    // Set the question as valid
     dispatch(handleSetIsValid(true));
 
+    // If the random number is greater than 900, refetch the survey data
     if (Math.random() * 1000 > 900) {
       setIsRefetch((prev) => !prev);
     }
 
+    // If there is no survey data or the current question is not valid, return
     if (!surveyData?.SurveyResponses) return;
 
+    // Get the current question
     const question = surveyData?.SurveyResponses[currentIndex];
 
+    // If the question is not valid, return
     // if (!question?.IsValid) return;
 
+    // Get the config json of the current question
     const configJson = question?.ValueJson?.QuestionContent
       ?.ConfigJson as Record<string, any>;
+    // Get the jump logics of the current question
     const jump: JumpLogic[] = (configJson?.JumpLogics || []) as JumpLogic[];
 
+    // If there are jump logics, go through each logic and check if the conditions are met
     if (jump.length) {
       for (const logic of jump) {
         let result: boolean | null = null;
 
+        // Go through each condition of the logic
         for (let i = 0; i < logic.Conditions.length; i++) {
           const cond = logic.Conditions[i];
 
+          // Get the question response of the condition
           const q = surveyData.SurveyResponses.find(
             (item) => item.ValueJson.QuestionContent.Id === cond.QuestionId
           );
@@ -91,6 +108,7 @@ const HandleSlide = ({ dataResponse, setIsRefetch }: Props) => {
 
           let isValid = false;
 
+          // Check if the condition is met
           if (
             q?.ValueJson.QuestionContent.QuestionTypeId === 1 ||
             q?.ValueJson.QuestionContent.QuestionTypeId === 2
@@ -123,9 +141,11 @@ const HandleSlide = ({ dataResponse, setIsRefetch }: Props) => {
             }
           }
 
+          // If it's the first condition, set the result to the isValid
           if (i === 0) {
             result = isValid;
           } else {
+            // If it's not the first condition, use the conjunction to combine the results
             if (cond.Conjunction === "AND") {
               result = result && isValid;
             } else if (cond.Conjunction === "OR") {
@@ -192,8 +212,8 @@ const HandleSlide = ({ dataResponse, setIsRefetch }: Props) => {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const { JumpLogics, ...rest } = (i.ValueJson.QuestionContent
                 .ConfigJson || {}) as {
-                  [key: string]: any;
-                };
+                [key: string]: any;
+              };
               return rest;
             })(),
             Options: i.ValueJson.QuestionContent.Options,
@@ -215,6 +235,7 @@ const HandleSlide = ({ dataResponse, setIsRefetch }: Props) => {
         dataResponse={dataResponse}
         setCurrent={setCurrent}
         setCurrentIndex={setCurrentIndex}
+        takingSubject={takingSubject}
       />
     );
   }
@@ -237,10 +258,12 @@ const Start = ({
   dataResponse,
   setCurrent,
   setCurrentIndex,
+  takingSubject,
 }: {
   dataResponse: SurveyType | null;
   setCurrent: Dispatch<SetStateAction<string>>;
   setCurrentIndex: Dispatch<SetStateAction<number>>;
+  takingSubject: string;
 }) => {
   const data = useAppSelector((state) => state.appSlice.infoSurvey);
   const dispatch = useAppDispatch();
@@ -255,6 +278,7 @@ const Start = ({
   );
 
   const handleStart = () => {
+    console.log("Handle Start...");
     if (dataResponse) {
       let dataStore = (dataResponse?.Questions || []).map(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -337,11 +361,12 @@ const Start = ({
 
       dispatch(
         setSurveyData({
-          taken_subject: "Preview",
+          taken_subject: takingSubject,
           InvalidReason: "",
           SurveyResponses: dataStore,
         })
       );
+
       if (dataResponse?.Questions?.length && dataResponse?.Questions[0]?.Id) {
         setCurrent(dataResponse?.Questions[0]?.Id);
         setCurrentIndex(0);

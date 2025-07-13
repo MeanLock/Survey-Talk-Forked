@@ -19,6 +19,7 @@ import {
 import Swal from "sweetalert2";
 import { callAxiosRestApi } from "../../../../core/api/rest-api/main/api-call";
 import { loginRequiredAxiosInstance } from "../../../../core/api/rest-api/config/instances/v2";
+import { getAccountMe } from "@/services/Profile/get-accounts-me";
 
 interface DefaultLayoutContextProps {
   isAdmin: boolean;
@@ -58,6 +59,7 @@ const DefaultLayout = () => {
       dispatch(clearAuthToken());
       setMember(null);
     } else if (auth.token && JwtUtil.isTokenValid(auth.token)) {
+      console.log("Chạy hàm nèeeee");
       // CALL API TO GET USER
       fetch();
       setNavItems(_loginNav);
@@ -72,35 +74,16 @@ const DefaultLayout = () => {
   // FUNCTIONS
   const fetch = async () => {
     try {
-      const response = await callAxiosRestApi({
-        instance: loginRequiredAxiosInstance,
-        method: "get",
-        url: "User/accounts/me",
-      });
-      if (response.success) {
-        const member = response.data;
-
-        const user = {
-          Id: member.Account.Id,
-          RoleId: member.Account.Role.Id,
-          FullName: member.Account.FullName,
-          Balance: member.Account.Balance,
-          IsVerified: member.Account.IsVerified,
-          Xp: member.Account.Xp,
-          Level: member.Account.Level,
-          IsFilterSurveyRequired: member.Account.IsFilterSurveyRequired,
-          LastFilterSurveyTakenAt: member.Account.LastFilterSurveyTakenAt,
-          MainImageUrl: member.Account.MainImageUrl,
-          Profile: member.Account.Profile,
-        };
-
+      const user = await getAccountMe();
+      if (user) {
         dispatch(
           updateAuthUser({
-            user: user,
+            user: user.user,
           })
         );
 
-        setMember(user);
+        setMember(user.profile);
+        console.log("User Profile: ", user.profile);
         if (
           !member.Account.Profile ||
           member.Account.Profile.CountryRegion === null ||
@@ -129,6 +112,7 @@ const DefaultLayout = () => {
           });
         }
       }
+      setIsLoading(false);
     } catch (error) {}
   };
 
@@ -141,7 +125,9 @@ const DefaultLayout = () => {
     >
       <div className="default-layout flex flex-col w-full h-screen">
         {/* HEADER */}
-        <DefaultLayoutHeader navItems={navItems} member={member} />
+        {member && (
+          <DefaultLayoutHeader navItems={navItems} member={member.Account} />
+        )}
 
         {/* MAIN WRAPPER */}
         <div className="flex flex-col flex-grow w-full mt-[83px]">

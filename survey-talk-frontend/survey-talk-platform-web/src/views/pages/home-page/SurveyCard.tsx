@@ -43,7 +43,10 @@ export const SurveyCard: React.FC<Props> = ({ data }) => {
       </div>
       <div
         onClick={() =>
-          window.open(`/survey/take-survey?id=${data?.Id}`, "_blank")
+          window.open(
+            `/survey/${data?.Id}/taking?taking_subject=Verified`,
+            "_blank"
+          )
         }
         className="survey-card__button"
       >
