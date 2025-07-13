@@ -351,64 +351,72 @@ const QuestionPage = ({
     setOrderCurrent(Order);
   };
 
-const handleDeleteQuestion = () => {
-  if (!orderCurrent) return;
+  const handleDeleteQuestion = () => {
+    if (!orderCurrent) return;
 
-  const questionToDelete = formData?.Questions.find(
-    (item: any) => item.Order === orderCurrent
-  );
+    const questionToDelete = formData?.Questions.find(
+      (item: any) => item.Order === orderCurrent
+    );
 
-  if (!questionToDelete) return;
+    if (!questionToDelete) return;
 
-  const affectedQuestions = new Set<number>(); // Track affected questions
+    const affectedQuestions = new Set<number>(); // Track affected questions
 
-  const newQuestions = formData?.Questions.filter(
-    (item: any) => item.Order !== orderCurrent
-  ).map((item: any, index: number) => {
-    const updatedItem = { ...item, Order: index + 1 };
-    
-    if (updatedItem.ConfigJson?.JumpLogics?.length > 0) {
-      // Filter out jump logics that reference the deleted question
-      updatedItem.ConfigJson.JumpLogics = updatedItem.ConfigJson.JumpLogics.filter((jumpLogic: any) => {
-        const hasConditionReference = jumpLogic.Conditions.some(
-          (condition: any) => condition.QuestionId === questionToDelete.Id
-        );
-        const hasTargetReference = jumpLogic.TargetQuestionId === questionToDelete.Id;
+    const newQuestions = formData?.Questions.filter(
+      (item: any) => item.Order !== orderCurrent
+    ).map((item: any, index: number) => {
+      const updatedItem = { ...item, Order: index + 1 };
 
-        // If question is affected, add to set
-        if (hasConditionReference || hasTargetReference) {
-          affectedQuestions.add(updatedItem.Order);
+      if (updatedItem.ConfigJson?.JumpLogics?.length > 0) {
+        // Filter out jump logics that reference the deleted question
+        updatedItem.ConfigJson.JumpLogics =
+          updatedItem.ConfigJson.JumpLogics.filter((jumpLogic: any) => {
+            const hasConditionReference = jumpLogic.Conditions.some(
+              (condition: any) => condition.QuestionId === questionToDelete.Id
+            );
+            const hasTargetReference =
+              jumpLogic.TargetQuestionId === questionToDelete.Id;
+
+            // If question is affected, add to set
+            if (hasConditionReference || hasTargetReference) {
+              affectedQuestions.add(updatedItem.Order);
+            }
+
+            return !hasConditionReference && !hasTargetReference;
+          });
+
+        if (updatedItem.ConfigJson.JumpLogics.length === 0) {
+          delete updatedItem.ConfigJson.JumpLogics;
         }
-
-        return !hasConditionReference && !hasTargetReference;
-      });
-
-      if (updatedItem.ConfigJson.JumpLogics.length === 0) {
-        delete updatedItem.ConfigJson.JumpLogics;
       }
+
+      return updatedItem;
+    });
+
+    setFormData((prev: any) => ({
+      ...prev,
+      Questions: newQuestions,
+    }));
+
+    // Show single alert if there were any changes
+    if (affectedQuestions.size > 0) {
+      const affectedQuestionsList = Array.from(affectedQuestions).sort(
+        (a, b) => a - b
+      );
+      toast.warning(
+        `Một trong số các khối điều kiện ở các câu ${affectedQuestionsList.join(
+          ", "
+        )} đã bị xóa, vui lòng kiểm tra lại`
+      ); // Thịnh();
     }
 
-    return updatedItem;
-  });
-
-  setFormData((prev: any) => ({
-    ...prev,
-    Questions: newQuestions,
-  }));
-
-  // Show single alert if there were any changes
-  if (affectedQuestions.size > 0) {
-    const affectedQuestionsList = Array.from(affectedQuestions).sort((a, b) => a - b);
-    toast.warning(`Một trong số các khối điều kiện ở các câu ${affectedQuestionsList.join(', ')} đã bị xóa, vui lòng kiểm tra lại`); // Thịnh();
-  }
-
-  // Update current question selection
-  if (orderCurrent > 1) {
-    setOrderCurrent(orderCurrent - 1);
-  } else if (newQuestions.length > 0) {
-    setOrderCurrent(1);
-  }
-};
+    // Update current question selection
+    if (orderCurrent > 1) {
+      setOrderCurrent(orderCurrent - 1);
+    } else if (newQuestions.length > 0) {
+      setOrderCurrent(1);
+    }
+  };
 
   const handleSwapQuestion = (target: number) => {
     const currentOrder = orderCurrent;
@@ -505,18 +513,19 @@ const handleDeleteQuestion = () => {
           className="question-main flex-1 flex flex-col overflow-y-auto relative"
           style={{
             ...(formData?.ConfigJson?.Background === "image" && {
-              backgroundImage: `url(${formData?.ConfigJson?.IsUseBackgroundImageBase64 &&
-                  formData.BackgroundImageBase64
+              backgroundImage: `url(${
+                formData?.ConfigJson?.IsUseBackgroundImageBase64 &&
+                formData.BackgroundImageBase64
                   ? formData.BackgroundImageBase64
                   : formData?.ConfigJson?.DefaultBackgroundImageId
-                    ? listBackground.find(
+                  ? listBackground.find(
                       //Thịnh
                       (item) =>
                         item.Id ===
                         formData?.ConfigJson?.DefaultBackgroundImageId
                     )?.MainImageUrl
-                    : ""
-                })`,
+                  : ""
+              })`,
               backgroundSize: "cover",
               backgroundPosition: "center",
               backgroundRepeat: "no-repeat",
@@ -535,7 +544,7 @@ const handleDeleteQuestion = () => {
         >
           <div className="question-input-container relative z-10 flex flex-col items-center">
             {questionedit?.MainImageBase64 &&
-              questionedit.ConfigJson?.ImageEndQuestion ? (
+            questionedit.ConfigJson?.ImageEndQuestion ? (
               <img
                 src={questionedit?.MainImageBase64}
                 className="rounded-2xl "
@@ -599,7 +608,7 @@ const handleDeleteQuestion = () => {
 
       <div className="question-footer flex items-center">
         <div className="footer-content flex overflow-x-scroll w-full">
-          {(formData?.Questions || [])?.map((item: any) => (
+          {/* {(formData?.Questions || [])?.map((item: any) => (
             <QuestionItem
               key={item.Order}
               order={item.Order}
@@ -607,7 +616,18 @@ const handleDeleteQuestion = () => {
               onChange={handleChangeQuestion}
               onOpenOverlay={() => setIsOpenOverlay(true)}
             />
-          ))}
+          ))} */}
+          {[...(formData?.Questions || [])]
+            .sort((a, b) => a.Order - b.Order) // Sort by Order before mapping
+            .map((item: any) => (
+              <QuestionItem
+                key={item.Order}
+                order={item.Order}
+                orderCurrent={orderCurrent}
+                onChange={handleChangeQuestion}
+                onOpenOverlay={() => setIsOpenOverlay(true)}
+              />
+            ))}
           <div
             className="add-question-btn flex flex-col items-center justify-center"
             onClick={handleAddQuestion}
@@ -636,8 +656,9 @@ const QuestionItem = ({
 }) => {
   return (
     <div
-      className={`question-item flex flex-col items-center justify-center ${order === orderCurrent && "question-active"
-        }`}
+      className={`question-item flex flex-col items-center justify-center ${
+        order === orderCurrent && "question-active"
+      }`}
       onClick={() => onChange(order)}
     >
       <CheckCircleIcon
