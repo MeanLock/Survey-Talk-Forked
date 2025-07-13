@@ -10,6 +10,7 @@ import ButtonAddAnswer from "../../molecules/buttons/ButtonAddAnswer";
 import "./styles.scss";
 import { answerDefault } from "../../../constants/questions";
 import Answer from "../../molecules/answer/Answer";
+import { generateUUID } from "@/core/utils/uuid.util";
 
 type Props = {
   formData: SurveyType;
@@ -28,7 +29,7 @@ type Props = {
 const Ranking = ({ question, handleUpdateQuestion, formData }: Props) => {
   useEffect(() => {
     if (!question?.Options?.length) {
-      handleUpdateQuestion("Options", [{ ...answerDefault, Order: 1 }]);
+      handleUpdateQuestion("Options", [{ ...answerDefault,Id: generateUUID(), Order: 1 }]);
     }
   }, [question, handleUpdateQuestion]);
 
@@ -51,7 +52,7 @@ const Ranking = ({ question, handleUpdateQuestion, formData }: Props) => {
     const newOrder = question?.Options?.length
       ? Math.max(...question.Options.map((o) => o.Order)) + 1
       : 1;
-    const newOption = { ...answerDefault, Order: newOrder };
+    const newOption = { ...answerDefault, Id: generateUUID(),Order: newOrder };
     const updatedOptions = [...(question?.Options || []), newOption];
     handleUpdateQuestion("Options", updatedOptions);
   };

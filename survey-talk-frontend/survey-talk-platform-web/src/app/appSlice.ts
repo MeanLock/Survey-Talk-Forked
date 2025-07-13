@@ -3,7 +3,7 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 
 interface IQuestionContent {
-    Id: number;
+    Id: string;
     MainImageUrl: string;
     QuestionTypeId: number;
     Content: string;
@@ -15,7 +15,7 @@ interface IQuestionContent {
 interface SurveyResponse {
     isEnd?: boolean;
     isNext?: boolean;
-    parentId?: string | number;
+    parentId?: string;
     IsValid: boolean;
     ValueJson: {
         QuestionContent: IQuestionContent;
@@ -76,7 +76,7 @@ const compareAnswers = (answer1: any, answer2: any, questionType: string) => {
 // Helper function để validate câu trả lời lặp lại
 const validateDuplicateAnswers = (
     state: any,
-    currentQuestionId: number | string,
+    currentQuestionId: string,
     questionType: string
 ) => {
     const responses = state.surveyData?.SurveyResponses || [];
@@ -97,9 +97,8 @@ const validateDuplicateAnswers = (
     const answer2 = parent.ValueJson.QuestionResponse;
     if (!compareAnswers(answer1, answer2, questionType)) {
         const hasReason = !!state.surveyData.InvalidReason;
-        const mess = `${hasReason ? ". " : ""}Câu ${
-            current.parentId
-        } có đáp án không khớp với nhau`;
+        const mess = `${hasReason ? ". " : ""}Câu ${current.parentId
+            } có đáp án không khớp với nhau`;
         if (
             state.surveyData &&
             !state.surveyData.InvalidReason.includes(mess)
@@ -138,8 +137,8 @@ export const appSlice = createSlice({
         handleUpdateSigleChoose(
             state,
             action: PayloadAction<{
-                idChoose: number;
-                questionId: number | string;
+                idChoose: string;
+                questionId: string;
             }>
         ) {
             if (!state.isValid) {
@@ -182,15 +181,13 @@ export const appSlice = createSlice({
                 state.surveyData.SurveyResponses =
                     state.surveyData.SurveyResponses.map((i) =>
                         i.ValueJson.QuestionContent.Id ===
-                        action.payload.questionId
+                            action.payload.questionId
                             ? { ...i, IsValid: false }
                             : i
                     );
-                const mess = `${
-                    state.surveyData.InvalidReason ? ". " : ""
-                }Câu ${
-                    action.payload.questionId
-                } Thời điểm ghi nhận không hợp lệ`;
+                const mess = `${state.surveyData.InvalidReason ? ". " : ""
+                    }Câu ${action.payload.questionId
+                    } Thời điểm ghi nhận không hợp lệ`;
                 if (!state.surveyData.InvalidReason.includes(mess)) {
                     state.surveyData.InvalidReason =
                         state.surveyData.InvalidReason + mess;
@@ -201,8 +198,8 @@ export const appSlice = createSlice({
         handleUpdateMutilChoice(
             state,
             action: PayloadAction<{
-                idChoose: number;
-                questionId: number | string;
+                idChoose: string;
+                questionId: string;
             }>
         ) {
             if (!state.isValid) {
@@ -216,20 +213,16 @@ export const appSlice = createSlice({
                                 ?.MultipleChoice
                         )
                             ? [
-                                  ...(i.ValueJson.QuestionResponse as any)
-                                      .MultipleChoice,
-                              ]
+                                ...(i.ValueJson.QuestionResponse as any)
+                                    .MultipleChoice,
+                            ]
                             : [];
                         const idx = prevArr.findIndex(
-                            (v) => Number(v) === Number(action.payload.idChoose)
+                            (v) => v === action.payload.idChoose
                         );
                         let newArr;
                         if (idx > -1) {
-                            newArr = prevArr.filter(
-                                (v) =>
-                                    Number(v) !==
-                                    Number(action.payload.idChoose)
-                            );
+                            newArr = prevArr.filter((v) => v !== action.payload.idChoose);
                         } else {
                             newArr = [...prevArr, action.payload.idChoose];
                         }
@@ -268,15 +261,13 @@ export const appSlice = createSlice({
                 state.surveyData.SurveyResponses =
                     state.surveyData.SurveyResponses.map((i) =>
                         i.ValueJson.QuestionContent.Id ===
-                        action.payload.questionId
+                            action.payload.questionId
                             ? { ...i, IsValid: false }
                             : i
                     );
-                const mess = `${
-                    state.surveyData.InvalidReason ? ". " : ""
-                }Câu ${
-                    action.payload.questionId
-                } Thời điểm ghi nhận không hợp lệ`;
+                const mess = `${state.surveyData.InvalidReason ? ". " : ""
+                    }Câu ${action.payload.questionId
+                    } Thời điểm ghi nhận không hợp lệ`;
                 if (!state.surveyData.InvalidReason.includes(mess)) {
                     state.surveyData.InvalidReason =
                         state.surveyData.InvalidReason + mess;
@@ -287,7 +278,7 @@ export const appSlice = createSlice({
         handleChangeSlider(
             state,
             action: PayloadAction<{
-                idChoose: number | string;
+                idChoose: string;
                 value: number;
             }>
         ) {
@@ -334,15 +325,13 @@ export const appSlice = createSlice({
                 state.surveyData.SurveyResponses =
                     state.surveyData.SurveyResponses.map((i) =>
                         i.ValueJson.QuestionContent.Id ===
-                        action.payload.idChoose
+                            action.payload.idChoose
                             ? { ...i, IsValid: false }
                             : i
                     );
-                const mess = `${
-                    state.surveyData.InvalidReason ? ". " : ""
-                }Câu ${
-                    action.payload.idChoose
-                } Thời điểm ghi nhận không hợp lệ`;
+                const mess = `${state.surveyData.InvalidReason ? ". " : ""
+                    }Câu ${action.payload.idChoose
+                    } Thời điểm ghi nhận không hợp lệ`;
                 if (!state.surveyData.InvalidReason.includes(mess)) {
                     state.surveyData.InvalidReason =
                         state.surveyData.InvalidReason + mess;
@@ -353,7 +342,7 @@ export const appSlice = createSlice({
         handleChangeRangeSlide(
             state,
             action: PayloadAction<{
-                idChoose: number | string;
+                idChoose: string;
                 min: number;
                 max: number;
             }>
@@ -401,15 +390,13 @@ export const appSlice = createSlice({
                 state.surveyData.SurveyResponses =
                     state.surveyData.SurveyResponses.map((i) =>
                         i.ValueJson.QuestionContent.Id ===
-                        action.payload.idChoose
+                            action.payload.idChoose
                             ? { ...i, IsValid: false }
                             : i
                     );
-                const mess = `${
-                    state.surveyData.InvalidReason ? ". " : ""
-                }Câu ${
-                    action.payload.idChoose
-                } Thời điểm ghi nhận không hợp lệ`;
+                const mess = `${state.surveyData.InvalidReason ? ". " : ""
+                    }Câu ${action.payload.idChoose
+                    } Thời điểm ghi nhận không hợp lệ`;
                 if (!state.surveyData.InvalidReason.includes(mess)) {
                     state.surveyData.InvalidReason =
                         state.surveyData.InvalidReason + mess;
@@ -420,7 +407,7 @@ export const appSlice = createSlice({
         handleUpdateRating(
             state,
             action: PayloadAction<{
-                idChoose: number | string;
+                idChoose:string;
                 value: number;
             }>
         ) {
@@ -467,15 +454,13 @@ export const appSlice = createSlice({
                 state.surveyData.SurveyResponses =
                     state.surveyData.SurveyResponses.map((i) =>
                         i.ValueJson.QuestionContent.Id ===
-                        action.payload.idChoose
+                            action.payload.idChoose
                             ? { ...i, IsValid: false }
                             : i
                     );
-                const mess = `${
-                    state.surveyData.InvalidReason ? ". " : ""
-                }Câu ${
-                    action.payload.idChoose
-                } Thời điểm ghi nhận không hợp lệ`;
+                const mess = `${state.surveyData.InvalidReason ? ". " : ""
+                    }Câu ${action.payload.idChoose
+                    } Thời điểm ghi nhận không hợp lệ`;
                 if (!state.surveyData.InvalidReason.includes(mess)) {
                     state.surveyData.InvalidReason =
                         state.surveyData.InvalidReason + mess;
@@ -486,8 +471,8 @@ export const appSlice = createSlice({
         handleUpdateRaking(
             state,
             action: PayloadAction<{
-                idChoose: number | string;
-                ranking: { SurveyOptionId: number; RankIndex: number }[];
+                idChoose: string;
+                ranking: { SurveyOptionId: string; RankIndex: number }[];
             }>
         ) {
             if (!state.isValid) {
@@ -533,15 +518,13 @@ export const appSlice = createSlice({
                 state.surveyData.SurveyResponses =
                     state.surveyData.SurveyResponses.map((i) =>
                         i.ValueJson.QuestionContent.Id ===
-                        action.payload.idChoose
+                            action.payload.idChoose
                             ? { ...i, IsValid: false }
                             : i
                     );
-                const mess = `${
-                    state.surveyData.InvalidReason ? ". " : ""
-                }Câu ${
-                    action.payload.idChoose
-                } Thời điểm ghi nhận không hợp lệ`;
+                const mess = `${state.surveyData.InvalidReason ? ". " : ""
+                    }Câu ${action.payload.idChoose
+                    } Thời điểm ghi nhận không hợp lệ`;
                 if (!state.surveyData.InvalidReason.includes(mess)) {
                     state.surveyData.InvalidReason =
                         state.surveyData.InvalidReason + mess;
@@ -552,7 +535,7 @@ export const appSlice = createSlice({
         handleUpdateForm(
             state,
             action: PayloadAction<{
-                idChoose: number | string;
+                idChoose: string;
                 type: number;
                 value: string | number;
             }>
@@ -603,15 +586,13 @@ export const appSlice = createSlice({
                 state.surveyData.SurveyResponses =
                     state.surveyData.SurveyResponses.map((i) =>
                         i.ValueJson.QuestionContent.Id ===
-                        action.payload.idChoose
+                            action.payload.idChoose
                             ? { ...i, IsValid: false }
                             : i
                     );
-                const mess = `${
-                    state.surveyData.InvalidReason ? ". " : ""
-                }Câu ${
-                    action.payload.idChoose
-                } Thời điểm ghi nhận không hợp lệ`;
+                const mess = `${state.surveyData.InvalidReason ? ". " : ""
+                    }Câu ${action.payload.idChoose
+                    } Thời điểm ghi nhận không hợp lệ`;
                 if (!state.surveyData.InvalidReason.includes(mess)) {
                     state.surveyData.InvalidReason =
                         state.surveyData.InvalidReason + mess;
@@ -624,7 +605,7 @@ export const appSlice = createSlice({
 
         handleUpdateSpeechText(
             state,
-            action: PayloadAction<{ text: string; questionId: number | string }>
+            action: PayloadAction<{ text: string; questionId: string }>
         ) {
             if (!state.isValid) {
                 const clone = state.surveyData?.SurveyResponses.map((i) => {
@@ -660,18 +641,17 @@ export const appSlice = createSlice({
 
         handleUpdateInvalidReason(
             state,
-            action: PayloadAction<{ questionId: number | string }>
+            action: PayloadAction<{ questionId: string }>
         ) {
             if (state.surveyData) {
                 state.surveyData.InvalidReason =
                     state.surveyData.InvalidReason +
-                    `${state.surveyData.InvalidReason ? ". " : ""}Câu ${
-                        action.payload.questionId
+                    `${state.surveyData.InvalidReason ? ". " : ""}Câu ${action.payload.questionId
                     } phát hiện đầu vào ẩn`;
                 state.surveyData.SurveyResponses =
                     state.surveyData.SurveyResponses.map((i) =>
                         i.ValueJson.QuestionContent.Id ===
-                        action.payload.questionId
+                            action.payload.questionId
                             ? { ...i, IsValid: false }
                             : i
                     );

@@ -1,5 +1,5 @@
 export type OptionType = {
-  Id?: number | null;
+  Id: string ;
   Content: string;
   Order: number;
   MainImageBase64?: string; // base64 image data
@@ -14,15 +14,15 @@ export type SlideType = {
 
 export type JumpLogicsType = {
   Conditions: {
-    QuestionOrder: number;
+    QuestionId: string;
     Conjunction: string;
     Operator: string;
     CompareValue: number;
   }[];
-  TargetQuestionOrder: number;
+  TargetQuestionId: string;
 };
 export type QuestionType = {
-  Id?: number | null;
+  Id?: string ;
   MainImageBase64?: string;
   QuestionTypeId: number;
   Content: string;

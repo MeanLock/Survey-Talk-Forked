@@ -12,7 +12,7 @@ import SingleInputSlide from "./SingleInputSlide";
 import SingleSliderSlide from "./SingleSliderSlide";
 
 type Props = {
-  currentQuestionId: number;
+  currentQuestionId: string;
 };
 
 const Slide = ({ currentQuestionId }: Props) => {
@@ -120,7 +120,7 @@ const Slide = ({ currentQuestionId }: Props) => {
       dispatch(
         handleUpdateSpeechText({
           text: inputText,
-          questionId: data?.ValueJson.QuestionContent.Id || 0,
+          questionId: data?.ValueJson.QuestionContent.Id || "",
         })
       );
     }

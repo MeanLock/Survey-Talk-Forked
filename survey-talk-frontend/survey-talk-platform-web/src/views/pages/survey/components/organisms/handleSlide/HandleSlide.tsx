@@ -22,13 +22,13 @@ import { NextButton } from "../../atoms/Buttons/NextButton";
 
 type JumpLogic = {
   Conditions: {
-    QuestionId: number;
+    QuestionId: string;
     Conjunction: "AND" | "OR" | null;
     Operator: string;
-    OptionId: number;
+    OptionId: string;
     CompareValue: number;
   }[];
-  TargetQuestionId: number;
+  TargetQuestionId: string;
 };
 
 type Props = {
@@ -37,7 +37,7 @@ type Props = {
 };
 
 const HandleSlide = ({ dataResponse, setIsRefetch }: Props) => {
-  const [current, setCurrent] = useState(0);
+  const [current, setCurrent] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [searchParams] = useSearchParams();
   const taken_subject = useMemo(
@@ -167,7 +167,7 @@ const HandleSlide = ({ dataResponse, setIsRefetch }: Props) => {
     const nextIndex = currentIndex + 1;
     const nextQuestion = surveyData.SurveyResponses[nextIndex];
     setCurrentIndex(nextIndex);
-    setCurrent(nextQuestion?.ValueJson?.QuestionContent?.Id ?? 0);
+    setCurrent(nextQuestion?.ValueJson?.QuestionContent?.Id ?? "");
   }, [surveyData, currentIndex]);
 
   const handleEnd = useCallback(() => {
@@ -239,7 +239,7 @@ const Start = ({
   setCurrentIndex,
 }: {
   dataResponse: SurveyType | null;
-  setCurrent: Dispatch<SetStateAction<number>>;
+  setCurrent: Dispatch<SetStateAction<string>>;
   setCurrentIndex: Dispatch<SetStateAction<number>>;
 }) => {
   const data = useAppSelector((state) => state.appSlice.infoSurvey);

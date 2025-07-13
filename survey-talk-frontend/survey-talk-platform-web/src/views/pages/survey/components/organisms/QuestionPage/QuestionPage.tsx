@@ -21,9 +21,11 @@ import Sidebar from "../sidebar/SideBar";
 import SwitchCustomize from "./components/SwitchCustomize";
 import RatingIcon from "./components/rating-icon/RatingIcon";
 import "./styles.scss";
+import { generateUUID } from "@/core/utils/uuid.util";
+import { toast } from "react-toastify";
 
 const questionDefault = {
-  Id: null,
+  Id: "",
   QuestionTypeId: null,
   Content: "",
   Description: "",
@@ -337,6 +339,7 @@ const QuestionPage = ({
         ...prev.Questions,
         {
           ...questionDefault,
+          Id: generateUUID(),
           Order: (prev.Questions[prev.Questions.length - 1]?.Order || 0) + 1,
         },
       ],
@@ -348,19 +351,58 @@ const QuestionPage = ({
     setOrderCurrent(Order);
   };
 
-  const handleDeleteQuestion = () => {
-    if (!orderCurrent) return;
-    const newQuestions = formData?.Questions.filter(
-      (item: any) => item.Order !== orderCurrent
-    ).map((item: any, index: number) => ({
-      ...item,
-      Order: index + 1,
-    }));
-    setFormData((prev: any) => ({
-      ...prev,
-      Questions: newQuestions,
-    }));
-  };
+const handleDeleteQuestion = () => {
+  if (!orderCurrent) return;
+
+  const questionToDelete = formData?.Questions.find(
+    (item: any) => item.Order === orderCurrent
+  );
+
+  if (!questionToDelete) return;
+
+  const newQuestions = formData?.Questions.filter(
+    (item: any) => item.Order !== orderCurrent
+  ).map((item: any, index: number) => {
+    const updatedItem = { ...item, Order: index + 1 };
+    
+    if (updatedItem.ConfigJson?.JumpLogics?.length > 0) {
+      updatedItem.ConfigJson.JumpLogics = updatedItem.ConfigJson.JumpLogics.map((jumpLogic: any) => {
+        const updatedConditions = jumpLogic.Conditions.filter(
+          (condition: any) => condition.QuestionId !== questionToDelete.Id
+        );
+
+        return {
+          ...jumpLogic,
+          Conditions: updatedConditions,
+          TargetQuestionId: jumpLogic.TargetQuestionId === questionToDelete.Id 
+            ? '' 
+            : jumpLogic.TargetQuestionId
+        };
+      }).filter((jumpLogic: any) => jumpLogic.Conditions.length > 0);
+
+      // Remove JumpLogics array if empty
+      if (updatedItem.ConfigJson.JumpLogics.length === 0) {
+        delete updatedItem.ConfigJson.JumpLogics;
+      }
+    }
+
+    return updatedItem;
+  });
+
+  setFormData((prev: any) => ({
+    ...prev,
+    Questions: newQuestions,
+  }));
+
+  toast.success(`Đã xóa câu hỏi ${orderCurrent}`);
+
+  // Update current question selection
+  if (orderCurrent > 1) {
+    setOrderCurrent(orderCurrent - 1);
+  } else if (newQuestions.length > 0) {
+    setOrderCurrent(1);
+  }
+};
 
   const handleSwapQuestion = (target: number) => {
     const currentOrder = orderCurrent;
@@ -406,7 +448,7 @@ const QuestionPage = ({
     if (!formData?.Questions?.length) {
       setFormData((prev: any) => ({
         ...prev,
-        Questions: [{ ...questionDefault, Order: 1 }],
+        Questions: [{ ...questionDefault, Id: generateUUID(), Order: 1 }],
       }));
     }
   }, [formData?.Questions?.length, setFormData]);
@@ -437,7 +479,7 @@ const QuestionPage = ({
       defaultBackgroundThemes
     );
   }, []);
-  console.log(questionedit);
+  console.log("questionedit: ", questionedit);
   return (
     <div className="question-page flex flex-col h-full">
       <input type="file" hidden ref={ref} onChange={handleUploadImageBase64} />
@@ -456,19 +498,18 @@ const QuestionPage = ({
           className="question-main flex-1 flex flex-col overflow-y-auto relative"
           style={{
             ...(formData?.ConfigJson?.Background === "image" && {
-              backgroundImage: `url(${
-                formData?.ConfigJson?.IsUseBackgroundImageBase64 &&
-                formData.BackgroundImageBase64
+              backgroundImage: `url(${formData?.ConfigJson?.IsUseBackgroundImageBase64 &&
+                  formData.BackgroundImageBase64
                   ? formData.BackgroundImageBase64
                   : formData?.ConfigJson?.DefaultBackgroundImageId
-                  ? listBackground.find(
+                    ? listBackground.find(
                       //Thịnh
                       (item) =>
                         item.Id ===
                         formData?.ConfigJson?.DefaultBackgroundImageId
                     )?.MainImageUrl
-                  : ""
-              })`,
+                    : ""
+                })`,
               backgroundSize: "cover",
               backgroundPosition: "center",
               backgroundRepeat: "no-repeat",
@@ -487,7 +528,7 @@ const QuestionPage = ({
         >
           <div className="question-input-container relative z-10 flex flex-col items-center">
             {questionedit?.MainImageBase64 &&
-            questionedit.ConfigJson?.ImageEndQuestion ? (
+              questionedit.ConfigJson?.ImageEndQuestion ? (
               <img
                 src={questionedit?.MainImageBase64}
                 className="rounded-2xl "
@@ -588,9 +629,8 @@ const QuestionItem = ({
 }) => {
   return (
     <div
-      className={`question-item flex flex-col items-center justify-center ${
-        order === orderCurrent && "question-active"
-      }`}
+      className={`question-item flex flex-col items-center justify-center ${order === orderCurrent && "question-active"
+        }`}
       onClick={() => onChange(order)}
     >
       <CheckCircleIcon

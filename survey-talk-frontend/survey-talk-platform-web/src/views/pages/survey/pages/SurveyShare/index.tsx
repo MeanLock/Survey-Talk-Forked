@@ -42,21 +42,21 @@ interface QuestionOption {
 }
 
 interface JumpLogicCondition {
-    QuestionOrder: number;
+    QuestionId: string;
     Conjunction: string | null;
     Operator: string;
-    OptionOrder: number;
+    OptionId: string;
     CompareValue: number;
 }
 
 interface JumpLogic {
     Conditions: JumpLogicCondition[];
-    TargetQuestionOrder: number;
+    TargetQuestionId: string;
 }
 
 interface DisplayLogic {
     Conditions: JumpLogicCondition[];
-    TargetQuestionOrder: number;
+    TargetQuestionId: string;
 }
 
 interface MatrixDataItem {
@@ -149,7 +149,7 @@ const SurveyPreview: React.FC = () => {
     };
 
     const handleAnswerChange = (
-        questionOrder: number | any,
+        questionOrder: string | any,
         value: any
     ): void => {
         setAnswers((prev) => ({

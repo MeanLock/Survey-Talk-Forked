@@ -172,14 +172,14 @@ export type QuestionConfigJson = {
 };
 
 export type QuestionOption = {
-  SurveyOptionId: number;
+  SurveyOptionId: string;
   Content: string | null;
   Order: number;
   MainImageUrl: string | null;
 };
 
 export type SurveyQuestion = {
-  Id: number;
+  Id: string;
   QuestionTypeId: number;
   Version: number | null;
   MainImageUrl: string | null;
@@ -279,15 +279,15 @@ export type SurveyDataMarket = {
 };
 
 export type DataMarketOption = {
-  Id: number;
-  SurveyQuestionId: number;
+  Id: string;
+  SurveyQuestionId: string;
   Content: string;
   Order: number;
   MainImageUrl: string | null;
 };
 
 export type DataMarketQuestion = {
-  Id: number;
+  Id: string;
   SurveyId: number;
   QuestionTypeId: number;
   Content: string | null;
@@ -351,17 +351,17 @@ export type SlideType = {
 // Jump Logic
 export type JumpLogicsType = {
   Conditions: {
-    QuestionOrder: number;
+    QuestionId: string;
     Conjunction: string;
     Operator: string;
     CompareValue: number;
   }[];
-  TargetQuestionOrder: number;
+  TargetQuestionId: string;
 };
 
 // Options
 export type OptionType = {
-  Id?: number | null;
+  Id?: string | null;
   Content: string;
   Order: number;
   MainImageBase64?: string; // base64 image data
@@ -369,7 +369,7 @@ export type OptionType = {
 
 // Question
 export type QuestionType = {
-  Id?: number | null;
+  Id?: string | null;
   MainImageBase64?: string;
   QuestionTypeId: number;
   Content: string;
@@ -454,7 +454,7 @@ export type SurveyCreateUpdateType = {
 //         MainImageBase64: string;
 //         Version: number;
 //         IsReanswerRequired: boolean;
-//         ReferenceSurveyQuestionId: number;
+//         ReferenceSurveyQuestionId: string;
 //         Content: string;
 //         Description: string;
 //         TimeLimit: number;
@@ -513,31 +513,31 @@ export type SurveyCreateUpdateType = {
 export type DisplayLogic = {
   Conditions: [
     {
-      QuestionId: number;
+      QuestionId: string;
       Conjunction: string;
       Operator: string;
-      OptionId: number;
+      OptionId: string;
       CompareValue: number;
     }
   ];
-  TargetQuestionId: number;
+  TargetQuestionId: string;
 };
 
 export type JumpLogic = {
   Conditions: [
     {
-      QuestionId: number;
+      QuestionId: string;
       Conjunction: string;
       Operator: string;
-      OptionId: number;
+      OptionId: string;
       CompareValue: number;
     }
   ];
-  TargetQuestionId: number;
+  TargetQuestionId: string;
 };
 
 export type TakingSessionQuestion = {
-  Id: number;
+  Id: string;
   QuestionTypeId: number;
   Version: number | null;
   MainImageUrl: string;

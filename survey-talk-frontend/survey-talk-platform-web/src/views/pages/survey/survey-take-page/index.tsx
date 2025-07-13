@@ -209,7 +209,7 @@ const mockSurveyData = {
 };
 
 interface Question {
-  Id: number;
+  Id: string;
   QuestionTypeId: number;
   Content: string;
   Description?: string;
@@ -217,7 +217,7 @@ interface Question {
   ConfigJson?: any;
   RequiredAnswer: boolean;
   Options?: Array<{
-    Id: number;
+    Id: string;
     Content: string;
     Order: number;
     MainImageUrl?: string;
@@ -331,7 +331,7 @@ export default function SurveyPage() {
   }, []);
 
   // Handle answer change
-  const handleAnswerChange = (questionId: number, answer: any) => {
+  const handleAnswerChange = (questionId: string, answer: any) => {
     setAnswers((prev) => ({
       ...prev,
       [questionId]: answer,
