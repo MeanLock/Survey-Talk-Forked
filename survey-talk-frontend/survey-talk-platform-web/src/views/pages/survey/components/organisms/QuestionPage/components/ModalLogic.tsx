@@ -121,7 +121,7 @@ const [localJumpLogics, setLocalJumpLogics] = React.useState<JumpLogicType[]>(
     const handleAddLogic = () => {
         const newLogic: JumpLogicType = {
             Conditions: [],
-            TargetQuestionId: "end",
+            TargetQuestionId: null,
         };
                setLocalJumpLogics([...localJumpLogics, newLogic]);
 
@@ -189,9 +189,9 @@ const [localJumpLogics, setLocalJumpLogics] = React.useState<JumpLogicType[]>(
 
  const handleSaveLogic = () => {
         const isValid = localJumpLogics.every((logic) => {
-            if (!logic.TargetQuestionId) {
-                return false;
-            }
+            // if (!logic.TargetQuestionId) {
+            //     return false;
+            // }
             return logic.Conditions.every((condition) => {
                 if (!condition.QuestionId || !condition.Operator) {
                     return false;
@@ -525,18 +525,18 @@ const [localJumpLogics, setLocalJumpLogics] = React.useState<JumpLogicType[]>(
                                         Nhảy tới
                                     </span>
                                     <select
-                                            value={logic.TargetQuestionId || ''} // Handle null value
+                                            value={
+                      logic.TargetQuestionId === null
+                        ? "end"
+                        : logic.TargetQuestionId
+                    }
 
                                         onChange={(e) => {
                                             const updatedLogic: JumpLogicType =
                                             {
                                                 ...logic,
                                                 TargetQuestionId:
-                                                    e.target.value === "end"
-                                                        ? "end"
-                                                        : (
-                                                            e.target.value
-                                                        ),
+                                                    e.target.value === "end" ? null : e.target.value,
                                             };
                                             const newLogics = [...localJumpLogics];
                                             newLogics[logicIndex] =
