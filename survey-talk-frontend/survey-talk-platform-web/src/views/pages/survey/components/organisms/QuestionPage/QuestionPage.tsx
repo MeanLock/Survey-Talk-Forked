@@ -360,27 +360,29 @@ const handleDeleteQuestion = () => {
 
   if (!questionToDelete) return;
 
+  const affectedQuestions = new Set<number>(); // Track affected questions
+
   const newQuestions = formData?.Questions.filter(
     (item: any) => item.Order !== orderCurrent
   ).map((item: any, index: number) => {
     const updatedItem = { ...item, Order: index + 1 };
     
     if (updatedItem.ConfigJson?.JumpLogics?.length > 0) {
-      updatedItem.ConfigJson.JumpLogics = updatedItem.ConfigJson.JumpLogics.map((jumpLogic: any) => {
-        const updatedConditions = jumpLogic.Conditions.filter(
-          (condition: any) => condition.QuestionId !== questionToDelete.Id
+      // Filter out jump logics that reference the deleted question
+      updatedItem.ConfigJson.JumpLogics = updatedItem.ConfigJson.JumpLogics.filter((jumpLogic: any) => {
+        const hasConditionReference = jumpLogic.Conditions.some(
+          (condition: any) => condition.QuestionId === questionToDelete.Id
         );
+        const hasTargetReference = jumpLogic.TargetQuestionId === questionToDelete.Id;
 
-        return {
-          ...jumpLogic,
-          Conditions: updatedConditions,
-          TargetQuestionId: jumpLogic.TargetQuestionId === questionToDelete.Id 
-            ? '' 
-            : jumpLogic.TargetQuestionId
-        };
-      }).filter((jumpLogic: any) => jumpLogic.Conditions.length > 0);
+        // If question is affected, add to set
+        if (hasConditionReference || hasTargetReference) {
+          affectedQuestions.add(updatedItem.Order);
+        }
 
-      // Remove JumpLogics array if empty
+        return !hasConditionReference && !hasTargetReference;
+      });
+
       if (updatedItem.ConfigJson.JumpLogics.length === 0) {
         delete updatedItem.ConfigJson.JumpLogics;
       }
@@ -394,7 +396,11 @@ const handleDeleteQuestion = () => {
     Questions: newQuestions,
   }));
 
-  toast.success(`Đã xóa câu hỏi ${orderCurrent}`);
+  // Show single alert if there were any changes
+  if (affectedQuestions.size > 0) {
+    const affectedQuestionsList = Array.from(affectedQuestions).sort((a, b) => a - b);
+    toast.warning(`Một trong số các khối điều kiện ở các câu ${affectedQuestionsList.join(', ')} đã bị xóa, vui lòng kiểm tra lại`); // Thịnh();
+  }
 
   // Update current question selection
   if (orderCurrent > 1) {
@@ -451,6 +457,7 @@ const handleDeleteQuestion = () => {
         Questions: [{ ...questionDefault, Id: generateUUID(), Order: 1 }],
       }));
     }
+    console.log("formData?.Questions?.length: ", formData);
   }, [formData?.Questions?.length, setFormData]);
 
   const handleUploadImageBase64 = (e: any) => {
