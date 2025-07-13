@@ -6,30 +6,30 @@ import { loginRequiredAxiosInstance } from "@/core/api/rest-api/config/instances
 export const GET_QUERY_KEY = "edit";
 
 const get = async (id: number) => {
-    const response = await callAxiosRestApi({
-        instance: loginRequiredAxiosInstance,
-        method: "get",
-        url: `/survey?id=${id}`
-    });
+  const response = await callAxiosRestApi({
+    instance: loginRequiredAxiosInstance,
+    method: "get",
+    url: `/survey?id=${id}`,
+  });
 
-    return response.data;
+  return response.data;
 };
 
 export const getTodDoOptions = (id: number) =>
-    queryOptions({
-        queryKey: [GET_QUERY_KEY],
-        queryFn: () => get(id),
-    });
+  queryOptions({
+    queryKey: [GET_QUERY_KEY],
+    queryFn: () => get(id),
+  });
 
 type UseGetType = {
-    queryConfig?: QueryConfig<typeof getTodDoOptions>;
-    id: number;
+  queryConfig?: QueryConfig<typeof getTodDoOptions>;
+  id: number;
 };
 
 export const useGetSurvey = ({ queryConfig, id }: UseGetType) => {
-    return useQuery({
-        ...getTodDoOptions(id),
-        ...queryConfig,
-        enabled: Boolean(id),
-    });
+  return useQuery({
+    ...getTodDoOptions(id),
+    ...queryConfig,
+    enabled: false,
+  });
 };

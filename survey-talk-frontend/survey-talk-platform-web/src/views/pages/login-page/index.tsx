@@ -41,6 +41,7 @@ import {
 } from "../../../redux/fake/fakeSlice";
 import { requesterFake, takerFake } from "../../../core/mockData/userFake";
 import type { RootState } from "../../../redux/rootReducer";
+import { getAccountMe } from "@/services/Profile/get-accounts-me";
 interface LoginPageProps {
   disableCustomTheme?: boolean;
 }
@@ -153,33 +154,12 @@ const LoginPage: FC<LoginPageProps> = (props) => {
           LocalStorageUtil.setAuthTokenToPersistLocalStorage(token);
 
           // CALL API GET USER INFORMATIONS
-          const userResponses = await callAxiosRestApi({
-            instance: loginRequiredAxiosInstance,
-            method: "get",
-            url: "User/accounts/me",
-          });
-          if (userResponses.success && userResponses.data) {
-            const user = {
-              Id: userResponses.data.Account.Id,
-              RoleId: userResponses.data.Account.Role.Id,
-              FullName: userResponses.data.Account.FullName,
-              Balance: userResponses.data.Account.Balance,
-              IsVerified: userResponses.data.Account.IsVerified,
-              Xp: userResponses.data.Account.Xp,
-              Level: userResponses.data.Account.Level,
-              IsFilterSurveyRequired:
-                userResponses.data.Account.IsFilterSurveyRequired,
-              LastFilterSurveyTakenAt:
-                userResponses.data.Account.LastFilterSurveyTakenAt,
-              MainImageUrl: userResponses.data.Account.MainImageUrl,
-              Profile: userResponses.data.Account.Profile,
-            };
-            console.log("User: ", user);
-            // Cập nhật Redux với thông tin user
+          const user = await getAccountMe();
+          if (user) {
             dispatch(
               setAuthToken({
                 token: token,
-                user: user,
+                user: user.user,
               })
             );
 

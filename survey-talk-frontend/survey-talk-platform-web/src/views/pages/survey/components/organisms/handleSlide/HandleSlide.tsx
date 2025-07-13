@@ -34,9 +34,10 @@ type JumpLogic = {
 type Props = {
   dataResponse: SurveyType | null;
   setIsRefetch: Dispatch<SetStateAction<boolean>>;
+  takingSubject: string;
 };
 
-const HandleSlide = ({ dataResponse, setIsRefetch }: Props) => {
+const HandleSlide = ({ dataResponse, setIsRefetch, takingSubject }: Props) => {
   const [current, setCurrent] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [searchParams] = useSearchParams();
@@ -45,7 +46,6 @@ const HandleSlide = ({ dataResponse, setIsRefetch }: Props) => {
     [searchParams]
   );
 
-
   const surveyData = useAppSelector((state) => state.appSlice.surveyData);
   console.log("surveyData", surveyData);
   const dispatch = useAppDispatch();
@@ -53,7 +53,7 @@ const HandleSlide = ({ dataResponse, setIsRefetch }: Props) => {
   const { id } = useParams();
   const { mutate } = useUpdateSurveyPro({
     mutationConfig: {
-      onSuccess() { },
+      onSuccess() {},
     },
   });
 
@@ -192,8 +192,8 @@ const HandleSlide = ({ dataResponse, setIsRefetch }: Props) => {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const { JumpLogics, ...rest } = (i.ValueJson.QuestionContent
                 .ConfigJson || {}) as {
-                  [key: string]: any;
-                };
+                [key: string]: any;
+              };
               return rest;
             })(),
             Options: i.ValueJson.QuestionContent.Options,
@@ -215,6 +215,7 @@ const HandleSlide = ({ dataResponse, setIsRefetch }: Props) => {
         dataResponse={dataResponse}
         setCurrent={setCurrent}
         setCurrentIndex={setCurrentIndex}
+        takingSubject={takingSubject}
       />
     );
   }
@@ -237,10 +238,12 @@ const Start = ({
   dataResponse,
   setCurrent,
   setCurrentIndex,
+  takingSubject,
 }: {
   dataResponse: SurveyType | null;
   setCurrent: Dispatch<SetStateAction<number>>;
   setCurrentIndex: Dispatch<SetStateAction<number>>;
+  takingSubject: string;
 }) => {
   const data = useAppSelector((state) => state.appSlice.infoSurvey);
   const dispatch = useAppDispatch();
@@ -255,6 +258,7 @@ const Start = ({
   );
 
   const handleStart = () => {
+    console.log("Handle Start...");
     if (dataResponse) {
       let dataStore = (dataResponse?.Questions || []).map(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -337,11 +341,12 @@ const Start = ({
 
       dispatch(
         setSurveyData({
-          taken_subject: "Preview",
+          taken_subject: takingSubject,
           InvalidReason: "",
           SurveyResponses: dataStore,
         })
       );
+
       if (dataResponse?.Questions?.length && dataResponse?.Questions[0]?.Id) {
         setCurrent(dataResponse?.Questions[0]?.Id);
         setCurrentIndex(0);
