@@ -178,7 +178,8 @@ const AvailableSurveys: React.FC<AvailableSurveyProps> = () => {
   };
 
   const getTopicName = (id: number) => {
-    return SurveyTopics.filter((t) => t.id === id)[0].name;
+    // return SurveyTopics.filter((t) => t.id === id)[0].name;
+    return "Ê";
   };
 
   const handleTopicFilterChange = (topicId: number) => {
@@ -236,26 +237,6 @@ const AvailableSurveys: React.FC<AvailableSurveyProps> = () => {
   const handleSearchAPI = async () => {
     try {
       setIsLoading(true);
-      // CALL API, MỞ LẠI SAU KHI ĐÃ CÓ DATA
-      // const response = await callAxiosRestApi({
-      //   instance: loginRequiredAxiosInstance,
-      //   method: "get",
-      //   url: `Survey/core/community/surveys?Keyword=${Keyword}&Additional=${Additional}`,
-      // });
-      // if (response.success) {
-      //   const surveys = response.data.Surveys;
-      //   setSurveys(surveys);
-      //   setFilteredSurveys(surveys);
-      //   setSurveyFoundCount(surveys.length);
-      //   setSelectedSurvey(null);
-      //   setIsShowSelectedSurvey(false);
-      //   setSelectedTopics(null);
-      //   setSortMode(0);
-      //   setIsLoading(false);
-      // }else{
-      //   toast.error(`Lỗi khi tìm kiếm Khảo sát phù hợp, vui lòng thử lại sau!`);
-      // }
-
       setTimeout(() => {
         const surveys = SurveyListCustomer;
         setSurveys(surveys);

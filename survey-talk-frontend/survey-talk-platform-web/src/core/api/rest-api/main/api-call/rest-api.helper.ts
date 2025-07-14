@@ -5,6 +5,7 @@ import {
 } from "../response-generator/v1/response-generator";
 import axios from "axios";
 import { errorAlert } from "../../../../utils/alert.util";
+import { toast } from "react-toastify";
 
 interface RestApiHelperParams {
   instance: AxiosInstance;
@@ -36,15 +37,15 @@ export async function callAxiosRestApi(
       response.data
     );
   } catch (error: any) {
-    console.error("API call error:", error);
-    errorAlert(error);
+    toast.error(error.response.data.message);
+    console.log("Error nè: ", error.response.data.message);
     let isAppError = false;
     let errorMessage = "Có gì đó không ổn";
 
     if (axios.isAxiosError(error)) {
       if (error.response) {
         errorMessage =
-          error.response.data?.message || `Lỗi API: ${error.response.status}`;
+          error.response.data.message || `Lỗi API: ${error.response.status}`;
       } else if (error.request) {
         errorMessage = "Không có phản hồi từ server";
       } else {

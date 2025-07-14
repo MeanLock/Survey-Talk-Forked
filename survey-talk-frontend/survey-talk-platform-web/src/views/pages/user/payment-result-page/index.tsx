@@ -3,9 +3,11 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { updateAuthUser } from "../../../../redux/auth/authSlice";
 import type { RootState } from "../../../../redux/rootReducer";
+import { useRefetchUser } from "@/hooks/useRefetchUser";
 
 const PaymentResultPage: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const refetchUser = useRefetchUser();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -25,11 +27,7 @@ const PaymentResultPage: React.FC = () => {
       auth.user &&
       (auth.user.Balance || auth.user.Balance === 0)
     ) {
-      dispatch(
-        updateAuthUser({
-          Balance: Number(auth.user.Balance) + amount,
-        })
-      );
+      refetchUser();
       navigate("/user/transactions");
     } else {
       // Nếu không hợp lệ, điều hướng về trang giao dịch

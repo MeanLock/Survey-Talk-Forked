@@ -10,11 +10,11 @@ export const GET_QUERY_KEY = "get-me-surveys";
 
 // Hàm gọi API thực tế
 const get = async (params: {
-  KeyWord: string | null;
+  Keywords: string | null;
   Deadline: string | null;
-  StatusId: number | null;
+  Status: string | null;
 }) => {
-  const { KeyWord, Deadline, StatusId } = params;
+  const { Keywords, Deadline, Status } = params;
 
   const response = await callAxiosRestApi({
     instance: loginRequiredAxiosInstance,
@@ -22,9 +22,9 @@ const get = async (params: {
     url: `Survey/core/community/surveys/me`,
     config: {
       params: {
-        KeyWord,
+        Keywords,
         Deadline,
-        StatusId,
+        Status,
       },
     },
   });
@@ -34,34 +34,34 @@ const get = async (params: {
 
 // Tạo queryOptions cho useQuery
 export const getMeSurveysOptions = (params: {
-  KeyWord: string | null;
+  Keywords: string | null;
   Deadline: string | null;
-  StatusId: number | null;
+  Status: string | null;
 }) =>
   queryOptions({
-    queryKey: [GET_QUERY_KEY, params.KeyWord, params.Deadline, params.StatusId],
+    queryKey: [GET_QUERY_KEY, params.Keywords, params.Deadline, params.Status],
     queryFn: () => get(params),
   });
 
 type UseGetType = {
   queryConfig?: QueryConfig<ReturnType<typeof get>>;
-  KeyWord: string | null;
+  Keywords: string | null;
   Deadline: string | null;
-  StatusId: number | null;
+  Status: string | null;
 };
 
 // Hook chính
 export const useGetMeSurveys = ({
   queryConfig,
-  KeyWord,
+  Keywords,
   Deadline,
-  StatusId,
+  Status,
 }: UseGetType) => {
   const token = useSelector((state: RootState) => state.auth.token);
   const isValidToken = token ? JwtUtil.isTokenValid(token) : false;
 
   return useQuery({
-    ...getMeSurveysOptions({ KeyWord, Deadline, StatusId }),
+    ...getMeSurveysOptions({ Keywords, Deadline, Status }),
     ...queryConfig,
     enabled: isValidToken && (queryConfig?.enabled ?? true),
   });

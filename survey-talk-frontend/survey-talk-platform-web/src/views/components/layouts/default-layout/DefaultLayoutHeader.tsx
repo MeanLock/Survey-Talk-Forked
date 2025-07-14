@@ -26,7 +26,8 @@ import { Level } from "./Level";
 import type { RootState } from "../../../../redux/rootReducer";
 import { clearFakeData } from "../../../../redux/fake/fakeSlice";
 import { requesterFake, takerFake } from "../../../../core/mockData/userFake";
-import DefaultAvatar from "@/assets/Image/Customers/default.jpg"
+import DefaultAvatar from "@/assets/Image/Customers/default.jpg";
+import type { UserInformations } from "@/services/Profile/get-accounts-me";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
@@ -41,23 +42,12 @@ function useQuery() {
 
 interface DefaultLayoutHeaderProps {
   navItems: any;
-  member: {
-    Id: number;
-    RoleId: number;
-    FullName: string;
-    Balance: number;
-    IsVerified: boolean;
-    Xp: number;
-    Level: number;
-    IsFilterSurveyRequired: boolean;
-    LastFilterSurveyTakenAt: string | null;
-    MainImageUrl: string | null;
-  } | null;
+  userInformations: UserInformations
 }
 
 export const DefaultLayoutHeader: React.FC<DefaultLayoutHeaderProps> = ({
   navItems,
-  member,
+  userInformations,
 }) => {
   const [openMenu, setOpenMenu] = useState<null | HTMLElement>(null);
   const [value, setValue] = useState("");
@@ -69,11 +59,11 @@ export const DefaultLayoutHeader: React.FC<DefaultLayoutHeaderProps> = ({
 
   useEffect(() => {
     setValue(window.location.pathname);
-    console.log("Member: ", member);
     if (auth.token && JwtUtil.isTokenValid(auth.token)) {
       setIsLogin(true);
     } else {
       setIsLogin(false);
+      handleLogout();
     }
   }, [auth]);
 
@@ -122,30 +112,32 @@ export const DefaultLayoutHeader: React.FC<DefaultLayoutHeaderProps> = ({
             </Box>
           </Box>
 
-          {isLogin ? (
+          {isLogin && userInformations ? (
             <div className="user-profile flex gap-3 items-center">
               <div className="flex items-center gap-2 text-[#ffc40d]">
                 <StarsIcon />
                 <p className="font-bold">
                   {/* TASK FAKE DATA, PHẢI BỎ KHI ĐÃ CÓ API */}
-                  {auth.user?.Balance?.toLocaleString("vn")}
-                  {/* {member?.Balance.toLocaleString("vn")} */}
+                  {/* {auth.user?.Balance?.toLocaleString("vn")} */}
+                  {userInformations.Balance.toLocaleString("vn")}
                 </p>
               </div>
               <IconButton onClick={handleMenuOpen}>
                 <img
-                  src={member?.MainImageUrl ? member.MainImageUrl : DefaultAvatar}
-                  alt={member?.FullName}
+                  src={
+                    userInformations?.MainImageUrl ? userInformations.MainImageUrl : DefaultAvatar
+                  }
+                  alt={userInformations?.FullName}
                   className="w-[48px] h-[48px] rounded-full"
                 />
               </IconButton>
 
               <div className="user-details flex flex-col items-start">
-                <p className="user-profile__full-name">{member?.FullName}</p>
+                <p className="user-profile__full-name">{userInformations?.FullName}</p>
                 <Level
                   //TASK FAKE DATA, PHẢI BỎ KHI ĐÃ CÓ API
-                  xp={member ? member.Xp : null}
-                  level={member ? member.Level : null}
+                  xp={userInformations ? userInformations.Xp : null}
+                  level={userInformations ? userInformations.Level : null}
                   // xp={member ? member.Xp : null}
                   // level={member ? member.Level : null}
                 />

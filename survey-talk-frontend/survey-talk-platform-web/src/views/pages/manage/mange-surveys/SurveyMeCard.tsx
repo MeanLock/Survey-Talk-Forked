@@ -26,9 +26,10 @@ export const SurveyMeCard: React.FC<Props> = ({
 }) => {
   // FUNCTIONS
   const countTakenResult = (survey: Survey): string => {
-    const count = survey.SurveyTakenResults;
-    if (count) {
-      return count.length + " lượt khảo sát";
+    console.log("Survey: ", survey);
+    const count = survey.CurrentTakenResultCount;
+    if (count > 0) {
+      return count + "/" + survey.SurveyPrivateData.Kpi + " lượt làm";
     } else {
       return "Chưa có người làm";
     }
@@ -113,7 +114,7 @@ export const SurveyMeCard: React.FC<Props> = ({
           )}
         </div>
         <div className="w-full flex items-center justify-start">
-          <p className="font-bold text-[#3e5dab]">{data.Title}</p>
+          <p className="font-bold text-[#3e5dab] truncate">{data.Title}</p>
         </div>
         <div className="w-full flex items-center justify-start gap-5">
           <p className="text-sm text-gray-400">{countTakenResult(data)}</p>
