@@ -8,7 +8,8 @@ import PublishIcon from "@mui/icons-material/Publish";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
-
+import UnpublishedIcon from '@mui/icons-material/Unpublished';
+import { Tooltip } from "@mui/material";
 interface Props {
   data: Survey;
   onEdit: (id: number) => void;
@@ -76,41 +77,65 @@ export const SurveyMeCard: React.FC<Props> = ({
           className="w-[276px] h-[112px] object-cover rounded-lg shadow-lg group-hover:brightness-75 transition duration-300"
         />
         <div className="w-[276px] h-[112px] absolute inset-0 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition duration-300">
-          <IconButton
-            onClick={() => onEdit(data.Id)}
-            aria-label="Edit"
-            sx={{ color: "white" }}
-            className="bg-white rounded-full shadow-md hover:bg-gray-200"
-          >
-            <EditIcon />
-          </IconButton>
-          <IconButton
-            onClick={() => onViewDetails(data.Id)}
-            aria-label="View Details"
-            sx={{ color: "white" }}
-            className="bg-white rounded-full shadow-md hover:bg-gray-200"
-          >
-            <RemoveRedEyeIcon />
-          </IconButton>
-          {data.SurveyStatusId === 1 && (
+          <Tooltip title="Sửa khảo sát" arrow placement="top">
             <IconButton
-              onClick={() => onPublish(data.Id)}
-              aria-label="Publish"
+              onClick={() => onEdit(data.Id)}
+              aria-label="Edit"
               sx={{ color: "white" }}
               className="bg-white rounded-full shadow-md hover:bg-gray-200"
             >
-              <PublishIcon />
+              <EditIcon />
             </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Xem khảo sát" arrow placement="top">
+            <IconButton
+              onClick={() => onViewDetails(data.Id)}
+              aria-label="View Details"
+              sx={{ color: "white" }}
+              className="bg-white rounded-full shadow-md hover:bg-gray-200"
+            >
+              <RemoveRedEyeIcon />
+            </IconButton>
+          </Tooltip>
+
+          {data.SurveyStatusId === 1 && (
+            <>
+              <Tooltip title="Đăng khảo sát" arrow placement="top">
+                <IconButton
+                  onClick={() => onPublish(data.Id)}
+                  aria-label="Publish"
+                  sx={{ color: "white" }}
+                  className="bg-white rounded-full shadow-md hover:bg-gray-200"
+                >
+                  <PublishIcon />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Xóa khảo sát" arrow placement="top">
+                <IconButton
+                  onClick={() => onDelete(data.Id)}
+                  aria-label="Delete"
+                  sx={{ color: "white" }}
+                  className="bg-white rounded-full shadow-md hover:bg-gray-200"
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+
+            </>
           )}
           {data.SurveyStatusId === 2 && (
-            <IconButton
-              onClick={() => onDelete(data.Id)}
-              aria-label="Delete"
-              sx={{ color: "white" }}
-              className="bg-white rounded-full shadow-md hover:bg-gray-200"
-            >
-              <DeleteIcon />
-            </IconButton>
+            <Tooltip title="Hủy đăng khảo sát" arrow placement="top">
+              <IconButton
+                onClick={() => onDelete(data.Id)}
+                aria-label="Unpublish"
+                sx={{ color: "white" }}
+                className="bg-white rounded-full shadow-md hover:bg-gray-200"
+              >
+                <UnpublishedIcon />
+              </IconButton>
+            </Tooltip>
           )}
         </div>
         <div className="w-full flex items-center justify-start">

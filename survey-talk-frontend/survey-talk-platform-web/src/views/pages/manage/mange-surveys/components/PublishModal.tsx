@@ -20,6 +20,7 @@ import { callAxiosRestApi } from "../../../../../core/api/rest-api/main/api-call
 import { loginRequiredAxiosInstance } from "../../../../../core/api/rest-api/config/instances/v2";
 import { toast } from "react-toastify";
 import { useRefetchUser } from "@/hooks/useRefetchUser";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   survey: SurveyType;
@@ -328,6 +329,7 @@ export const PublishModal: React.FC<Props> = ({
   // 4. Filter
   const handleFilter = async () => {
     try {
+        console.log("Filter response: ", prompt,accuracy,marriage,education);
       const response = await callAxiosRestApi({
         instance: loginRequiredAxiosInstance,
         method: "post",
@@ -346,6 +348,7 @@ export const PublishModal: React.FC<Props> = ({
           },
         },
       });
+    
       if (response.success) {
         setSuggestedKPI(response.data.MaxKpi);
         setR(response.data.R);

@@ -86,6 +86,7 @@ const ManageSurveyPage = () => {
 
   useEffect(() => {
     if (MeSurveysFromAPI) {
+      console.log("Fetched Me Surveys:", MeSurveysFromAPI);
       setSurveys(MeSurveysFromAPI);
       setFilteredSurveys(MeSurveysFromAPI);
       setSelectedSurvey(null);
@@ -236,7 +237,7 @@ const ManageSurveyPage = () => {
     navigate(`/survey/${id}/editing`);
   };
 
-  const handleViewDetail = (id: number) => {};
+  const handleViewDetail = (id: number) => { };
 
   const handlePublish = (id: number) => {
     const survey = surveys?.filter((s) => s.Id === id)[0];
@@ -247,6 +248,7 @@ const ManageSurveyPage = () => {
   const handleClosePublishModal = () => {
     setShowPublishModal(false);
     setSelectedSurvey(null);
+    navigate(0); // Refresh the page to reflect changes
   };
 
   const handleUnPublished = async (id: number) => {
@@ -256,7 +258,8 @@ const ManageSurveyPage = () => {
       url: `Survey/core/community/surveys/${id}/unpublished`,
     });
     if (response && response.success) {
-      toast.success("Oke!");
+      toast.success("Hủy đăng khảo sát thành công");
+      navigate(0);
     }
   };
 
@@ -296,7 +299,7 @@ const ManageSurveyPage = () => {
         <RadioGroup
           value={filterOption}
           onValueChange={handleFilter}
-          className="flex flex-row gap-6 items-center"
+          className="flex flex-row gap-6 items-center  "
         >
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="All" id="all" className="w-4 h-4" />

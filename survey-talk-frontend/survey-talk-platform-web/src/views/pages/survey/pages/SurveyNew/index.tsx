@@ -206,7 +206,8 @@ const SurveyNew = () => {
         latestDataRef.current = sentBody;
         console.log("sentBody: ", sentBody);
         setIsSucces(responseData?.IsSuccess);
-        if (!id) {
+        const currentPath = window.location.pathname;
+        if (!id && currentPath.endsWith('/survey/new')) {
           window.history.pushState({}, "", `/survey/${sentBody.Id}/editing`);
         }
       },
@@ -226,7 +227,8 @@ const SurveyNew = () => {
         setIsApiCalling(false);
         latestDataRef.current = sentBody;
         setIsSucces(responseData?.IsSuccess);
-        if (!id) {
+        const currentPath = window.location.pathname;
+        if (!id && currentPath.endsWith('/survey/new')) {
           window.history.pushState({}, "", `/survey/${sentBody.Id}/editing`);
         }
       },
@@ -567,25 +569,25 @@ const SurveyNew = () => {
                   ...(!isSaving &&
                     !isSuccess &&
                     !isTrigger && {
-                      backgroundColor: "#f44336",
-                      color: "#ffffff",
-                      "&:hover": {
-                        backgroundColor: "#d32f2f",
-                      },
-                    }),
+                    backgroundColor: "#f44336",
+                    color: "#ffffff",
+                    "&:hover": {
+                      backgroundColor: "#d32f2f",
+                    },
+                  }),
                 }}
               >
                 {isApiCalling
                   ? "Đang lưu..." // Hiển thị khi lưu thủ công
                   : isTrigger
-                  ? isSaving
-                    ? `Đang lưu ... ${saveCountdown}`
+                    ? isSaving
+                      ? `Đang lưu ... ${saveCountdown}`
+                      : isSuccess
+                        ? "Đã lưu"
+                        : "Lưu thất bại, vui lòng thử lại"
                     : isSuccess
-                    ? "Đã lưu"
-                    : "Lưu thất bại, vui lòng thử lại"
-                  : isSuccess
-                  ? "Lưu"
-                  : "Lưu thất bại, vui lòng thử lại"}
+                      ? "Lưu"
+                      : "Lưu thất bại, vui lòng thử lại"}
               </Button>
             </div>
           </div>
