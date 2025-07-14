@@ -237,7 +237,9 @@ const ManageSurveyPage = () => {
     navigate(`/survey/${id}/editing`);
   };
 
-  const handleViewDetail = (id: number) => { };
+  const handleViewDetail = (id: number) => {
+    navigate(`${id}/details`);
+  };
 
   const handlePublish = (id: number) => {
     const survey = surveys?.filter((s) => s.Id === id)[0];
