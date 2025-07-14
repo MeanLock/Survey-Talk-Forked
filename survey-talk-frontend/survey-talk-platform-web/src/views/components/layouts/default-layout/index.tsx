@@ -38,9 +38,8 @@ const DefaultLayout = () => {
 
   // STATES
   const [isLoading, setIsLoading] = useState(true);
-  const [member, setMember] = useState<any>(null);
   const [navItems, setNavItems] = useState<any>([]);
-
+  const [userInformations, setUserInformations] = useState<any>(null);
   const [footerNavItems, setFooterNavItems] = useState<
     {
       label: string;
@@ -57,17 +56,14 @@ const DefaultLayout = () => {
     if (!auth.token) {
       setNavItems(_nonLoginNav);
       dispatch(clearAuthToken());
-      setMember(null);
     } else if (auth.token && JwtUtil.isTokenValid(auth.token)) {
-      console.log("Chạy hàm nèeeee");
-      // CALL API TO GET USER
+      // CALL API TO GET USER INFORMATIONS
       fetch();
       setNavItems(_loginNav);
     } else {
       console.log("Không valid rồiiiii");
       alert("Không valid");
       dispatch(clearAuthToken());
-      setMember(null);
     }
   }, []);
 
@@ -78,20 +74,38 @@ const DefaultLayout = () => {
       if (user) {
         dispatch(
           updateAuthUser({
+            token: auth.token,
             user: user.user,
           })
         );
 
-        setMember(user.profile);
-        console.log("User Profile: ", user.profile);
-        if (
-          !member.Account.Profile ||
-          member.Account.Profile.CountryRegion === null ||
-          member.Account.Profile.AverageIncome === null ||
-          member.Account.Profile.DistrictCode === null ||
-          member.Account.Profile.JobField === null ||
-          member.Account.Profile.MaritalStatus === null ||
-          member.Account.Profile.WardCode === null
+        setUserInformations(user.user);
+
+        if (!user.user.Profile) {
+          Swal.fire({
+            title: "Chỉ còn 1 bước nữa thôi!",
+            text: "Cập nhật thông tin ngay để bắt đầu các chức năng của trang web",
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonText: "Vào làm",
+            cancelButtonText: "Hủy",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              navigate("/survey/filter-survey");
+            } else {
+              dispatch(clearAuthToken());
+              navigate("/login");
+            }
+          });
+        } else if (
+          user.user.Profile.CountryRegion === null ||
+          user.user.Profile.AverageIncome === null ||
+          user.user.Profile.DistrictCode === null ||
+          user.user.Profile.JobField === null ||
+          user.user.Profile.MaritalStatus === null ||
+          user.user.Profile.WardCode === null
         ) {
           Swal.fire({
             title: "Chỉ còn 1 bước nữa thôi!",
@@ -119,15 +133,16 @@ const DefaultLayout = () => {
   return (
     <DefaultLayoutContext.Provider
       value={{
-        isAdmin: member && member.isAdmin,
-        isLogin: member ? true : false,
+        isAdmin: userInformations && userInformations.isAdmin,
+        isLogin: userInformations ? true : false,
       }}
     >
       <div className="default-layout flex flex-col w-full h-screen">
         {/* HEADER */}
-        {member && (
-          <DefaultLayoutHeader navItems={navItems} member={member.Account} />
-        )}
+        <DefaultLayoutHeader
+          navItems={navItems}
+          userInformations={userInformations}
+        />
 
         {/* MAIN WRAPPER */}
         <div className="flex flex-col flex-grow w-full mt-[83px]">

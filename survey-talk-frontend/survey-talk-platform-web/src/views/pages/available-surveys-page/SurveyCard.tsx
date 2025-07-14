@@ -28,8 +28,9 @@ export const SurveyCard: React.FC<Props> = ({ survey, onShowDetail }) => {
   };
 
   const topicName = (id: number) => {
-    const name = SurveyTopics.filter((s) => s.id === id)[0].name;
-    return name;
+    // const name = SurveyTopics.filter((s) => s.id === id)[0].name;
+    // return name;
+    return "Ê";
   };
 
   return (

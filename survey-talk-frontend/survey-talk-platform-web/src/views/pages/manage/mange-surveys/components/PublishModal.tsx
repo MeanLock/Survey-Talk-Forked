@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from "react-redux";
-import type { Survey } from "../../../../../core/types";
+import type { SurveyType } from "@/core/types/tools";
 import { SegmentBasic } from "./SegmentBasic";
 import { SegmentAge } from "./SegmentAge";
 import dayjs from "dayjs"; // Ensure dayjs is installed for date manipulation
@@ -19,9 +19,10 @@ import { Balance } from "@mui/icons-material";
 import { callAxiosRestApi } from "../../../../../core/api/rest-api/main/api-call";
 import { loginRequiredAxiosInstance } from "../../../../../core/api/rest-api/config/instances/v2";
 import { toast } from "react-toastify";
+import { useRefetchUser } from "@/hooks/useRefetchUser";
 
 interface Props {
-  survey: Survey;
+  survey: SurveyType;
   open: boolean;
   onClose: () => void;
   changeStatus: () => void;
@@ -107,6 +108,7 @@ export const PublishModal: React.FC<Props> = ({
   // REDUX
   const user = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch();
+  const refetchUser = useRefetchUser();
 
   // STATES
   const [isDoneSegmentFilter, setIsDoneSegmentFilter] =
@@ -153,6 +155,9 @@ export const PublishModal: React.FC<Props> = ({
 
   // HOOKS
   useEffect(() => {
+    if (!user) {
+      toast.error("Vui lòng đăng nhập để thực hiện hành động !");
+    }
     reset();
   }, []);
 
@@ -214,7 +219,7 @@ export const PublishModal: React.FC<Props> = ({
     setErrEndDate(false);
     setErrEndDateMsg("");
 
-    setUserPoint(user?.balance || 0); // Retrieve userPoint from Redux user balance
+    setUserPoint(user?.Balance || 0); // Retrieve userPoint from Redux user balance
     setTheoryPrice(0);
     setTotalPrice(0);
     setErrPrice(false);
@@ -446,7 +451,7 @@ export const PublishModal: React.FC<Props> = ({
     if (theoryPrice > Number(value)) {
       setErrPrice(true);
       setErrPriceMsg(`Số tiền đăng tối thiểu là: ${formatVND(theoryPrice)}`);
-    } else if (Number(value) > user?.Balance) {
+    } else if (user?.Balance && Number(value) > user?.Balance) {
       setErrPrice(true);
       setErrPriceMsg(
         `Tài khoản của bạn đang có: ${user?.Balance} có vẻ không đủ, bạn có muốn nạp thêm ?`
@@ -507,11 +512,7 @@ export const PublishModal: React.FC<Props> = ({
       });
       if (response.success) {
         toast.success("Đăng khảo sát thành công!");
-        dispatch(
-          updateAuthUser({
-            Balance: user?.Balance - totalPrice,
-          })
-        );
+        await refetchUser();
         // Đóng modal
         onClose();
       }

@@ -1,14 +1,13 @@
 import type React from "react";
-import type { SurveyCommunity, SurveyCommunityCard } from "../../../core/types";
-import { motion } from "framer-motion";
+import type { SurveyCommunity } from "../../../core/types";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { SurveyCard } from "./SurveyCard";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import { useState } from "react";
-import { Button, duration, IconButton } from "@mui/material";
-
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 interface Props {
   prefix: string;
@@ -16,52 +15,44 @@ interface Props {
 }
 
 export const SurveysCarousel: React.FC<Props> = ({ prefix, data }) => {
-  // STATES
-  const [positionIndexes, setPositionIndexes] = useState([0, 1, 2, 3, 4]);
-
-  const handleNext = () => {
-    setPositionIndexes((prevIndexes) => {
-      const updatedIndexes = prevIndexes.map((p) => (p + 4) % 5);
-      return updatedIndexes;
-    });
-  };
-  const handleBack = () => {
-    setPositionIndexes((prevIndexes) => {
-      const updatedIndexes = prevIndexes.map((p) => (p + 1) % 5);
-      return updatedIndexes;
-    });
-  };
-
-  const positions = ["left", "left1", "center", "right1", "right"];
-
-  const cardVariants = {
-    center: { x: "0%", scale: 1, zIndex: 5 },
-    left1: { x: "-88%", scale: 0.7, zIndex: 3 },
-    left: { x: "-150%", scale: 0.5, zIndex: 2 },
-    right: { x: "150%", scale: 0.5, zIndex: 1 },
-    right1: { x: "88%", scale: 0.7, zIndex: 3 },
-  };
+  if (!data || data.length === 0) {
+    return null;
+  }
 
   return (
-    <div className="w-full gap-2 flex justify-between items-center relative mt-[300px] mb-[200px]">
-      <IconButton onClick={() => handleBack()}>
-        <ArrowBackIosNewIcon />
-      </IconButton>
-      {data?.map((s, index) => (
-        <motion.div
-          key={index}
-          initial="center"
-          animate={positions[positionIndexes[index]]}
-          variants={cardVariants}
-          transition={{ duration: 0.5 }}
-          style={{ position: "absolute", left: "38%" }}
+    <div className="w-full max-w-7xl mx-auto px-4 py-8">
+      {data.length === 1 ? (
+        // Single card - center it
+        <div className="flex justify-center">
+          <div className="w-full max-w-sm">
+            <SurveyCard data={data[0]} />
+          </div>
+        </div>
+      ) : (
+        // Multiple cards - use carousel
+        <Carousel
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+          className="w-full"
         >
-          <SurveyCard data={s} />
-        </motion.div>
-      ))}
-      <IconButton onClick={() => handleNext()}>
-        <ArrowForwardIosIcon />
-      </IconButton>
+          <CarouselContent className="-ml-2 md:-ml-4">
+            {data.map((survey, index) => (
+              <CarouselItem
+                key={index}
+                className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
+              >
+                <div className="p-1">
+                  <SurveyCard data={survey} />
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="hidden sm:flex" />
+          <CarouselNext className="hidden sm:flex" />
+        </Carousel>
+      )}
     </div>
   );
 };
