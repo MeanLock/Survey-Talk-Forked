@@ -96,7 +96,7 @@ const get_roleNav = (role_id: number, account_id: number) => {
       },
       {
         component: CNavItem,
-        name: 'Filter Survey',
+        name: 'Khảo Sát Lọc',
         to: '/filter-survey/table',
         icon: <DescriptionOutlinedIcon sx={{ fontSize: 29 }} />,
 

@@ -94,13 +94,13 @@ const getColumnDefs = ({ navigate, onUnpublish }: ColumnActionsProps) => [
                     >
                         <Eye size={20} />
                     </CButton>
-                    <CButton
+                    {/* <CButton
                         size="sm"
                         className="text-danger"
                         onClick={() => onUnpublish(surveyId)}
                     >
                         <Warning size={20} />
-                    </CButton>
+                    </CButton> */}
                 </div>
             )
         },
@@ -149,18 +149,18 @@ const tabConfigs = [
             return response.success ? response.data.Surveys : [];
         },
     },
-    {
-        key: "finished",
-        title: "Hoàn Thành",
-        description: "Khảo Sát Đã Hoàn Thành",
-        loadData: async () => {
-            const response = await getCommunitySurveys(managerAxiosInstance);
-            if (response.success) {
-                return response.data.Surveys.filter((survey: any) => !survey.IsAvailable);
-            }
-            return [];
-        },
-    },
+    // {
+    //     key: "finished",
+    //     title: "Hoàn Thành",
+    //     description: "Khảo Sát Đã Hoàn Thành",
+    //     loadData: async () => {
+    //         const response = await getCommunitySurveys(managerAxiosInstance);
+    //         if (response.success) {
+    //             return response.data.Surveys.filter((survey: any) => !survey.IsAvailable);
+    //         }
+    //         return [];
+    //     },
+    // },
 ]
 
 

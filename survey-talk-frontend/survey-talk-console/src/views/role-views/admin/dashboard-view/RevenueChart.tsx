@@ -43,7 +43,8 @@ export function RevenueChart({ activeTab }: { activeTab: string }) {
     if (activeTab === 'Daily' || activeTab === 'Weekly') {
       return currentDate.toDateString() === start.toDateString();
     }
-
+    start.setHours(0, 0, 0, 0);
+    end.setHours(23, 59, 59, 999);
     return currentDate >= start && currentDate <= end;
   }
 

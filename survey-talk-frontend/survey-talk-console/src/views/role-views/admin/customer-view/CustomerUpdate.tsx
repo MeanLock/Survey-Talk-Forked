@@ -8,6 +8,11 @@ import {
   CFormLabel
 } from '@coreui/react';
 import { Account } from "../../../../core/types";
+import { deactivateAccount, updateAccount } from "../../../../core/services/account/account.service";
+import { adminAxiosInstance } from "../../../../core/api/rest-api/config/instances/v2";
+import { toast } from "react-toastify";
+import { CustomerViewContext } from ".";
+import { formatDate } from "../../../../core/utils/date.util";
 
 interface CustomerUpdateProps {
   account: Account;
@@ -15,18 +20,73 @@ interface CustomerUpdateProps {
 }
 
 const CustomForm: React.FC<CustomerUpdateProps> = ({ account, onClose }) => {
-
+  const context = useContext(CustomerViewContext);
   const fullname = useRef<HTMLInputElement>(null);
   const dob = useRef<HTMLInputElement>(null);
   const gender = useRef<HTMLInputElement>(null);
   const phone = useRef<HTMLInputElement>(null);
   const address = useRef<HTMLInputElement>(null);
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    const data = {
+      FullName: fullname.current?.value,
+      Dob: dob.current?.value,
+      Gender: gender.current?.value,
+      Address: address.current?.value,
+      Phone: phone.current?.value,
+    };
+    try {
+      const res = await updateAccount(adminAxiosInstance, account.Id, data);
+      if (res.success) {
+        onClose();
+        context?.handleDataChange();
+        toast.success(`Tài khoản ${account.Id} cập nhật thành công!`);
+      }
+    } catch (error) {
+      console.error("Error deactivating account:", error);
+    }
+  };
+  const handleDeactivate = async (event: React.FormEvent, isDeactivate: boolean) => {
+    event.preventDefault();
+    try {
+      const res = await deactivateAccount(adminAxiosInstance, account.Id, isDeactivate);
+      if (res.success) {
+        onClose();
+        context?.handleDataChange();
+        toast.success(`Tài khoản ${isDeactivate ? 'vô hiệu hóa' : 'kích hoạt'} thành công!`);
+      }
+    } catch (error) {
+      console.error("Error deactivating account:", error);
+    }
   };
 
   return (
     <CForm className="row g-3 needs-validation" noValidate onSubmit={handleSubmit}>
+            <CCol md={12} className="d-flex gap-4 mt-2">
+        <div className="d-flex align-items-center gap-2">
+          <span className="text-muted">Khảo sát đầu vào:</span>
+          <span className={`badge ${account.IsFilterSurveyRequired ? 'bg-success' : 'bg-danger'}`}>
+            {account.IsFilterSurveyRequired ? 'Đã làm' : 'Chưa làm'}
+          </span>
+        </div>
+        <div className="d-flex align-items-center gap-2">
+          <span className="text-muted">Xác thực:</span>
+          <span className={`badge ${account.IsVerified ? 'bg-success' : 'bg-danger'}`}>
+            {account.IsVerified ? 'Đã làm' : 'Chưa làm'}
+          </span>
+        </div>
+      </CCol>
+      <CCol md={12}>
+        <CFormLabel htmlFor="address">Email</CFormLabel>
+        <CFormInput type="text" id="address" defaultValue={account.Email} disabled />
+      </CCol>
+        {account.DeactivatedAt !== null && (
+        <CCol md={12}>
+          <CFormLabel htmlFor="address">Ngày vô hiệu hóa</CFormLabel>
+          <CFormInput type="text" id="address" defaultValue={formatDate(account.DeactivatedAt)} disabled />
+        </CCol>
+      )}
+
       <CCol md={12}>
         <CFormLabel htmlFor="fullname">Họ và Tên</CFormLabel>
         <CFormInput type="text" id="fullname" defaultValue={account.FullName} ref={fullname} required />
@@ -62,11 +122,18 @@ const CustomForm: React.FC<CustomerUpdateProps> = ({ account, onClose }) => {
           className="mx-2"
           color={account.DeactivatedAt === null ? "danger" : "info"}
           style={{ color: "white" }}
+          onClick={(e) => handleDeactivate(e, account.DeactivatedAt === null ? true : false)}
         >
-          {account.DeactivatedAt === null ? 'Vô hiệu hóa' : 'Activate'}
+          {account.DeactivatedAt === null ? 'Vô hiệu hóa' : 'Kích hoạt'}
         </CButton>
         |
-        <CButton className="mx-2" color="success" type="submit" style={{ color: "white" }} >
+        <CButton
+          className="mx-2"
+          color="success"
+          type="submit"
+          style={{ color: "white" }}
+          onClick={handleSubmit}
+        >
           Cập nhật
         </CButton>
       </CCol>
