@@ -22,8 +22,10 @@ const EndSurveyCustomer = () => {
   }
 
   const handleNavigateToHome = async () => {
-    await refetchUser();
-    navigate("/");
+    const check = await refetchUser();
+    if (check) {
+      navigate("/");
+    }
   };
 
   return (

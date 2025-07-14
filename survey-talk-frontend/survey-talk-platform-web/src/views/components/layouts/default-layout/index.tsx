@@ -74,6 +74,7 @@ const DefaultLayout = () => {
       if (user) {
         dispatch(
           updateAuthUser({
+            token: auth.token,
             user: user.user,
           })
         );
@@ -138,7 +139,10 @@ const DefaultLayout = () => {
     >
       <div className="default-layout flex flex-col w-full h-screen">
         {/* HEADER */}
-        <DefaultLayoutHeader navItems={navItems} userInformations={userInformations} />
+        <DefaultLayoutHeader
+          navItems={navItems}
+          userInformations={userInformations}
+        />
 
         {/* MAIN WRAPPER */}
         <div className="flex flex-col flex-grow w-full mt-[83px]">
