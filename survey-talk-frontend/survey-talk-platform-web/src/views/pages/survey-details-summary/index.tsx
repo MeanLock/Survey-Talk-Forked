@@ -88,7 +88,7 @@ const SurveyDetailsPage = () => {
             <QuestionPreview questions={SurveyDetails.Questions} />
           )}
 
-          {showMode === "survey-summaries" && <ResponseSummaries />}
+          {showMode === "survey-summaries" && <ResponseSummaries summaryLists={SurveySummaries} />}
         </div>
       )}
     </div>

@@ -37,18 +37,18 @@ export const _loginNav: {
       { title: "Danh Sách Khảo Sát", path: "/available-surveys" },
     ],
   },
-  {
-    label: "Data Markets",
-    isDropDown: false,
-    paths: [{ title: "", path: "/data-market" }],
-  },
+  // {
+  //   label: "Data Markets",
+  //   isDropDown: false,
+  //   paths: [{ title: "", path: "/data-market" }],
+  // },
   {
     label: "Quản Lý",
     isDropDown: true,
     paths: [
       { title: "Quản Lý Điểm", path: "/manage/points" },
       { title: "Quản Lý Khảo Sát", path: "/manage/surveys" },
-      { title: "Quản Lý Data Market", path: "/manage/data-market" },
+      // { title: "Quản Lý Data Market", path: "/manage/data-market" },
     ],
   },
 ];

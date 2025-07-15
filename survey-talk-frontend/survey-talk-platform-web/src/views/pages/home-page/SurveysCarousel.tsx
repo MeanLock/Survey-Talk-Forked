@@ -37,7 +37,7 @@ export const SurveysCarousel: React.FC<Props> = ({ prefix, data }) => {
           }}
           className="w-full"
         >
-          <CarouselContent className="-ml-2 md:-ml-4">
+          <CarouselContent className="-ml-2 md:-ml-4 gap-20">
             {data.map((survey, index) => (
               <CarouselItem
                 key={index}

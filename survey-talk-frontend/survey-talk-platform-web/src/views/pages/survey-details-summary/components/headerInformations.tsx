@@ -4,6 +4,8 @@ import FolderIcon from "@mui/icons-material/Folder";
 import FolderCopyIcon from "@mui/icons-material/FolderCopy";
 import NetworkPingIcon from "@mui/icons-material/NetworkPing";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import { Button } from "@/components/ui/button";
+import DownloadIcon from "@mui/icons-material/Download";
 
 type SurveyTakenResult = {
   Id: number;
@@ -62,6 +64,9 @@ export const HeaderInformations: React.FC<Props> = ({
   };
 
   const formatDate = (dateString: string) => {
+    if (!dateString) {
+      return "Chưa đăng";
+    }
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -103,7 +108,9 @@ export const HeaderInformations: React.FC<Props> = ({
               <NetworkPingIcon sx={{ fontSize: "10px" }} />
             </div>
           </div>
-          <p className="text-[15px] font-semibold truncate">{kpi}</p>
+          <p className="text-[15px] font-semibold truncate">
+            {kpi > 0 ? kpi : "Chưa đăng"}
+          </p>
         </div>
 
         <div className="w-[153px] h-[65px] rounded-lg flex flex-col justify-between items-start p-2 bg-[#50A350]/35">
@@ -114,7 +121,9 @@ export const HeaderInformations: React.FC<Props> = ({
             </div>
           </div>
           <p className="text-[15px] font-semibold truncate">
-            {totalPrice.toLocaleString("vn")} VND
+            {totalPrice > 0
+              ? totalPrice.toLocaleString("vn") + "VND"
+              : "Chưa đăng"}
           </p>
         </div>
 
@@ -141,9 +150,19 @@ export const HeaderInformations: React.FC<Props> = ({
             {formatDate(endDate)}
           </p>
         </div>
+
+        {/* <div>
+          <Button variant="default">
+            Tải Dữ Liệu{" "}
+            <span>
+              <DownloadIcon />
+            </span>{" "}
+            (file .xls)
+          </Button>
+        </div> */}
       </div>
 
-      <div className="grid grid-cols-4 gap-10">
+      {/* <div className="grid grid-cols-4 gap-10">
         <div className="col-span-1 flex items-center justify-center">
           <div className="w-full bg-white rounded-xl h-[331px] shadow-xl flex flex-col p-5 items-start justify-between">
             <div className="flex flex-col items-start justify-around ">
@@ -161,7 +180,7 @@ export const HeaderInformations: React.FC<Props> = ({
             table
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
