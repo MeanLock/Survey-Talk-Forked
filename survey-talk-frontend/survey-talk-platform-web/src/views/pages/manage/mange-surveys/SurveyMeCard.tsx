@@ -15,6 +15,7 @@ interface Props {
   onEdit: (id: number) => void;
   onViewDetails: (id: number) => void;
   onPublish: (id: number) => void;
+  onUnPublish: (id: number) => void;
   onDelete: (id: number) => void;
 }
 
@@ -23,6 +24,7 @@ export const SurveyMeCard: React.FC<Props> = ({
   onEdit,
   onViewDetails,
   onPublish,
+  onUnPublish,
   onDelete,
 }) => {
   // FUNCTIONS
@@ -128,7 +130,7 @@ export const SurveyMeCard: React.FC<Props> = ({
           {data.SurveyStatusId === 2 && (
             <Tooltip title="Hủy đăng khảo sát" arrow placement="top">
               <IconButton
-                onClick={() => onDelete(data.Id)}
+                onClick={() => onUnPublish(data.Id)}
                 aria-label="Unpublish"
                 sx={{ color: "white" }}
                 className="bg-white rounded-full shadow-md hover:bg-gray-200"

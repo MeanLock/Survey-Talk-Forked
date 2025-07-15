@@ -21,12 +21,12 @@ const SingleChooseSlide = ({ data }: Props) => {
   // const isValid = useMemo(() => data?.IsValid, [data]);
 
   const handleSelect = useCallback(
-    (id: number) => {
+    (id: string) => {
       if (!isValid) return;
       dispatch(
         handleUpdateSigleChoose({
           idChoose: id,
-          questionId: data?.ValueJson?.QuestionContent?.Id || 0,
+          questionId: data?.ValueJson?.QuestionContent?.Id || "",
         })
       );
     },

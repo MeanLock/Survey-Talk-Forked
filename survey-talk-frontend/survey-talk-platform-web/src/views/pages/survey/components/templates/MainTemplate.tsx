@@ -77,7 +77,7 @@ const MainTemPlate = ({ children }: Props) => {
         </div>
       ) : (
         <div className="w-full flex flex-col items-center justify-center relative ">
-          <DefaultLayoutHeader navItems={_loginNav} member={member} />
+          <DefaultLayoutHeader navItems={_loginNav} userInformations={member} />
           <div className="mt-[95px] w-full">{children}</div>
         </div>
       )}
