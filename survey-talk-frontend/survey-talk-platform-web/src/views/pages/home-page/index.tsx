@@ -8,6 +8,7 @@ import Benefit1 from "../../../assets/Image/Home/benefit1.png";
 import Benefit2 from "../../../assets/Image/Home/benefit2.png";
 import Benefit3 from "../../../assets/Image/Home/benefit3.png";
 import YellowBanner from "../../../assets/Image/Home/bottomYellowBanner.png";
+import NotFoundImg from "../../../assets/Image/Logo/notfound.png";
 
 // COMPONENTS
 import LinkButton from "../../components/common/system/button/LinkButton";
@@ -66,7 +67,7 @@ const benefitData = [
   },
 ];
 
-interface HomePageProps {}
+interface HomePageProps { }
 
 const HomePage: FC<HomePageProps> = () => {
   // REDUX
@@ -128,7 +129,16 @@ const HomePage: FC<HomePageProps> = () => {
             {isLoadingFeatureSurveys && !isFetched ? (
               <CircularProgress />
             ) : (
-              <SurveysCarousel prefix="suityoubest" data={suitYouBest} />
+              suitYouBest && suitYouBest.length === 0 ? (
+                <div className="w-full flex-1 flex flex-col gap-4 items-center justify-center mt-10">
+                  <img src={NotFoundImg} className="w-[200px] h-[200px]" />
+                  <p className="font-bold text-gray-400">
+                    Chưa có khảo sát nào phù hợp với bạn
+                  </p>
+                </div>
+              ) : (
+                <SurveysCarousel prefix="suityoubest" data={suitYouBest} />
+              )
             )}
           </div>
 
@@ -137,7 +147,16 @@ const HomePage: FC<HomePageProps> = () => {
             {isLoadingFeatureSurveys && !isFetched ? (
               <CircularProgress />
             ) : (
-              <SurveysCarousel prefix="bigbonus" data={bigBonus} />
+              bigBonus && bigBonus.length === 0 ? (
+                <div className="w-full flex-1 flex flex-col gap-4 items-center justify-center mt-10">
+                  <img src={NotFoundImg} className="w-[200px] h-[200px]" />
+                  <p className="font-bold text-gray-400">
+                    Chưa có khảo sát nào big bonus
+                  </p>
+                </div>
+              ) : (
+                <SurveysCarousel prefix="bigbonus" data={bigBonus} />
+              )
             )}
           </div>
 
@@ -148,7 +167,16 @@ const HomePage: FC<HomePageProps> = () => {
             {isLoadingFeatureSurveys && !isFetched ? (
               <CircularProgress />
             ) : (
-              <SurveysCarousel prefix="base" data={baseOnFavTopic} />
+              baseOnFavTopic && baseOnFavTopic.length === 0 ? (
+                <div className="w-full flex-1 flex flex-col gap-4 items-center justify-center mt-10">
+                  <img src={NotFoundImg} className="w-[200px] h-[200px]" />
+                  <p className="font-bold text-gray-400">
+                    Chưa có khảo sát nào phù hợp với chủ đề yêu thích của bạn
+                  </p>
+                </div>
+              ) : (
+                <SurveysCarousel prefix="base" data={baseOnFavTopic} />
+              )
             )}
           </div>
         </div>

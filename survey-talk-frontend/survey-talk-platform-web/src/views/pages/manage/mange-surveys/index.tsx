@@ -30,6 +30,7 @@ import { callAxiosRestApi } from "@/core/api/rest-api/main/api-call";
 import { loginRequiredAxiosInstance } from "@/core/api/rest-api/config/instances/v2";
 import { toast } from "react-toastify";
 import type { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu";
+import { confirmAlert } from "@/core/utils/alert.util";
 
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
@@ -262,6 +263,22 @@ const ManageSurveyPage = () => {
     if (response && response.success) {
       toast.success("Hủy đăng khảo sát thành công");
       navigate(0);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    const alert = await confirmAlert("Bạn có chắc muốn xóa khảo sát này?");
+    console.log("Xóa khảo sát với ID:", alert);
+    if (!alert.isConfirmed) return;
+    const response = await callAxiosRestApi({
+      instance: loginRequiredAxiosInstance,
+      method: "delete",
+      url: `Survey/core/surveys/${id}`,
+    });
+    if (response && response.success) {
+      navigate(0);
+       toast.success("Xóa khảo sát thành công");
+
     }
   };
 
@@ -514,7 +531,8 @@ const ManageSurveyPage = () => {
                   onEdit={handleEdit}
                   onPublish={handlePublish}
                   onViewDetails={handleViewDetail}
-                  onDelete={handleUnPublished}
+                  onUnPublish={handleUnPublished}
+                  onDelete={handleDelete}
                 />
               ))}
             </div>

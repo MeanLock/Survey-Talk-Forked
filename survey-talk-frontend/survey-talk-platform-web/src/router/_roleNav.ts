@@ -47,8 +47,8 @@ export const _loginNav: {
     isDropDown: true,
     paths: [
       { title: "Quản Lý Điểm", path: "/manage/points" },
-      { title: "Quản Lý Khảo Sát", path: "manage/surveys" },
-      { title: "Quản Lý Data Market", path: "manage/data-market" },
+      { title: "Quản Lý Khảo Sát", path: "/manage/surveys" },
+      { title: "Quản Lý Data Market", path: "/manage/data-market" },
     ],
   },
 ];

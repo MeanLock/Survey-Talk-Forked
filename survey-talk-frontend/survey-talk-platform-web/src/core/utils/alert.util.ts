@@ -51,7 +51,7 @@ export const confirmAlert = (message: string) => {
     showCancelButton: true,
     confirmButtonColor: '#3085d6',
     cancelButtonColor: '#d33',
-    confirmButtonText: 'Yes',
-    cancelButtonText: 'No',
+    confirmButtonText: 'Có',
+    cancelButtonText: 'Không',
   })
 };
