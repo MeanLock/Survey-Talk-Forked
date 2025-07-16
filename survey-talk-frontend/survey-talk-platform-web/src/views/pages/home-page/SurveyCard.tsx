@@ -29,8 +29,10 @@ export const SurveyCard: React.FC<Props> = ({ data }) => {
             <StarsIcon sx={{ color: "#FFC40D" }} />
             <p>{data?.TakerBaseRewardPrice}</p>
             <div className="bonus top-[-15px] right-[-30px]">
-              {data?.CurrentSurveyRewardTracking?.RewardPrice -
-                data?.TakerBaseRewardPrice}
+              {(
+                data?.CurrentSurveyRewardTracking?.RewardPrice -
+                data?.TakerBaseRewardPrice
+              ).toLocaleString("vn")}
             </div>
           </div>
         </div>

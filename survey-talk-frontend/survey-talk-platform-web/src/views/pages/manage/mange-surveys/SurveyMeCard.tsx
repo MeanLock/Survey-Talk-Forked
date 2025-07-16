@@ -8,7 +8,7 @@ import PublishIcon from "@mui/icons-material/Publish";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
-import UnpublishedIcon from '@mui/icons-material/Unpublished';
+import UnpublishedIcon from "@mui/icons-material/Unpublished";
 import { Tooltip } from "@mui/material";
 interface Props {
   data: Survey;
@@ -30,6 +30,9 @@ export const SurveyMeCard: React.FC<Props> = ({
   // FUNCTIONS
   const countTakenResult = (survey: Survey): string => {
     console.log("Survey: ", survey);
+    if (survey.SurveyStatusId !== 2) {
+      return "Khảo sát chưa đăng";
+    }
     const count = survey.CurrentTakenResultCount;
     if (count > 0) {
       return count + "/" + survey.SurveyPrivateData.Kpi + " lượt làm";
@@ -124,7 +127,6 @@ export const SurveyMeCard: React.FC<Props> = ({
                   <DeleteIcon />
                 </IconButton>
               </Tooltip>
-
             </>
           )}
           {data.SurveyStatusId === 2 && (
