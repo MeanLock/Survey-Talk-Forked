@@ -24,7 +24,13 @@ export const BonusTrackingCard: React.FC<BonusTrackingCardProps> = () => {
         return !latest || new Date(item.CreatedAt) > new Date(latest.CreatedAt) ? item : latest;
     }, null as typeof data[0] | null);
 
-    const currentBonus = ((latestTracking?.RewardPrice ?? 0) - (context?.surveyData?.TakerBaseRewardPrice ?? 0)) ;
+   const calculateCurrentBonus = () => {
+    if (data.length === 0) {
+        return context?.surveyData?.TakerBaseRewardPrice ?? 0;
+    }
+    return (latestTracking?.RewardPrice ?? 0) - (context?.surveyData?.TakerBaseRewardPrice ?? 0);
+};
+    const currentBonus = calculateCurrentBonus();
     const chartData = {
         labels: data.map((item) => new Date(item.CreatedAt).toLocaleDateString("vi-VN")),
         datasets: [
@@ -63,7 +69,7 @@ export const BonusTrackingCard: React.FC<BonusTrackingCardProps> = () => {
             <div style={{ height: "180px" }}>
                 <Line data={chartData} options={options} />
             </div>
-           
+
         </div>
     )
 }

@@ -10,7 +10,7 @@ import { API_CONFIG } from "../../../../../../config";
 
 const adminAxiosInstance = axios.create({
   //baseURL:  API_CONFIG.REST_API_BASE_URL,
-  baseURL:  "https://52519d488042.ngrok-free.app/api/",
+  baseURL:  API_CONFIG.REST_API_BASE_URL,
   timeout: 200000,
 });
 

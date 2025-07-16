@@ -37,8 +37,8 @@ export function CashFlowChart({ activeTab }: { activeTab: string }) {
  const getTooltipLabel = (item: PeriodicAccountBalanceCount) => {
   const moneyIn = item.DepositTransactionAmount.toLocaleString('vi-VN') + ' VND';
   const moneyOut = item.WithdrawalTransactionAmount.toLocaleString('vi-VN') + ' VND';
-  
   if (activeTab === 'Daily' || activeTab === 'Weekly') {
+    console.log("Daily or Weekly data:", moneyIn);
     return [
       `Nạp: ${moneyIn}`,
       `Rút: ${moneyOut}`
@@ -121,8 +121,9 @@ export function CashFlowChart({ activeTab }: { activeTab: string }) {
     tooltip: {
       callbacks: {
         label: (context: any) => {
-          return getTooltipLabel(moneyFlowData[context.dataIndex])[context.datasetIndex + 1];
-        },
+ const tooltipLabels = getTooltipLabel(moneyFlowData[context.dataIndex]);
+          // Return the appropriate label based on dataset index (0 for deposits, 1 for withdrawals)
+          return context.datasetIndex === 0 ? tooltipLabels[0] : tooltipLabels[1];        },
         title: (context: any) => {
           const labels = getTooltipLabel(moneyFlowData[context[0].dataIndex]);
           return activeTab === 'Daily' || activeTab === 'Weekly' ? 

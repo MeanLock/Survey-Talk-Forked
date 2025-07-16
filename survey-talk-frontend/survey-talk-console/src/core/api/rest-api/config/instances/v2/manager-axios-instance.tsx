@@ -10,7 +10,7 @@ import { API_CONFIG } from "../../../../../../config";
 
 const managerAxiosInstance = axios.create({
   baseURL: API_CONFIG.REST_API_BASE_URL,
-  timeout: 10000,
+  timeout: 200000,
 });
 
 

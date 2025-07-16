@@ -18,138 +18,17 @@ import {
 } from "@coreui/react"
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community"
 import { Eye } from "phosphor-react"
+import { getBalanceDepositHistory } from "../../../../core/services/payment/account-payment.service"
+import { managerAxiosInstance } from "../../../../core/api/rest-api/config/instances/v2/manager-axios-instance"
 
 ModuleRegistry.registerModules([AllCommunityModule])
 
-// Mock data for withdrawal requests
-export const WithdrawMoneyRequestMockData = [
-  {
-    Id: 1,
-    CustomerName: "Hoàng Minh Lộc",
-    CreateDate: "2025-06-25 ",
-    StatusId: 1,
-    TransferDate: null,
-    TransactionInformations: {
-      Id: 1,
-      BankId: "970415",
-      BankName: "MB",
-      AccountNo: "0896893636",
-      Amount: 50000,
-      AccountName: "HOANG MINH LOC",
-    },
-  },
-  {
-    Id: 2,
-    CustomerName: "Minh Lộc",
-    CreateDate: "2024-01-18 ",
-    StatusId: 2,
-    TransferDate: "2024-01-15 09:15:00",
-    TransactionInformations: {
-      Id: 2,
-      BankId: "970422",
-      BankName: "MB Bank",
-      AccountNo: "9876543210",
-      Amount: 75000,
-      AccountName: "TRAN THI B",
-    },
-  },
-  {
-    Id: 3,
-    CustomerName: "DUONG XUAN BACH",
-    CreateDate: "2024-06-17 ",
-    StatusId: 2,
-    TransferDate: "2024-01-15 ",
-    TransactionInformations: {
-      Id: 3,
-      BankId: "970436",
-      BankName: "Vietcombank",
-      AccountNo: "5555666677",
-      Amount: 10000,
-      AccountName: "LE VAN C",
-    },
-  },
-  {
-    Id: 4,
-    CustomerName: "HOANG MINH LOC",
-    CreateDate: "2024-06-16 ",
-    StatusId: 2,
-    TransferDate: "2024-01-13 08:30:00",
-    TransactionInformations: {
-      Id: 4,
-      BankId: "970418",
-      BankName: "BIDV",
-      AccountNo: "1111222233",
-      Amount: 30000,
-      AccountName: "PHAM THI D",
-    },
-  },
-  {
-    Id: 5,
-    CustomerName: "TRAN QUANG PHAT THINH",
-    CreateDate: "2024-06-17 ",
-    StatusId: 2,
-    TransferDate: "2024-01-15 09:15:00",
-    TransactionInformations: {
-      Id: 5,
-      BankId: "970407",
-      BankName: "Techcombank",
-      AccountNo: "7777888899",
-      Amount: 8500,
-      AccountName: "DANG VAN E",
-    },
-  },
-  {
-    Id: 6,
-    CustomerName: "TRAN QUANG PHAT THINH",
-    CreateDate: "2024-06-17",
-    StatusId: 2,
-    TransferDate: "2024-01-11 14:20:00",
-    TransactionInformations: {
-      Id: 6,
-      BankId: "970432",
-      BankName: "VPBank",
-      AccountNo: "4444555566",
-      Amount: 65000,
-      AccountName: "TRAN QUANG PHAT THINH",
-    },
-  },
-  {
-    Id: 7,
-    CustomerName: "TRAN QUANG PHAT THINH",
-    CreateDate: "2024-06-17 ",
-    StatusId: 2,
-    TransferDate: "2024-01-15 09:15:00",
-    TransactionInformations: {
-      Id: 7,
-      BankId: "970403",
-      BankName: "Sacombank",
-      AccountNo: "2222333344",
-      Amount: 45000,
-      AccountName: "LY VAN G",
-    },
-  },
-  {
-    Id: 8,
-    CustomerName: "TRAN QUANG PHAT THINH",
-    CreateDate: "2024-06-17 ",
-    StatusId: 2,
-    TransferDate: "2024-01-09 10:45:00",
-    TransactionInformations: {
-      Id: 8,
-      BankId: "970448",
-      BankName: "OCB",
-      AccountNo: "8888999900",
-      Amount: 9000,
-      AccountName: "HOANG THI H",
-    },
-  }
-]
 
 type TransactionViewProps = {}
 
 interface TransactionViewContextProps {
   handleDataChange: () => void
-  updateTransactionStatus: (id: number, status: number) => void
+  updateTransactionStatus: (id: string, status: number) => void;
 }
 
 interface GridState {
@@ -164,15 +43,38 @@ interface QRModalProps {
   onConfirm: () => void
   onCancel: () => void
 }
+interface TransactionStatus {
+  Id: number;
+  Name: string;
+}
 
+interface TransactionType {
+  Id: number;
+  Name: string;
+}
+
+interface Account {
+  Id: number;
+  FullName: string;
+  Email: string;
+  Phone: string;
+  MainImageUrl: string;
+}
+
+interface DepositHistory {
+  Id: number;
+  Amount: number;
+  CreatedAt: string;
+  Account: Account;
+  TransactionStatus: TransactionStatus;
+  TransactionType: TransactionType;
+}
 export const TransactionViewContext = createContext<TransactionViewContextProps | null>(null)
 
 const QRModal: FC<QRModalProps> = ({ visible, onClose, transaction, onConfirm, onCancel }) => {
   if (!transaction) return null
 
-  const { BankName, AccountNo, Amount, AccountName } = transaction.TransactionInformations
-  const qrUrl = `https://img.vietqr.io/image/${BankName}-${AccountNo}-compact.png?amount=${Amount}&addInfo=Survey Talk Chuyen Tien&accountName=${AccountName}`
-
+  const qrUrl = `https://img.vietqr.io/image/${transaction.BankId}-${transaction.AccountNo}-compact.png?amount=${transaction.Amount}&addInfo=Survey Talk Chuyen Tien&accountName=${transaction.AccountName}`
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -192,16 +94,16 @@ const QRModal: FC<QRModalProps> = ({ visible, onClose, transaction, onConfirm, o
             <strong>Tên:</strong> {transaction.CustomerName}
           </p>
           <p>
-            <strong>Số tiền rút:</strong> {formatCurrency(Amount)}
+            <strong>Số tiền rút:</strong> {formatCurrency(transaction.Amount)}
           </p>
           <p>
-            <strong>Ngân hàng:</strong> {transaction.TransactionInformations.BankName}
+            <strong>Ngân hàng:</strong> {transaction.BankName}
           </p>
           <p>
-            <strong>Số tài khoản:</strong> {AccountNo}
+            <strong>Số tài khoản:</strong> {transaction.AccountNo}
           </p>
           <p>
-            <strong>Tên tài khoản:</strong> {AccountName}
+            <strong>Tên tài khoản:</strong> {transaction.AccountName}
           </p>
         </div>
 
@@ -218,10 +120,10 @@ const QRModal: FC<QRModalProps> = ({ visible, onClose, transaction, onConfirm, o
         </div>
       </CModalBody>
       <CModalFooter>
-        <CButton color="danger" onClick={onCancel} style={{color:'white'}}>
+        <CButton color="danger" onClick={onCancel} style={{ color: 'white' }}>
           Hủy
         </CButton>
-        <CButton color="success" onClick={onConfirm} style={{color:'white'}}>
+        <CButton color="success" onClick={onConfirm} style={{ color: 'white' }}>
           Xác nhận chuyển thành công
         </CButton>
       </CModalFooter>
@@ -229,7 +131,7 @@ const QRModal: FC<QRModalProps> = ({ visible, onClose, transaction, onConfirm, o
   )
 }
 
-const state_creator = (table: any[], updateStatus: (id: number, status: number) => void) => {
+const state_creator = (table: any[], updateStatus: (id: string, status: number) => void) => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -248,13 +150,13 @@ const state_creator = (table: any[], updateStatus: (id: number, status: number) 
       { headerName: "Họ và Tên", field: "CustomerName", flex: 0.9 },
       {
         headerName: "Số tiền rút",
-        field: "TransactionInformations.Amount",
+        field: "Amount",
         flex: 0.8,
         cellRenderer: (params: any) => {
-          return formatCurrency(params.data.TransactionInformations.Amount)
+          return formatCurrency(params.data.Amount)
         },
       },
-     
+
       {
         headerName: "Thời gian chuyển",
         field: "TransferDate",
@@ -303,14 +205,14 @@ const state_creator = (table: any[], updateStatus: (id: number, status: number) 
   return state
 }
 
-const EyeButton: FC<{ transaction: any; updateStatus: (id: number, status: number) => void }> = ({
+const EyeButton: FC<{ transaction: any; updateStatus: (id: string, status: number) => void }> = ({
   transaction,
   updateStatus,
 }) => {
   const [modalVisible, setModalVisible] = useState(false)
 
   const handleConfirm = () => {
-    updateStatus(transaction.Id, 2)
+    updateStatus(transaction.Id.toString(), 2);
     setModalVisible(false)
   }
 
@@ -338,33 +240,131 @@ const EyeButton: FC<{ transaction: any; updateStatus: (id: number, status: numbe
     </>
   )
 }
+const deposit_state_creator = (transactions: DepositHistory[]) => {
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  };
 
-const TransactionView: FC<TransactionViewProps> = () => {
-  const [state, setState] = useState<GridState | null>(null)
-  const [withdrawalData, setWithdrawalData] = useState(WithdrawMoneyRequestMockData)
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString("vi-VN");
+  };
 
-  const updateTransactionStatus = (id: number, status: number) => {
-    const updatedData = withdrawalData.map((item) => {
-      if (item.Id === id) {
-        return {
-          ...item,
-          StatusId: status,
-          TransferDate: status === 2 ? new Date().toISOString() : null,
+  return {
+    columnDefs: [
+      { headerName: "ID", field: "Id", flex: 0.3 },
+      {
+        headerName: "Người nạp",
+        field: "Account.FullName",
+        flex: 1,
+        valueGetter: (params: any) => params.data.Account.FullName
+      },
+      {
+        headerName: "Số tiền",
+        field: "Amount",
+        flex: 0.8,
+        cellRenderer: (params: any) => formatCurrency(params.data.Amount)
+      },
+      {
+        headerName: "Thời gian",
+        field: "CreatedAt",
+        flex: 1,
+        cellRenderer: (params: any) => formatDate(params.data.CreatedAt)
+      },
+      {
+        headerName: "Trạng thái",
+        field: "TransactionStatus.Name",
+        flex: 0.8,
+        cellClass: "d-flex align-items-center",
+        cellRenderer: (params: any) => {
+          const status = {
+            title: params.data.TransactionStatus.Name === "Chờ xử lý" ? "Chờ xử lý" : "Thành công",
+            color: params.data.TransactionStatus.Id === 2 ? "success" : "warning",
+            bg: "light",
+          };
+          return (
+            <CCard
+              textColor={status.color}
+              style={{ width: "120px" }}
+              className={`text-center fw-bold rounded-pill px-2 border-2 border-${status.color} bg-${status.bg}`}
+            >
+              {status.title}
+            </CCard>
+          );
         }
       }
-      return item
-    })
-    setWithdrawalData(updatedData)
-    setState(state_creator(updatedData, updateTransactionStatus))
-  }
+    ],
+    rowData: transactions
+  };
+};
+const TransactionView: FC<TransactionViewProps> = () => {
+  const [state, setState] = useState<GridState | null>(null)
+  const [withdrawalData, setWithdrawalData] = useState<any[]>([]);
+  const [depositState, setDepositState] = useState<GridState | null>(null);
+  const fetchDepositHistory = async () => {
+    try {
+      const response = await getBalanceDepositHistory(managerAxiosInstance);
+      if (response.success && response.data) {
+        setDepositState(deposit_state_creator(response.data.TransactionHistory));
+      }
+    } catch (error) {
+      console.error('Error fetching deposit history:', error);
+    }
+  };
 
+  const updateTransactionStatus = async (id: string, status: number) => {
+
+    try {
+      const apiUrl = `https://6857de4821f5d3463e566b36.mockapi.io/withdrawalRequests/${id}`;
+      // Prepare updated data
+      const updatedTransaction = {
+        ...withdrawalData.find((item: any) => item.Id === id),
+        StatusId: status,
+        TransferDate: status === 2 ? Math.floor(Date.now() / 1000) : null, // Convert to Unix timestamp
+      };
+
+      // Update API
+      const response = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedTransaction),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update transaction');
+      }
+
+      // Update local state after successful API update
+      const updatedData = withdrawalData.map((item: any) => {
+        if (item.Id === id) {
+          return updatedTransaction;
+        }
+        return item;
+      });
+
+      handleDataChange();
+    } catch (error) {
+      console.error('Error updating transaction:', error);
+      // You might want to add error handling here (e.g., show toast notification)
+    }
+  };
   const handleDataChange = async () => {
-    setState(state_creator(withdrawalData, updateTransactionStatus))
+    const apiUrl = "https://6857de4821f5d3463e566b36.mockapi.io/withdrawalRequests";
+    const res = await fetch(apiUrl);
+    const data = await res.json();
+    setWithdrawalData(data);
+    setState(state_creator(data, updateTransactionStatus)) // Use data directly instead of withdrawalData
   }
 
   useEffect(() => {
     handleDataChange()
-  }, [withdrawalData])
+    fetchDepositHistory();
+
+  }, [])
 
   const defaultColDef = useMemo(() => {
     return {
@@ -398,6 +398,31 @@ const TransactionView: FC<TransactionViewProps> = () => {
               <AgGridReact
                 columnDefs={state.columnDefs}
                 rowData={state.rowData}
+                defaultColDef={defaultColDef}
+                rowHeight={70}
+                headerHeight={40}
+                pagination={true}
+                paginationPageSize={10}
+                paginationPageSizeSelector={[10, 20, 50, 100]}
+                domLayout="autoHeight"
+              />
+            </div>
+          )}
+        </CCol>
+      </CRow>
+      <CRow className="mt-5">
+        <h3 className="transaction__title mb-5">Lịch sử nạp tiền</h3>
+        <CCol xs={12}>
+          {depositState === null ? (
+            <CButton className="w-100" color="secondary" disabled>
+              <CSpinner as="span" size="sm" aria-hidden="true" />
+              Loading...
+            </CButton>
+          ) : (
+            <div id="deposit-table" className="">
+              <AgGridReact
+                columnDefs={depositState.columnDefs}
+                rowData={depositState.rowData}
                 defaultColDef={defaultColDef}
                 rowHeight={70}
                 headerHeight={40}
