@@ -8,6 +8,6 @@ namespace SurveyTalkService.DataAccess.Repositories.interfaces
     {
         Task<IEnumerable<SurveyQuestion>> FindBySurveyIdAndIsDeletedContainAsync(int surveyId, bool isDeletedContain);
 
-        Task DeleteByIdAsync(int id, DateTime? deletedAt = null);
+        Task DeleteByIdAsync(Guid id, DateTime? deletedAt = null);
     }
 }

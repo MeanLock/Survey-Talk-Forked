@@ -2,9 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using SurveyTalkService.API.Controllers.UserControllers;
 using SurveyTalkService.API.Filters.ExceptionFilters;
-using SurveyTalkService.BusinessLogic.DTOs.Survey.Session.V1;
+using SurveyTalkService.BusinessLogic.DTOs.Survey.Session.V2;
 using SurveyTalkService.BusinessLogic.Enums;
 using SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices;
 using SurveyTalkService.BusinessLogic.Services.DbServices.UserServices;

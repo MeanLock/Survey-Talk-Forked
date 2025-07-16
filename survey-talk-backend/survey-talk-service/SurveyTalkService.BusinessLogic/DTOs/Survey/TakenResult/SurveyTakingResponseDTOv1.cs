@@ -16,7 +16,9 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.TakenResult.V1
 
     public class SurveyResponseQuestionContentDTO
     {
-        public int Id { get; set; }
+        // public int Id { get; set; }
+        // [INT --> GUID]
+        public Guid Id { get; set; }
         public string? MainImageUrl { get; set; }
         public int QuestionTypeId { get; set; }
         public string? Content { get; set; }
@@ -40,7 +42,9 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.TakenResult.V1
 
     public class SurveyResponseOptionDTO
     {
-        public int Id { get; set; }
+        // public int Id { get; set; }
+        // [INT --> GUID]
+        public Guid Id { get; set; }
         public string? Content { get; set; }
         public int Order { get; set; }
         public string? MainImageUrl { get; set; }
@@ -51,8 +55,11 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.TakenResult.V1
         public SurveyResponseInputDTO? Input { get; set; }
         public SurveyResponseRangeDTO? Range { get; set; }
         public List<SurveyResponseRankingDTO>? Ranking { get; set; }
-        public int? SingleChoice { get; set; }
-        public List<int>? MultipleChoice { get; set; }
+        // public int? SingleChoice { get; set; }
+        // public List<int>? MultipleChoice { get; set; }
+        // [INT --> GUID]
+        public Guid? SingleChoice { get; set; }
+        public List<Guid>? MultipleChoice { get; set; }
         public string? SpeechText { get; set; }
     }
 
@@ -70,7 +77,9 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.TakenResult.V1
 
     public class SurveyResponseRankingDTO
     {
-        public int SurveyOptionId { get; set; }
+        // public int SurveyOptionId { get; set; }
+        // [INT --> GUID]
+        public Guid SurveyOptionId { get; set; }
         public int RankIndex { get; set; }
     }
 }

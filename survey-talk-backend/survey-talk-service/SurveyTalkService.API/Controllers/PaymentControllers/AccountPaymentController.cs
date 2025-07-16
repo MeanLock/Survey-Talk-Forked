@@ -54,7 +54,58 @@ namespace SurveyTalkService.API.Controllers.PaymentControllers
         [HttpPost("confirm-payment")]
         public async Task ConfirmPayment([FromBody] WebhookType? webhookBody)
         {
-                await _accountPaymentService.ConfirmPayment(webhookBody);
+            await _accountPaymentService.ConfirmPayment(webhookBody);
         }
+
+        // POST /api/Payment/account/balance-withdrawal
+        [HttpPost("balance-withdrawal")]
+        [Authorize(Policy = "CustomerRequiredOnly")]
+        public async Task<IActionResult> WithdrawAccountBalance([FromBody] AccountBalanceWithdrawalDTO accountBalanceWithdrawalDTO)
+        {
+            Account account = HttpContext.Items["LoggedInAccount"] as Account;
+
+
+            await _accountPaymentService.WithdrawAccountBalance(account, accountBalanceWithdrawalDTO);
+
+            return Ok(new
+            {
+                Message = "Yêu cầu rút tiền thành công"
+            });
+        }
+
+        // GET /api/Payment/account/balance-deposits/history
+        [HttpGet("balance-deposits/history")]
+        [Authorize(Policy = "UserTransactionReportAccess")]
+        public async Task<IActionResult> GetAccountBalanceDepositHistory()
+        {
+            Account account = HttpContext.Items["LoggedInAccount"] as Account;
+
+            var history = await _accountPaymentService.GetAccountBalanceDepositHistory(account);
+
+            return Ok(new
+            {
+                Message = "Lấy lịch sử nạp tiền thành công",
+                TransactionHistory = history
+            });
+        }
+
+        // GET /api/Payment/account/balance-withdrawal/history
+        [HttpGet("balance-withdrawal/history")]
+        [Authorize(Policy = "UserTransactionReportAccess")]
+        public async Task<IActionResult> GetAccountBalanceWithdrawalHistory()
+        {
+            Account account = HttpContext.Items["LoggedInAccount"] as Account;
+
+            var history = await _accountPaymentService.GetAccountBalanceWithdrawalHistory(account);
+
+            return Ok(
+                new
+                {
+                    Message = "Lấy lịch sử rút tiền thành công",
+                    TransactionHistory = history
+                }
+            );
+        }
+
     }
 }

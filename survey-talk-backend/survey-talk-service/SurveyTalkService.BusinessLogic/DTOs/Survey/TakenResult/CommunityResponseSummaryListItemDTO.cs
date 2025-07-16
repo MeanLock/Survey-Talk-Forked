@@ -11,7 +11,9 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.TakenResult
 
     public class CommunityResponseSummarySurveyQuestionDTO
     {
-        public int Id { get; set; }
+        // public int Id { get; set; }
+        // [INT --> GUID]
+        public Guid Id { get; set; }
         public int SurveyId { get; set; }
         public int QuestionTypeId { get; set; }
         public string Content { get; set; } = string.Empty;
@@ -27,8 +29,12 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.TakenResult
 
     public class CommunityResponseSummarySurveyOptionDTO
     {
-        public int Id { get; set; }
-        public int SurveyQuestionId { get; set; }
+        // public int Id { get; set; }
+        // [INT --> GUID]
+        public Guid Id { get; set; }
+        // public int SurveyQuestionId { get; set; }
+        // [INT --> GUID]
+        public Guid SurveyQuestionId { get; set; }
         public string Content { get; set; } = string.Empty;
         public int Order { get; set; }
         public string MainImageUrl { get; set; } = string.Empty;

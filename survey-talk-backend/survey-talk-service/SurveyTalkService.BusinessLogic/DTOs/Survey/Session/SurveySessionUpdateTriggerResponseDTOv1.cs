@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SurveyTalkService.BusinessLogic.DTOs.Survey.Session.V1
+namespace SurveyTalkService.BusinessLogic.DTOs.Survey.Session.V2
 {
     public class SurveySessionUpdateTriggerResponseDTO
     {

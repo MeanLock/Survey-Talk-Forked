@@ -45,7 +45,9 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.Session.V2
         public string? MainImageBase64 { get; set; } // [field cập nhật]
         public int? Version { get; set; }
         public bool? IsReanswerRequired { get; set; } // [field cập nhật]
-        public int? ReferenceSurveyQuestionId { get; set; } // [field cập nhật]
+        // public int? ReferenceSurveyQuestionId { get; set; } // [field cập nhật]
+        // [INT --> GUID]
+        public Guid? ReferenceSurveyQuestionId { get; set; } // [field cập nhật]
         public string? Content { get; set; } // [field cập nhật]
         public string? Description { get; set; } // [field cập nhật]
         public int? TimeLimit { get; set; } // [field cập nhật]
@@ -78,30 +80,42 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.Session.V2
     public class SurveyEditingSessionDisplayLogicDTO
     {
         public List<SurveyEditingSessionDisplayLogicConditionDTO>? Conditions { get; set; }
-        public int TargetQuestionOrder { get; set; }
+        // public int TargetQuestionOrder { get; set; }
+        // [INT --> GUID]
+        public Guid? TargetQuestionId { get; set; }
     }
 
     public class SurveyEditingSessionDisplayLogicConditionDTO
     {
-        public int QuestionOrder { get; set; }
+        // public int QuestionOrder { get; set; }
+        // [INT --> GUID]
+        public Guid QuestionId { get; set; }
         public string? Conjunction { get; set; }
         public string? Operator { get; set; }
-        public int? OptionOrder { get; set; }
+        // public int? OptionOrder { get; set; }
+        // [INT --> GUID]
+        public Guid? OptionId { get; set; }
         public int? CompareValue { get; set; }
     }
 
     public class SurveyEditingSessionJumpLogicDTO
     {
         public List<SurveyEditingSessionJumpLogicConditionDTO>? Conditions { get; set; }
-        public int TargetQuestionOrder { get; set; }
+        // public int TargetQuestionOrder { get; set; }
+        // [INT --> GUID]
+        public Guid? TargetQuestionId { get; set; }
     }
 
     public class SurveyEditingSessionJumpLogicConditionDTO
     {
-        public int QuestionOrder { get; set; }
+        // public int QuestionOrder { get; set; }
+        // [INT --> GUID]
+        public Guid QuestionId { get; set; }
         public string? Conjunction { get; set; }
         public string? Operator { get; set; }
-        public int? OptionOrder { get; set; }
+        // public int? OptionOrder { get; set; }
+        // [INT --> GUID]
+        public Guid? OptionId { get; set; }
         public int? CompareValue { get; set; }
     }
 

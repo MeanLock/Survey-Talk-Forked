@@ -77,7 +77,7 @@ namespace SurveyTalkService.API.Controllers.UserControllers
 
         // PUT /api/User/accounts/{AccountId}
         [HttpPut("{accountId}")]
-        [Authorize(Policy = "AdminOrManagerRequired")]
+        [Authorize(Policy = "LoginRequired")]
         public async Task<IActionResult> UpdateAccount(int accountId, [FromBody] AccountUpdateDTO data)
         {
             int userId = int.Parse(User.FindFirst("id")?.Value);
@@ -86,14 +86,21 @@ namespace SurveyTalkService.API.Controllers.UserControllers
 
             if (userRoleId == 1)
             {
-                if (account.Role.Id == 1 && account.Id != userId)
+                if (account.Role.Id != 1 || account.Id != userId)
                 {
                     return Forbid();
                 }
             }
             else if (userRoleId == 2)
             {
-                if (account.Role.Id == 1 || account.Role.Id == 2)
+                if (account.Role.Id != 1 && account.Role.Id != 2 )
+                {
+                    return Forbid();
+                }
+            }
+            else if (userRoleId == 4)
+            {
+                if (account.Role.Id != 1 && account.Role.Id != 2 && account.Role.Id != 4)
                 {
                     return Forbid();
                 }

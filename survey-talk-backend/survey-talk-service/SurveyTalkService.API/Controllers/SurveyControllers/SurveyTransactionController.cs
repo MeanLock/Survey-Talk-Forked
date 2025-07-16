@@ -52,6 +52,20 @@ namespace SurveyTalkService.API.Controllers.SurveyControllers
                 Message = "Đăng community survey thành công",
             });
         }
+
+        // GET /api/Survey/transaction/community/survey-taken-earn/history
+        [HttpGet("community/survey-taken-earn/history")]
+        [Authorize(Policy = "UserTransactionReportAccess")]
+        public async Task<IActionResult> GetSurveyTakenEarnHistory([FromQuery] int? page = 1, [FromQuery] int? pageSize = 10)
+        {
+            Account account = HttpContext.Items["LoggedInAccount"] as Account;
+            var history = await _surveyTransactionService.GetSurveyTakenEarnHistory(account);
+            return Ok(new
+            {
+                Message = "Lấy lịch sử kiếm tiền từ survey thành công",
+                TransactionHistory = history
+            });
+        }
             
 
         // // POST /api/Survey/core/filter/surveys

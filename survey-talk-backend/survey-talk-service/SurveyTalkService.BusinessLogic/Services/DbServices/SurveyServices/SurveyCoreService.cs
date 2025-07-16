@@ -20,6 +20,7 @@ using SurveyTalkService.BusinessLogic.DTOs.Survey.JsonConfigs;
 using SurveyTalkService.BusinessLogic.DTOs.FilterTag;
 using SurveyTalkService.BusinessLogic.Services.EmbeddingVectorServices;
 using SurveyTalkService.BusinessLogic.DTOs.Survey.Publishment;
+using SurveyTalkService.BusinessLogic.Exceptions;
 
 namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
 {
@@ -626,16 +627,32 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                             CreatedAt = survey.CreatedAt,
                             UpdatedAt = survey.UpdatedAt
                         },
-                        SurveyTakenResults = surveyTakenResults.Select(str => new SurveyTakenResultListItemDTO
+                        SurveyTakenResults = (await Task.WhenAll(surveyTakenResults.Select(async str => new SurveyTakenResultListItemDTO
                         {
                             Id = str.Id,
                             IsValid = str.IsValid,
                             CompletedAt = str.CompletedAt,
+                            InvalidReason = str.InvalidReason,
+                            MoneyEarned = str.MoneyEarned,
+                            XpEarned = str.XpEarned,
                             Taker = new TakerListItemDTO
                             {
-                                Id = str.Taker.Id
+                                Id = str.Taker.Id,
+                                FullName = str.Taker.FullName,
+                                Dob = str.Taker.Dob,
+                                Gender = str.Taker.Gender,
+                                MainImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.ACCOUNt_IMAGE_PATH, str.Taker.Id.ToString(), "main")
                             },
-                        }).ToList(),
+                        }))).ToList(),
+                        SurveyRewardTrackings = survey.SurveyRewardTrackings.Select(srt => new SurveyRewardTracking
+                        {
+                            Id = srt.Id,
+                            SurveyId = srt.SurveyId,
+                            RewardPrice = srt.RewardPrice,
+                            RewardXp = srt.RewardXp,
+                            CreatedAt = srt.CreatedAt
+                        }).OrderByDescending(sst => sst.CreatedAt)
+                            .ToList(),
                     };
                     return communitySurveyDetail as T;
                 }
@@ -1091,6 +1108,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                         Description = "",
                         IsAvailable = false,
                         // ConfigJsonString = _surveyConfig.DefaultSurveyConfigJson.ToString(),
+                        SecurityModeId = 1, // Default security mode
                         ConfigJsonString = await GetDefaultSurveyConfigJsonString(),
                     };
 
@@ -1355,6 +1373,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                         CreatedAt = surveyPrivateData.CreatedAt,
                         UpdatedAt = surveyPrivateData.UpdatedAt,
                     };
+                    communitySurveyDetail.SurveyRewardTrackings = [];
                 }
 
                 return communitySurveyDetail;
@@ -1565,6 +1584,116 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
             {
                 Console.WriteLine("\n" + ex.StackTrace + "\n");
                 throw new HttpRequestException("Lấy danh sách tag tóm tắt của người tham gia khảo sát thất bại, lỗi: " + ex.Message);
+            }
+        }
+
+        public async Task DeleteSurvey(int surveyId, Account account)
+        {
+            using (var transaction = await _appDbContext.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    SurveyFilterObject surveyFilterObject = new SurveyFilterObject { };
+
+                    Survey survey = await _unitOfWork.SurveyRepository.FindByIdAndFilterObjectAsync(surveyId, surveyFilterObject);
+                    if (survey == null)
+                    {
+                        // return new SurveySessionUpdateTriggerResponseDTO("survey không tồn tại", false);
+                        throw new ForbiddenException("survey không tồn tại");
+                    }
+                    var currentSurveyStatus = await _unitOfWork.SurveyRepository.GetLatestSurveyStatusTrackingBySurveyIdAsync(survey.Id);
+                    if (currentSurveyStatus == null)
+                    {
+                        // return new SurveySessionUpdateTriggerResponseDTO("không tìm thấy trạng thái survey", false);
+                        throw new ForbiddenException("không tìm thấy trạng thái survey");
+                    }
+
+
+                    // kiêm tra quyền
+                    if (survey.SurveyTypeId == 1 && account.RoleId != 2 && account.RoleId != 3)
+                    {
+                        throw new ForbiddenException("không có quyền xoá survey này");
+                    }
+                    else if (survey.SurveyTypeId == 2 && account.RoleId != 4)
+                    {
+                        throw new ForbiddenException("không có quyền xoá survey này");
+                    }
+                    else if (survey.SurveyTypeId == 3 && account.RoleId != 2 && account.RoleId != 3)
+                    {
+                        throw new ForbiddenException("không có quyền xoá survey này");
+                    }
+
+
+
+
+                    if (survey.SurveyTypeId == 1 )
+                    {
+                        // kiểm tra survey status
+                        if (currentSurveyStatus?.SurveyStatusId == 2)
+                        {
+                            throw new ForbiddenException("không được phép xoá survey ở thời điểm hiện tại vì nó đã được đăng tải");
+                        }
+
+                        try
+                        {
+                            survey.DeletedAt = _dateHelpers.GetNowByAppTimeZone();
+                            SurveyStatusTracking surveyStatusTracking = new SurveyStatusTracking
+                            {
+                                SurveyId = survey.Id,
+                                SurveyStatusId = 4, // Deleted status
+                            };
+                            await _surveyGenericRepository.UpdateAsync(survey.Id, survey);
+                            await _surveyStatusTrackingGenericRepository.CreateAsync(surveyStatusTracking);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("\n" + ex.Message + "\n");
+                            Console.WriteLine("\n" + ex.StackTrace + "\n");
+                            throw new Exception(ex.Message);
+                        }
+
+                    }
+                    else if (survey.SurveyTypeId == 2)
+                    {
+                        // kiểm tra requester id
+                        if (survey.RequesterId != account.Id || survey.RequesterId != account.Id || survey.RequesterId != survey.RequesterId)
+                        {
+                            throw new ForbiddenException("chỉ có người tạo survey này mới có quyền xoá");
+                        }
+
+
+                        try
+                        {
+                            survey.DeletedAt = _dateHelpers.GetNowByAppTimeZone();
+                            SurveyStatusTracking surveyStatusTracking = new SurveyStatusTracking
+                            {
+                                SurveyId = survey.Id,
+                                SurveyStatusId = 4, // Deleted status
+                            };
+                            await _surveyGenericRepository.UpdateAsync(survey.Id, survey);
+                            await _surveyStatusTrackingGenericRepository.CreateAsync(surveyStatusTracking);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("\n" + ex.Message + "\n");
+                            Console.WriteLine("\n" + ex.StackTrace + "\n");
+                            throw new Exception(ex.Message);
+                        }
+
+                    }
+                    else
+                    {
+                        throw new Exception("không xác định");
+                    }
+
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    Console.WriteLine("\n" + ex.StackTrace + "\n");
+                    throw new HttpRequestException("Xoá survey thất bại, lỗi: " + ex.Message);
+                }
             }
         }
 

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SurveyTalkService.BusinessLogic.DTOs.Survey.Session
+namespace SurveyTalkService.BusinessLogic.DTOs.Survey.Session.V2
 {
     public class SurveyTakingSessionDTO
     {
@@ -38,7 +38,9 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.Session
 
     public class SurveyTakingSessionQuestionDTO
     {
-        public int Id { get; set; }
+        // public int Id { get; set; }
+        // [INT --> GUID]
+        public Guid Id { get; set; }
         public int QuestionTypeId { get; set; }
         public int? Version { get; set; }
         public string? MainImageUrl { get; set; }
@@ -74,27 +76,37 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.Session
     public class SurveyTakingSessionDisplayLogicDTO
     {
         public List<SurveyTakingSessionLogicConditionDTO>? Conditions { get; set; }
-        public int TargetQuestionId { get; set; }
+        // public int TargetQuestionId { get; set; }
+        // [INT --> GUID]
+        public Guid? TargetQuestionId { get; set; }
     }
 
     public class SurveyTakingSessionJumpLogicDTO
     {
         public List<SurveyTakingSessionLogicConditionDTO>? Conditions { get; set; }
-        public int TargetQuestionId { get; set; }
+        // public int TargetQuestionId { get; set; }
+        // [INT --> GUID]
+        public Guid? TargetQuestionId { get; set; }
     }
 
     public class SurveyTakingSessionLogicConditionDTO
     {
-        public int QuestionId { get; set; }
+        // public int QuestionId { get; set; }
+        // [INT --> GUID]
+        public Guid QuestionId { get; set; }
         public string? Conjunction { get; set; }
         public string? Operator { get; set; }
-        public int? OptionId { get; set; }
+        // public int? OptionId { get; set; }
+        // [INT --> GUID]
+        public Guid? OptionId { get; set; }
         public int? CompareValue { get; set; }
     }
 
     public class SurveyTakingSessionOptionDTO
     {
-        public int Id { get; set; }
+        // public int Id { get; set; }
+        // [INT --> GUID]
+        public Guid? Id { get; set; }
         public string? Content { get; set; }
         public int Order { get; set; }
         public string? MainImageUrl { get; set; }

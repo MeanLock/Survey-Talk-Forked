@@ -24,7 +24,7 @@ namespace SurveyTalkService.DataAccess.Repositories
                 .ToListAsync();
         }
 
-        public async Task DeleteByIdAsync(int id, DateTime? deletedAt = null)
+        public async Task DeleteByIdAsync(Guid id, DateTime? deletedAt = null)
         {
             var surveyQuestion = await _appDbContext.SurveyQuestions.FindAsync(id);
             if (surveyQuestion == null)

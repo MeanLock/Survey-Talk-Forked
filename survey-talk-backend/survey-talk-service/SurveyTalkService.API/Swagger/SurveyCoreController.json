@@ -147,7 +147,7 @@
         "method": "DELETE",
         "url": "/api/Survey/core/surveys/{SurveyId}",
         "description": "Xóa survey tuỳ loại",
-        "completed": false
+        "completed": true
     },
     {
         "method": "GET",

@@ -53,112 +53,121 @@ namespace SurveyTalkService.BusinessLogic.Services.OpenAIServices._4oMini
             AccountProfile accountProfile,
             List<SurveyTopicFavorite> surveyTopicFavorites)
         {
-            // Chuẩn bị function schema cho OpenAI function calling (giữ nguyên như GetFilterTagSummariesAsync)
-            var functionSchema = new JObject
+            try
             {
-                ["name"] = "summarize_filter_tags",
-                ["description"] = "Tóm tắt ngắn gọn tiếng Việt cho từng filter tag dựa trên response, profile, favorite topic.",
-                ["parameters"] = new JObject
+                // Chuẩn bị function schema cho OpenAI function calling (giữ nguyên như GetFilterTagSummariesAsync)
+                var functionSchema = new JObject
                 {
-                    ["type"] = "object",
-                    ["properties"] = new JObject
+                    ["name"] = "summarize_filter_tags",
+                    ["description"] = "Tóm tắt ngắn gọn tiếng Việt cho từng filter tag dựa trên response, profile, favorite topic.",
+                    ["parameters"] = new JObject
                     {
-                        ["result"] = new JObject
+                        ["type"] = "object",
+                        ["properties"] = new JObject
                         {
-                            ["type"] = "array",
-                            ["items"] = new JObject
+                            ["result"] = new JObject
                             {
-                                ["type"] = "object",
-                                ["properties"] = new JObject
+                                ["type"] = "array",
+                                ["items"] = new JObject
                                 {
-                                    ["FilterTagId"] = new JObject { ["type"] = "integer" },
-                                    ["Summary"] = new JObject { ["type"] = "string", ["description"] = "Tóm tắt ngắn gọn tiếng Việt hoặc null nếu không liên quan." }
-                                },
-                                ["required"] = new JArray { "FilterTagId", "Summary" }
+                                    ["type"] = "object",
+                                    ["properties"] = new JObject
+                                    {
+                                        ["FilterTagId"] = new JObject { ["type"] = "integer" },
+                                        ["Summary"] = new JObject { ["type"] = "string", ["description"] = "Tóm tắt ngắn gọn tiếng Việt hoặc null nếu không liên quan." }
+                                    },
+                                    ["required"] = new JArray { "FilterTagId", "Summary" }
+                                }
                             }
-                        }
+                        },
+                        ["required"] = new JArray { "result" }
+                    }
+                };
+
+                // Modify data
+                accountProfile.Account = null;
+                surveyTopicFavorites = surveyTopicFavorites.Select(f => new SurveyTopicFavorite
+                {
+                    SurveyTopicId = f.SurveyTopicId,
+                    FavoriteScore = f.FavoriteScore,
+                    SurveyTopic = new SurveyTopic
+                    {
+                        Name = f.SurveyTopic.Name,
                     },
-                    ["required"] = new JArray { "result" }
-                }
-            };
-
-            // Modify data
-            accountProfile.Account = null;
-            surveyTopicFavorites = surveyTopicFavorites.Select(f => new SurveyTopicFavorite
-            {
-                SurveyTopicId = f.SurveyTopicId,
-                FavoriteScore = f.FavoriteScore,
-                SurveyTopic = new SurveyTopic
+                }).ToList();
+                filterTags = filterTags.Select(tag => new FilterTag
                 {
-                    Name = f.SurveyTopic.Name,
-                },
-            }).ToList();
-            filterTags = filterTags.Select(tag => new FilterTag
-            {
-                Id = tag.Id,
-                FilterTagTypeId = tag.FilterTagTypeId,
-                Name = tag.Name,
-                FilterTagType = new FilterTagType
+                    Id = tag.Id,
+                    FilterTagTypeId = tag.FilterTagTypeId,
+                    Name = tag.Name,
+                    FilterTagType = new FilterTagType
+                    {
+                        Id = tag.FilterTagType.Id,
+                        Name = tag.FilterTagType.Name
+                    }
+                }).ToList();
+
+                // Format data
+                var filterTagsJson = JArray.FromObject(filterTags).ToString();
+                var surveyResponsesJson = surveyResponses.ToString();
+                var accountProfileJson = JObject.FromObject(accountProfile).ToString();
+                var surveyTopicFavoritesJson = JArray.FromObject(surveyTopicFavorites).ToString();
+                var accountInfoJson = JObject.FromObject(new { account.Dob, account.Gender }).ToString();
+
+
+
+                // Chuẩn bị prompt
+                var prompt = $@"Bạn là AI chuyên phân tích survey. Dưới đây là danh sách filter tag, danh sách response của 1 người dùng cho filter survey, thông tin profile, các chủ đề yêu thích và thông tin tài khoản (gồm ngày sinh và giới tính). Hãy chú ý sử dụng thông tin ngày sinh (dob) và giới tính (gender) của account để tóm tắt chính xác, phù hợp ngữ cảnh cá nhân hóa cho từng filter tag. Hãy trả về 1 mảng JSON, mỗi phần tử gồm FilterTagId và Summary tiếng Việt thật ngắn gọn, súc tích, đủ ý (không cần diễn giải chi tiết, không lặp lại nội dung câu hỏi), tóm tắt dựa trên response, profile, favorite topic và thông tin account. Nếu ở tag nào đó không được đề cập trong các yếu tố đầu vào (hoặc không chất lọc được thông tin) thì Summary phải để null, bạn buộc phải tuân theo rule này (không được viết các câu kiểu như 'không có thông tin', 'không có dữ liệu', 'không có', 'không rõ', v.v.). Không tự chế thêm tag, chỉ dùng đúng filterTagId đã cho. Kết quả trả về đúng format function calling OpenAI yêu cầu.\n\nfilterTags: {filterTagsJson}\nsurveyResponses: {surveyResponsesJson}\naccountProfile: {accountProfileJson}\nsurveyTopicFavorites: {surveyTopicFavoritesJson}\naccount: {accountInfoJson}";
+
+                // Chuẩn bị request body cho OpenAI
+                var body = new JObject
                 {
-                    Id = tag.FilterTagType.Id,
-                    Name = tag.FilterTagType.Name
-                }
-            }).ToList();
-
-            // Format data
-            var filterTagsJson = JArray.FromObject(filterTags).ToString();
-            var surveyResponsesJson = surveyResponses.ToString();
-            var accountProfileJson = JObject.FromObject(accountProfile).ToString();
-            var surveyTopicFavoritesJson = JArray.FromObject(surveyTopicFavorites).ToString();
-            var accountInfoJson = JObject.FromObject(new { account.Dob, account.Gender }).ToString();
-
-
-
-            // Chuẩn bị prompt
-            var prompt = $@"Bạn là AI chuyên phân tích survey. Dưới đây là danh sách filter tag, danh sách response của 1 người dùng cho filter survey, thông tin profile, các chủ đề yêu thích và thông tin tài khoản (gồm ngày sinh và giới tính). Hãy chú ý sử dụng thông tin ngày sinh (dob) và giới tính (gender) của account để tóm tắt chính xác, phù hợp ngữ cảnh cá nhân hóa cho từng filter tag. Hãy trả về 1 mảng JSON, mỗi phần tử gồm FilterTagId và Summary tiếng Việt thật ngắn gọn, súc tích, đủ ý (không cần diễn giải chi tiết, không lặp lại nội dung câu hỏi), tóm tắt dựa trên response, profile, favorite topic và thông tin account. Nếu ở tag nào đó không được đề cập trong các yếu tố đầu vào (hoặc không chất lọc được thông tin) thì Summary phải để null, bạn buộc phải tuân theo rule này (không được viết các câu kiểu như 'không có thông tin', 'không có dữ liệu', 'không có', 'không rõ', v.v.). Không tự chế thêm tag, chỉ dùng đúng filterTagId đã cho. Kết quả trả về đúng format function calling OpenAI yêu cầu.\n\nfilterTags: {filterTagsJson}\nsurveyResponses: {surveyResponsesJson}\naccountProfile: {accountProfileJson}\nsurveyTopicFavorites: {surveyTopicFavoritesJson}\naccount: {accountInfoJson}";
-
-            // Chuẩn bị request body cho OpenAI
-            var body = new JObject
-            {
-                ["model"] = _openAIConfig.BaseModel,
-                ["messages"] = new JArray
+                    ["model"] = _openAIConfig.BaseModel,
+                    ["messages"] = new JArray
         {
             new JObject { ["role"] = "system", ["content"] = "Bạn là AI chuyên phân tích survey và trả về JSON cho BE xử lý." },
             new JObject { ["role"] = "user", ["content"] = prompt }
         },
-                ["functions"] = new JArray { functionSchema },
-                ["function_call"] = new JObject { ["name"] = "summarize_filter_tags" }
-            };
+                    ["functions"] = new JArray { functionSchema },
+                    ["function_call"] = new JObject { ["name"] = "summarize_filter_tags" }
+                };
 
-            using (var httpClient = new HttpClient())
-            {
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _openAIConfig.ApiKey);
-                httpClient.BaseAddress = new Uri(_openAIConfig.BaseUrl);
-                var content = new StringContent(body.ToString(), Encoding.UTF8, "application/json");
-                var response = await httpClient.PostAsync("/v1/chat/completions", content);
-                response.EnsureSuccessStatusCode();
-                var responseString = await response.Content.ReadAsStringAsync();
-                var responseJson = JObject.Parse(responseString);
-                var functionCall = responseJson["choices"]?[0]?["message"]?["function_call"];
-                List<SummarizedFilterTagDTO> resultList = null;
-                if (functionCall != null && functionCall["arguments"] != null && !string.IsNullOrEmpty(functionCall["arguments"]?.ToString()))
+                using (var httpClient = new HttpClient())
                 {
-                    var arguments = functionCall["arguments"].ToString();
-                    var resultObj = JObject.Parse(arguments);
-                    if (resultObj["result"] != null)
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _openAIConfig.ApiKey);
+                    httpClient.BaseAddress = new Uri(_openAIConfig.BaseUrl);
+                    var content = new StringContent(body.ToString(), Encoding.UTF8, "application/json");
+                    var response = await httpClient.PostAsync("/v1/chat/completions", content);
+                    response.EnsureSuccessStatusCode();
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    var responseJson = JObject.Parse(responseString);
+                    var functionCall = responseJson["choices"]?[0]?["message"]?["function_call"];
+                    List<SummarizedFilterTagDTO> resultList = null;
+                    if (functionCall != null && functionCall["arguments"] != null && !string.IsNullOrEmpty(functionCall["arguments"]?.ToString()))
                     {
-                        resultList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<SummarizedFilterTagDTO>>(resultObj["result"].ToString());
+                        var arguments = functionCall["arguments"].ToString();
+                        var resultObj = JObject.Parse(arguments);
+                        if (resultObj["result"] != null)
+                        {
+                            resultList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<SummarizedFilterTagDTO>>(resultObj["result"].ToString());
+                        }
                     }
+                    // Đảm bảo trả về đủ các tag, kể cả summary null
+                    var resultDict = resultList?.ToDictionary(x => x.FilterTagId) ?? new Dictionary<int, SummarizedFilterTagDTO>();
+                    var fullResult = filterTags.Select(tag =>
+                        resultDict.TryGetValue(tag.Id, out var summary)
+                            ? summary
+                            : new SummarizedFilterTagDTO { FilterTagId = tag.Id, Summary = null }
+                    ).ToList();
+                    return fullResult;
                 }
-                // Đảm bảo trả về đủ các tag, kể cả summary null
-                var resultDict = resultList?.ToDictionary(x => x.FilterTagId) ?? new Dictionary<int, SummarizedFilterTagDTO>();
-                var fullResult = filterTags.Select(tag =>
-                    resultDict.TryGetValue(tag.Id, out var summary)
-                        ? summary
-                        : new SummarizedFilterTagDTO { FilterTagId = tag.Id, Summary = null }
-                ).ToList();
-                return fullResult;
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("\n" + ex.StackTrace + "\n");
+                throw new Exception($"lỗi trong hàm GetSummarizedDefaultFilterTagAsync {ex.Message}, dòng {new StackTrace(ex, true).GetFrame(0).GetFileLineNumber()}");
+            }
+
         }
 
         /// <summary>
@@ -172,94 +181,104 @@ namespace SurveyTalkService.BusinessLogic.Services.OpenAIServices._4oMini
             JArray surveyResponses
             )
         {
-            var functionSchema = new JObject
+            try
             {
-                ["name"] = "summarize_additional_filter_tags",
-                ["description"] = "Tóm tắt ngắn gọn tiếng Việt cho từng additional filter tag dựa trên surveyResponses, phản ánh tần suất và xu hướng hoạt động của người dùng trên nền tảng.",
-                ["parameters"] = new JObject
+                var functionSchema = new JObject
                 {
-                    ["type"] = "object",
-                    ["properties"] = new JObject
+                    ["name"] = "summarize_additional_filter_tags",
+                    ["description"] = "Tóm tắt ngắn gọn tiếng Việt cho từng additional filter tag dựa trên surveyResponses, phản ánh tần suất và xu hướng hoạt động của người dùng trên nền tảng.",
+                    ["parameters"] = new JObject
                     {
-                        ["result"] = new JObject
+                        ["type"] = "object",
+                        ["properties"] = new JObject
                         {
-                            ["type"] = "array",
-                            ["items"] = new JObject
+                            ["result"] = new JObject
                             {
-                                ["type"] = "object",
-                                ["properties"] = new JObject
+                                ["type"] = "array",
+                                ["items"] = new JObject
                                 {
-                                    ["FilterTagId"] = new JObject { ["type"] = "integer" },
-                                    ["Summary"] = new JObject { ["type"] = "string", ["description"] = "Tóm tắt ngắn gọn tiếng Việt hoặc null nếu không liên quan." }
-                                },
-                                ["required"] = new JArray { "FilterTagId", "Summary" }
+                                    ["type"] = "object",
+                                    ["properties"] = new JObject
+                                    {
+                                        ["FilterTagId"] = new JObject { ["type"] = "integer" },
+                                        ["Summary"] = new JObject { ["type"] = "string", ["description"] = "Tóm tắt ngắn gọn tiếng Việt hoặc null nếu không liên quan." }
+                                    },
+                                    ["required"] = new JArray { "FilterTagId", "Summary" }
+                                }
                             }
-                        }
-                    },
-                    ["required"] = new JArray { "result" }
-                }
-            };
+                        },
+                        ["required"] = new JArray { "result" }
+                    }
+                };
 
-            // Modify data
-            filterTags = filterTags.Select(tag => new FilterTag
-            {
-                Id = tag.Id,
-                FilterTagTypeId = tag.FilterTagTypeId,
-                Name = tag.Name,
-                FilterTagType = new FilterTagType
+                // Modify data
+                filterTags = filterTags.Select(tag => new FilterTag
                 {
-                    Id = tag.FilterTagType.Id,
-                    Name = tag.FilterTagType.Name
-                }
-            }).ToList();
+                    Id = tag.Id,
+                    FilterTagTypeId = tag.FilterTagTypeId,
+                    Name = tag.Name,
+                    FilterTagType = new FilterTagType
+                    {
+                        Id = tag.FilterTagType.Id,
+                        Name = tag.FilterTagType.Name
+                    }
+                }).ToList();
 
-            // Format data
-            var filterTagsJson = JArray.FromObject(filterTags).ToString();
-            var surveyResponsesJson = surveyResponses.ToString();
+                // Format data
+                var filterTagsJson = JArray.FromObject(filterTags).ToString();
+                var surveyResponsesJson = surveyResponses.ToString();
+                // Console.WriteLine("surveyResponsesJson: "+ surveyResponsesJson);
 
-            var prompt = $@"Bạn là AI chuyên phân tích survey. Dưới đây là danh sách additional filter tag và danh sách response của một lần làm survey của người dùng. Hãy trả về 1 mảng JSON, mỗi phần tử gồm FilterTagId và Summary tiếng Việt thật ngắn gọn, súc tích, đủ ý, phản ánh tần suất và xu hướng hoạt động của người dùng trên nền tảng dựa trên các response này. Nếu ở tag nào đó không được đề cập trong các yếu tố đầu vào (hoặc không chất lọc được thông tin) thì Summary phải để null, bạn buộc phải tuân theo rule này (không được viết các câu kiểu như 'không có thông tin', 'không có dữ liệu', 'không có', 'không rõ', v.v.). Không tự chế thêm tag, chỉ dùng đúng FilterTagId đã cho. Kết quả trả về đúng format function calling OpenAI yêu cầu.\n\nfilterTags: {filterTagsJson}\nsurveyResponses: {surveyResponsesJson}";
+                var prompt = $@"Bạn là AI chuyên phân tích survey. Dưới đây là danh sách additional filter tag và danh sách response của một lần làm survey của người dùng. Hãy trả về 1 mảng JSON, mỗi phần tử gồm FilterTagId và Summary tiếng Việt thật ngắn gọn, súc tích, đủ ý, phản ánh tần suất và xu hướng hoạt động của người dùng trên nền tảng dựa trên các response này. Nếu ở tag nào đó không được đề cập trong các yếu tố đầu vào (hoặc không chất lọc được thông tin) thì Summary phải để null, bạn buộc phải tuân theo rule này (không được viết các câu kiểu như 'không có thông tin', 'không có dữ liệu', 'không có', 'không rõ', v.v.). Không tự chế thêm tag, chỉ dùng đúng FilterTagId đã cho. Kết quả trả về đúng format function calling OpenAI yêu cầu.\n\nfilterTags: {filterTagsJson}\nsurveyResponses: {surveyResponsesJson}";
 
-            var body = new JObject
-            {
-                ["model"] = _openAIConfig.BaseModel,
-                ["messages"] = new JArray
+                var body = new JObject
+                {
+                    ["model"] = _openAIConfig.BaseModel,
+                    ["messages"] = new JArray
                 {
                     new JObject { ["role"] = "system", ["content"] = "Bạn là AI chuyên phân tích survey và trả về JSON cho BE xử lý." },
                     new JObject { ["role"] = "user", ["content"] = prompt }
                 },
-                ["functions"] = new JArray { functionSchema },
-                ["function_call"] = new JObject { ["name"] = "summarize_additional_filter_tags" }
-            };
+                    ["functions"] = new JArray { functionSchema },
+                    ["function_call"] = new JObject { ["name"] = "summarize_additional_filter_tags" }
+                };
 
-            using (var httpClient = new HttpClient())
-            {
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _openAIConfig.ApiKey);
-                httpClient.BaseAddress = new Uri(_openAIConfig.BaseUrl);
-                var content = new StringContent(body.ToString(), Encoding.UTF8, "application/json");
-                var response = await httpClient.PostAsync("/v1/chat/completions", content);
-                response.EnsureSuccessStatusCode();
-                var responseString = await response.Content.ReadAsStringAsync();
-                var responseJson = JObject.Parse(responseString);
-                var functionCall = responseJson["choices"]?[0]?["message"]?["function_call"];
-                List<SummarizedFilterTagDTO> resultList = null;
-                if (functionCall != null && functionCall["arguments"] != null && !string.IsNullOrEmpty(functionCall["arguments"]?.ToString()))
+                using (var httpClient = new HttpClient())
                 {
-                    var arguments = functionCall["arguments"].ToString();
-                    var resultObj = JObject.Parse(arguments);
-                    if (resultObj["result"] != null)
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _openAIConfig.ApiKey);
+                    httpClient.BaseAddress = new Uri(_openAIConfig.BaseUrl);
+                    var content = new StringContent(body.ToString(), Encoding.UTF8, "application/json");
+                    var response = await httpClient.PostAsync("/v1/chat/completions", content);
+                    response.EnsureSuccessStatusCode();
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    var responseJson = JObject.Parse(responseString);
+                    var functionCall = responseJson["choices"]?[0]?["message"]?["function_call"];
+                    List<SummarizedFilterTagDTO> resultList = null;
+                    if (functionCall != null && functionCall["arguments"] != null && !string.IsNullOrEmpty(functionCall["arguments"]?.ToString()))
                     {
-                        resultList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<SummarizedFilterTagDTO>>(resultObj["result"].ToString());
+                        var arguments = functionCall["arguments"].ToString();
+                        var resultObj = JObject.Parse(arguments);
+                        if (resultObj["result"] != null)
+                        {
+                            resultList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<SummarizedFilterTagDTO>>(resultObj["result"].ToString());
+                        }
                     }
+                    // Đảm bảo trả về đủ các tag, kể cả summary null
+                    var resultDict = resultList?.ToDictionary(x => x.FilterTagId) ?? new Dictionary<int, SummarizedFilterTagDTO>();
+                    var fullResult = filterTags.Select(tag =>
+                        resultDict.TryGetValue(tag.Id, out var summary)
+                            ? summary
+                            : new SummarizedFilterTagDTO { FilterTagId = tag.Id, Summary = null }
+                    ).ToList();
+                    return fullResult;
                 }
-                // Đảm bảo trả về đủ các tag, kể cả summary null
-                var resultDict = resultList?.ToDictionary(x => x.FilterTagId) ?? new Dictionary<int, SummarizedFilterTagDTO>();
-                var fullResult = filterTags.Select(tag =>
-                    resultDict.TryGetValue(tag.Id, out var summary)
-                        ? summary
-                        : new SummarizedFilterTagDTO { FilterTagId = tag.Id, Summary = null }
-                ).ToList();
-                return fullResult;
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("\n" + ex.StackTrace + "\n");
+                throw new Exception($"lỗi trong hàm GetSummarizedAddtionalFilterTagBySurveyTakenResponsesAsync {ex.Message}, dòng {new StackTrace(ex, true).GetFrame(0).GetFileLineNumber()}");
+            }
+
         }
 
         /// <summary>
@@ -274,118 +293,128 @@ namespace SurveyTalkService.BusinessLogic.Services.OpenAIServices._4oMini
             List<List<SurveyTakenResultTagFilter>> groupedTagFilters,
             List<TakerTagFilter> currentTakerTagFilters)
         {
-            // Chuẩn bị function schema cho OpenAI function calling
-            var functionSchema = new JObject
+            try
             {
-                ["name"] = "merge_additional_filter_tag_summaries",
-                ["description"] = "Gộp và tóm tắt chung nhất tiếng Việt cho từng additional filter tag dựa trên nhiều group summary (từ các survey gần nhất và group hiện tại).",
-                ["parameters"] = new JObject
+                // Chuẩn bị function schema cho OpenAI function calling
+                var functionSchema = new JObject
                 {
-                    ["type"] = "object",
-                    ["properties"] = new JObject
+                    ["name"] = "merge_additional_filter_tag_summaries",
+                    ["description"] = "Gộp và tóm tắt chung nhất tiếng Việt cho từng additional filter tag dựa trên nhiều group summary (từ các survey gần nhất và group hiện tại).",
+                    ["parameters"] = new JObject
                     {
-                        ["result"] = new JObject
+                        ["type"] = "object",
+                        ["properties"] = new JObject
                         {
-                            ["type"] = "array",
-                            ["items"] = new JObject
+                            ["result"] = new JObject
                             {
-                                ["type"] = "object",
-                                ["properties"] = new JObject
+                                ["type"] = "array",
+                                ["items"] = new JObject
                                 {
-                                    ["FilterTagId"] = new JObject { ["type"] = "integer" },
-                                    ["Summary"] = new JObject { ["type"] = "string", ["description"] = "Tóm tắt chung nhất tiếng Việt hoặc null nếu không liên quan." }
-                                },
-                                ["required"] = new JArray { "FilterTagId", "Summary" }
+                                    ["type"] = "object",
+                                    ["properties"] = new JObject
+                                    {
+                                        ["FilterTagId"] = new JObject { ["type"] = "integer" },
+                                        ["Summary"] = new JObject { ["type"] = "string", ["description"] = "Tóm tắt chung nhất tiếng Việt hoặc null nếu không liên quan." }
+                                    },
+                                    ["required"] = new JArray { "FilterTagId", "Summary" }
+                                }
                             }
-                        }
-                    },
-                    ["required"] = new JArray { "result" }
-                }
-            };
-            // Modify data
-            filterTags = filterTags.Select(tag => new FilterTag
-            {
-                Id = tag.Id,
-                FilterTagTypeId = tag.FilterTagTypeId,
-                Name = tag.Name,
-                FilterTagType = new FilterTagType
+                        },
+                        ["required"] = new JArray { "result" }
+                    }
+                };
+                // Modify data
+                filterTags = filterTags.Select(tag => new FilterTag
                 {
-                    Id = tag.FilterTagType.Id,
-                    Name = tag.FilterTagType.Name
-                }
-            }).ToList();
-            
-            // Format data
-            var filterTagsJson = JArray.FromObject(filterTags).ToString();
-            var groupedSummaries = new JArray();
-            foreach (var group in groupedTagFilters)
-            {
-                var groupArr = new JArray();
-                foreach (var tagFilter in group)
-                {
-                    groupArr.Add(new JObject
+                    Id = tag.Id,
+                    FilterTagTypeId = tag.FilterTagTypeId,
+                    Name = tag.Name,
+                    FilterTagType = new FilterTagType
                     {
-                        ["FilterTagId"] = tagFilter.AdditionalFilterTagId,
+                        Id = tag.FilterTagType.Id,
+                        Name = tag.FilterTagType.Name
+                    }
+                }).ToList();
+
+                // Format data
+                var filterTagsJson = JArray.FromObject(filterTags).ToString();
+                var groupedSummaries = new JArray();
+                foreach (var group in groupedTagFilters)
+                {
+                    var groupArr = new JArray();
+                    foreach (var tagFilter in group)
+                    {
+                        groupArr.Add(new JObject
+                        {
+                            ["FilterTagId"] = tagFilter.AdditionalFilterTagId,
+                            ["Summary"] = tagFilter.Summary
+                        });
+                    }
+                    groupedSummaries.Add(groupArr);
+                }
+                var currentGroupArr = new JArray();
+                foreach (var tagFilter in currentTakerTagFilters)
+                {
+                    currentGroupArr.Add(new JObject
+                    {
+                        ["FilterTagId"] = tagFilter.FilterTagId,
                         ["Summary"] = tagFilter.Summary
                     });
                 }
-                groupedSummaries.Add(groupArr);
-            }
-            var currentGroupArr = new JArray();
-            foreach (var tagFilter in currentTakerTagFilters)
-            {
-                currentGroupArr.Add(new JObject
+                groupedSummaries.Add(currentGroupArr);
+                var groupedSummariesJson = groupedSummaries.ToString();
+
+                var prompt = $@"Bạn là AI chuyên phân tích survey. Dưới đây là danh sách filter tag (id, name) và các nhóm summary (mỗi nhóm là 1 lần làm survey hoặc group hiện tại, mỗi phần tử gồm FilterTagId, Summary). Hãy gộp các summary cùng FilterTagId thành 1 Summary chung nhất, ngắn gọn, súc tích, đủ ý, phản ánh xu hướng hoạt động của người dùng. Nếu ở tag nào đó không được đề cập trong các yếu tố đầu vào (hoặc không chất lọc được thông tin) thì Summary phải để null, bạn buộc phải tuân theo rule này (không được viết các câu kiểu như 'không có thông tin', 'không có dữ liệu', 'không có', 'không rõ', v.v.). Không tự chế thêm tag, chỉ dùng đúng FilterTagId đã cho. Kết quả trả về đúng format function calling OpenAI yêu cầu.\n\nfilterTags: {filterTagsJson}\ngroupedSummaries: {groupedSummariesJson}";
+
+                var body = new JObject
                 {
-                    ["FilterTagId"] = tagFilter.FilterTagId,
-                    ["Summary"] = tagFilter.Summary
-                });
-            }
-            groupedSummaries.Add(currentGroupArr);
-            var groupedSummariesJson = groupedSummaries.ToString();
-
-            var prompt = $@"Bạn là AI chuyên phân tích survey. Dưới đây là danh sách filter tag (id, name) và các nhóm summary (mỗi nhóm là 1 lần làm survey hoặc group hiện tại, mỗi phần tử gồm FilterTagId, Summary). Hãy gộp các summary cùng FilterTagId thành 1 Summary chung nhất, ngắn gọn, súc tích, đủ ý, phản ánh xu hướng hoạt động của người dùng. Nếu ở tag nào đó không được đề cập trong các yếu tố đầu vào (hoặc không chất lọc được thông tin) thì Summary phải để null, bạn buộc phải tuân theo rule này (không được viết các câu kiểu như 'không có thông tin', 'không có dữ liệu', 'không có', 'không rõ', v.v.). Không tự chế thêm tag, chỉ dùng đúng FilterTagId đã cho. Kết quả trả về đúng format function calling OpenAI yêu cầu.\n\nfilterTags: {filterTagsJson}\ngroupedSummaries: {groupedSummariesJson}";
-
-            var body = new JObject
-            {
-                ["model"] = _openAIConfig.BaseModel,
-                ["messages"] = new JArray
+                    ["model"] = _openAIConfig.BaseModel,
+                    ["messages"] = new JArray
                 {
                     new JObject { ["role"] = "system", ["content"] = "Bạn là AI chuyên phân tích survey và trả về JSON cho BE xử lý." },
                     new JObject { ["role"] = "user", ["content"] = prompt }
                 },
-                ["functions"] = new JArray { functionSchema },
-                ["function_call"] = new JObject { ["name"] = "merge_additional_filter_tag_summaries" }
-            };
+                    ["functions"] = new JArray { functionSchema },
+                    ["function_call"] = new JObject { ["name"] = "merge_additional_filter_tag_summaries" }
+                };
 
-            using (var httpClient = new HttpClient())
-            {
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _openAIConfig.ApiKey);
-                httpClient.BaseAddress = new Uri(_openAIConfig.BaseUrl);
-                var content = new StringContent(body.ToString(), Encoding.UTF8, "application/json");
-                var response = await httpClient.PostAsync("/v1/chat/completions", content);
-                response.EnsureSuccessStatusCode();
-                var responseString = await response.Content.ReadAsStringAsync();
-                var responseJson = JObject.Parse(responseString);
-                var functionCall = responseJson["choices"]?[0]?["message"]?["function_call"];
-                List<SummarizedFilterTagDTO> resultList = null;
-                if (functionCall != null && functionCall["arguments"] != null && !string.IsNullOrEmpty(functionCall["arguments"]?.ToString()))
+                using (var httpClient = new HttpClient())
                 {
-                    var arguments = functionCall["arguments"].ToString();
-                    var resultObj = JObject.Parse(arguments);
-                    if (resultObj["result"] != null)
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _openAIConfig.ApiKey);
+                    httpClient.BaseAddress = new Uri(_openAIConfig.BaseUrl);
+                    var content = new StringContent(body.ToString(), Encoding.UTF8, "application/json");
+                    var response = await httpClient.PostAsync("/v1/chat/completions", content);
+                    response.EnsureSuccessStatusCode();
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    var responseJson = JObject.Parse(responseString);
+                    var functionCall = responseJson["choices"]?[0]?["message"]?["function_call"];
+                    List<SummarizedFilterTagDTO> resultList = null;
+                    if (functionCall != null && functionCall["arguments"] != null && !string.IsNullOrEmpty(functionCall["arguments"]?.ToString()))
                     {
-                        resultList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<SummarizedFilterTagDTO>>(resultObj["result"].ToString());
+                        var arguments = functionCall["arguments"].ToString();
+                        var resultObj = JObject.Parse(arguments);
+                        if (resultObj["result"] != null)
+                        {
+                            resultList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<SummarizedFilterTagDTO>>(resultObj["result"].ToString());
+                        }
                     }
+                    // Đảm bảo trả về đủ các tag, kể cả summary null
+                    var resultDict = resultList?.ToDictionary(x => x.FilterTagId) ?? new Dictionary<int, SummarizedFilterTagDTO>();
+                    var fullResult = filterTags.Select(tag =>
+                        resultDict.TryGetValue(tag.Id, out var summary)
+                            ? summary
+                            : new SummarizedFilterTagDTO { FilterTagId = tag.Id, Summary = null }
+                    ).ToList();
+                    return fullResult;
                 }
-                // Đảm bảo trả về đủ các tag, kể cả summary null
-                var resultDict = resultList?.ToDictionary(x => x.FilterTagId) ?? new Dictionary<int, SummarizedFilterTagDTO>();
-                var fullResult = filterTags.Select(tag =>
-                    resultDict.TryGetValue(tag.Id, out var summary)
-                        ? summary
-                        : new SummarizedFilterTagDTO { FilterTagId = tag.Id, Summary = null }
-                ).ToList();
-                return fullResult;
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("\n" + ex.StackTrace + "\n");
+                throw new Exception($"lỗi trong hàm GetMergedAdditionalFilterTagSummariesAsync {ex.Message}, dòng {new StackTrace(ex, true).GetFrame(0).GetFileLineNumber()}");
+            }
+
+
         }
 
         /// <summary>
@@ -453,7 +482,7 @@ namespace SurveyTalkService.BusinessLogic.Services.OpenAIServices._4oMini
                     ["Id"] = surveyTopic.Id,
                     ["Name"] = surveyTopic.Name
                 };
-                var topicObjJson = topicObj.ToString();
+                var topicObjJson = topicObj?.ToString();
                 var specificTopicObj = surveySpecificTopic == null ? null : new JObject
                 {
                     ["Id"] = surveySpecificTopic.Id,
@@ -461,7 +490,7 @@ namespace SurveyTalkService.BusinessLogic.Services.OpenAIServices._4oMini
                     ["SurveyTopicId"] = surveySpecificTopic.SurveyTopicId,
                     ["SurveyTopicName"] = surveySpecificTopic.SurveyTopic?.Name
                 };
-                var specificTopicObjJson = specificTopicObj.ToString();
+                var specificTopicObjJson = specificTopicObj?.ToString();
                 // Nếu cần modify dữ liệu, modify ở đây trước khi đưa vào prompt
 
                 var prompt = $@"Bạn là AI chuyên phân tích survey. Dưới đây là danh sách filter tag, thông tin segment người dùng mục tiêu (gồm các trường: CountryRegion, MaritalStatus, AverageIncome, EducationLevel, JobField, Prompt), chủ đề survey và chủ đề cụ thể. Hãy trả về 1 mảng JSON, mỗi phần tử gồm FilterTagId và Summary tiếng Việt thật ngắn gọn, súc tích, đủ ý, tóm tắt dựa trên thông tin segment, surveyTopic, surveySpecificTopic. Nếu ở tag nào đó không được đề cập trong các yếu tố đầu vào (hoặc không chất lọc được thông tin) thì Summary phải để null, bạn buộc phải tuân theo rule này (không được viết các câu kiểu như 'không có thông tin', 'không có dữ liệu', 'không có', 'không rõ', v.v.). Không tự chế thêm tag, chỉ dùng đúng FilterTagId đã cho. Kết quả trả về đúng format function calling OpenAI yêu cầu.\n\nfilterTags: {filterTagsJson}\nsurveyTakerSegment: {surveyTakerSegmentJson}\nsurveyTopic: {topicObjJson}\nsurveySpecificTopic: {specificTopicObjJson}";
@@ -510,8 +539,8 @@ namespace SurveyTalkService.BusinessLogic.Services.OpenAIServices._4oMini
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetSurveyTakerSegmentSummarizedFilterTagAsync: {ex.Message}");
-                Console.WriteLine(ex.StackTrace);
+                Console.WriteLine("\n" + ex.StackTrace + "\n");
+                throw new Exception($"lỗi trong hàm GetSurveyTakerSegmentSummarizedFilterTagAsync {ex.Message}, dòng {new StackTrace(ex, true).GetFrame(0).GetFileLineNumber()}");
                 return filterTags.Select(tag => new SummarizedFilterTagDTO { FilterTagId = tag.Id, Summary = null }).ToList();
             }
 

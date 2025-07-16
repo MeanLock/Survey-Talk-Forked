@@ -34,5 +34,11 @@
         "url": "/api/Survey/transaction/market-research/surveys/{SurveyId}/data-purchase",
         "description": "Mua data trong mảng version (truyền vào mảng TakenResultIds)",
         "completed": false
+    },
+    {
+        "method": "GET",
+        "url": "/api/Survey/transaction/community/survey-taken-earn/history",
+        "description": "Lấy lịch sử thu nhập từ việc tham gia khảo sát cộng đồng (taker earn history)",
+        "completed": true
     }
 ]

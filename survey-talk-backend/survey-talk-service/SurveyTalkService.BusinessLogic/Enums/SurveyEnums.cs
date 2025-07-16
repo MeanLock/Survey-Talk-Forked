@@ -28,4 +28,12 @@ namespace SurveyTalkService.BusinessLogic.Enums
         BigBonus = 2,
         SuitYourFavorite = 3
     }
+
+    public enum SurveyStatusQueryEnum
+    {
+        Editing = 1,
+        Published = 2,
+        Completed = 3,
+        Deactivated = 4,
+    }
 }

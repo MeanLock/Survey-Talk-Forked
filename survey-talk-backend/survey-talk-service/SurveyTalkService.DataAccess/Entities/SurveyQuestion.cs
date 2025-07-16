@@ -5,8 +5,6 @@ namespace SurveyTalkService.DataAccess.Entities;
 
 public partial class SurveyQuestion
 {
-    public int Id { get; set; }
-
     public int SurveyId { get; set; }
 
     public int? QuestionTypeId { get; set; }
@@ -29,7 +27,9 @@ public partial class SurveyQuestion
 
     public bool? IsReanswerRequired { get; set; }
 
-    public int? ReferenceSurveyQuestionId { get; set; }
+    public Guid Id { get; set; }
+
+    public Guid? ReferenceSurveyQuestionId { get; set; }
 
     public virtual ICollection<SurveyQuestion> InverseReferenceSurveyQuestion { get; set; } = new List<SurveyQuestion>();
 

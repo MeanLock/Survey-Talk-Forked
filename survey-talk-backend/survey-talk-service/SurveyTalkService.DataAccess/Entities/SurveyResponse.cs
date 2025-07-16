@@ -9,11 +9,11 @@ public partial class SurveyResponse
 
     public int SurveyTakenResultId { get; set; }
 
-    public int SurveyQuestionId { get; set; }
-
     public bool IsValid { get; set; }
 
     public string ValueJsonString { get; set; } = null!;
+
+    public Guid SurveyQuestionId { get; set; }
 
     public virtual ICollection<SurveyMarketResponseVersion> SurveyMarketResponseVersions { get; set; } = new List<SurveyMarketResponseVersion>();
 

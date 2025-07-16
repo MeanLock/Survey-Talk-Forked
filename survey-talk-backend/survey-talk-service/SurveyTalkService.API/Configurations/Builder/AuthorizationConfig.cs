@@ -77,6 +77,11 @@ namespace SurveyTalkService.API.Configurations.Builder
                     policy.RequireRole("Customer");
                     policy.Requirements.Add(new AccountExistsRequirement());
                 });
+                options.AddPolicy("UserTransactionReportAccess", policy =>
+                {
+                    policy.RequireRole("Customer","Manager");
+                    policy.Requirements.Add(new AccountExistsRequirement());
+                });
 
 
             });

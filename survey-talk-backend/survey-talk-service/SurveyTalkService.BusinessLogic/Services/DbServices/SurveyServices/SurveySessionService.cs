@@ -5,14 +5,13 @@ using SurveyTalkService.DataAccess.Data;
 using SurveyTalkService.BusinessLogic.Helpers;
 using SurveyTalkService.DataAccess.UOW;
 using SurveyTalkService.BusinessLogic.Services.AWSServices.S3;
-using SurveyTalkService.BusinessLogic.DTOs.Survey.Session.V1;
+using SurveyTalkService.BusinessLogic.DTOs.Survey.Session.V2;
 using SurveyTalkService.DataAccess.Entities;
 using SurveyTalkService.BusinessLogic.DTOs.Survey.Filters;
 using Newtonsoft.Json.Linq;
 using SurveyTalkService.BusinessLogic.Exceptions;
 using Newtonsoft.Json;
 using SurveyTalkService.DataAccess.Repositories.interfaces;
-using SurveyTalkService.BusinessLogic.DTOs.Survey.Session;
 using SurveyTalkService.BusinessLogic.Enums;
 using SurveyTalkService.BusinessLogic.DTOs.Survey.JsonConfigs;
 
@@ -212,7 +211,8 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                     }
 
                     // 5. Xử lý các question
-                    var dtoQuestionIds = surveyEditingSessionDTO.Questions?.Where(q => q.Id != null).Select(q => q.Id).ToHashSet() ?? new HashSet<int?>(); // [CHỈNH LẠI] sau sẽ có id mới
+                    // var dtoQuestionIds = surveyEditingSessionDTO.Questions?.Where(q => q.Id != null).Select(q => q.Id).ToHashSet() ?? new HashSet<Guid?>(); // [CHỈNH LẠI] sau sẽ có id mới
+                    var dtoQuestionIds = surveyEditingSessionDTO.Questions?.Select(q => q.Id).ToHashSet() ?? new HashSet<Guid?>();
                     var dbQuestions = survey.SurveyQuestions.ToList();
                     // Xóa question không còn trong DTO
                     foreach (var dbQ in dbQuestions)
@@ -266,21 +266,21 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                             // Thêm mới option cho question mới
                             foreach (var dtoO in dtoQ.Options ?? new List<SurveyEditingSessionOptionDTO>())
                             {
-                                if (dtoO.Id == null) // [CHỈNH LẠI] sau sẽ có id mới
+                                // if (dtoO.Id == null) // [CHỈNH LẠI] sau sẽ có id mới
+                                // {
+                                var newO = new SurveyOption
                                 {
-                                    var newO = new SurveyOption
-                                    {
-                                        SurveyQuestionId = newQ.Id,
-                                        Content = dtoO.Content,
-                                        Order = (byte)dtoO.Order
-                                    };
-                                    await _surveyOptionGenericRepository.CreateAsync(newO);
-                                    // Lưu ảnh option nếu có
-                                    if (dtoO.MainImageBase64 != null)
-                                    {
-                                        await _imageHelpers.SaveBase64File(dtoO.MainImageBase64, $"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{newQ.Id}\\option_{newO.Id}", "main");
-                                    }
+                                    SurveyQuestionId = newQ.Id,
+                                    Content = dtoO.Content,
+                                    Order = (byte)dtoO.Order
+                                };
+                                await _surveyOptionGenericRepository.CreateAsync(newO);
+                                // Lưu ảnh option nếu có
+                                if (dtoO.MainImageBase64 != null)
+                                {
+                                    await _imageHelpers.SaveBase64File(dtoO.MainImageBase64, $"{_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH}\\{survey.Id}\\question_{newQ.Id}\\option_{newO.Id}", "main");
                                 }
+                                //}
                             }
                             continue;
                         }
@@ -306,7 +306,8 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                         await _surveyQuestionGenericRepository.UpdateAsync(dbQ.Id, dbQ);
 
                         // Xử lý option
-                        var dtoOptionIds = dtoQ.Options?.Where(o => o.Id != null).Select(o => o.Id).ToHashSet() ?? new HashSet<int?>(); // [CHỈNH LẠI] sau sẽ có id mới
+                        // var dtoOptionIds = dtoQ.Options?.Where(o => o.Id != null).Select(o => o.Id).ToHashSet() ?? new HashSet<Guid?>(); // [CHỈNH LẠI] sau sẽ có id mới
+                        var dtoOptionIds = dtoQ.Options?.Select(o => o.Id).ToHashSet() ?? new HashSet<Guid?>();
                         var dbOptions = dbQ.SurveyOptions.ToList();
                         // Xóa option không còn trong DTO
                         foreach (var dbO in dbOptions)
@@ -415,8 +416,11 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                         Content = so.Content,
                         Order = so.Order,
                         MainImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.SURVEY_ORIGINAL_IMAGE_PATH, $"{survey.Id}/question_{sq.Id}/option_{so.Id}", "main")
-                    }))).ToList()
-                }))).ToList()
+                    })))
+                    .OrderBy(so => so.Order)
+                    .ToList()
+                }))).OrderBy(sq => sq.Order) // Sắp xếp theo thứ tự
+                .ToList()
             };
             return dto;
 
@@ -611,7 +615,8 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                     throw new ForbiddenException("không được phép chỉnh sửa survey ở thời điểm hiện tại");
                 }
 
-                if (currentSurveyStatus.SurveyStatusId == 2 && surveyEditingSessionDTO.Questions.Where(q => q.Id == null).ToList().Count > 0)  //[CHỈNH LẠI] sau này sẽ kiểm tra ID question có tồn tại hay không
+                // if (currentSurveyStatus.SurveyStatusId == 2 && surveyEditingSessionDTO.Questions.Where(q => q.Id == null).ToList().Count > 0)  //[CHỈNH LẠI] sau này sẽ kiểm tra ID question có tồn tại hay không
+                if (currentSurveyStatus.SurveyStatusId == 2 && surveyEditingSessionDTO.Questions.Any(q => !survey.SurveyQuestions.Any(sq => sq.Id == q.Id)))
                 {
                     // return new SurveySessionUpdateTriggerResponseDTO
                     // {
@@ -770,7 +775,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                                 SurveyStatusIds = new List<int> { 2 }
                             };
                             survey = await _unitOfWork.SurveyRepository.FindByIdAndFilterObjectAsync(surveyId, surveyFilterObject);
-                            var surveyTakenResults = await _unitOfWork.SurveyTakenResultRepository.FindBySurveyIdAsync(surveyId, false);
+                            var surveyTakenResults = (await _unitOfWork.SurveyTakenResultRepository.FindBySurveyIdAsync(surveyId, false)).Where(str => str.CompletedAt != null && str.CompletedAt > survey.PublishedAt).ToList();
 
                             if (survey == null)
                             {

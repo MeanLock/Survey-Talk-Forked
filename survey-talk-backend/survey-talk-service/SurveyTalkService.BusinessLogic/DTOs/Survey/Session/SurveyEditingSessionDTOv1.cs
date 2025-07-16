@@ -23,29 +23,33 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.Session.V1
 
     public class SurveyEditingSessionSurveyConfigJsonDTO
     {
-        public int? DefaultBackgroundImageId { get; set; } 
-        public string? BackgroundGradient1Color { get; set; } 
-        public string? BackgroundGradient2Color { get; set; } 
-        public string? TitleColor { get; set; } 
-        public string? ContentColor { get; set; } 
+        public int? DefaultBackgroundImageId { get; set; }
+        public string? BackgroundGradient1Color { get; set; }
+        public string? BackgroundGradient2Color { get; set; }
+        public string? TitleColor { get; set; }
+        public string? ContentColor { get; set; }
         public string? ButtonBackgroundColor { get; set; }
         public string? ButtonContentColor { get; set; }
         public bool? IsPause { get; set; }
-        public string? Password { get; set; } 
-        public int? Brightness { get; set; } 
-        public bool? SkipStartPage { get; set; } 
-        public string? Background { get; set; } 
-        public bool IsUseBackgroundImageBase64 { get; set; } 
+        public string? Password { get; set; }
+        public int? Brightness { get; set; }
+        public bool? SkipStartPage { get; set; }
+        public string? Background { get; set; }
+        public bool IsUseBackgroundImageBase64 { get; set; }
     }
 
     public class SurveyEditingSessionQuestionDTO
     {
-        public int? Id { get; set; } 
+        // public int? Id { get; set; }
+        // [INT --> GUID]
+        public Guid? Id { get; set; }
         public int? QuestionTypeId { get; set; } // [field cập nhật]
         public string? MainImageBase64 { get; set; } // [field cập nhật]
         public int? Version { get; set; }
         public bool? IsReanswerRequired { get; set; } // [field cập nhật]
-        public int? ReferenceSurveyQuestionId { get; set; } // [field cập nhật]
+        // public int? ReferenceSurveyQuestionId { get; set; } // [field cập nhật]
+        // [INT --> GUID]
+        public Guid? ReferenceSurveyQuestionId { get; set; } // [field cập nhật]
         public string? Content { get; set; } // [field cập nhật]
         public string? Description { get; set; } // [field cập nhật]
         public int? TimeLimit { get; set; } // [field cập nhật]
@@ -57,7 +61,7 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.Session.V1
 
     public class SurveyEditingSessionQuestionConfigJsonDTO
     {
-        public int? Min { get; set; } 
+        public int? Min { get; set; }
         public int? Max { get; set; }
         public int? Step { get; set; }
         public string? Unit { get; set; }
@@ -107,7 +111,9 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.Session.V1
 
     public class SurveyEditingSessionOptionDTO
     {
-        public int? Id { get; set; }
+        // public int? Id { get; set; }
+        // [INT --> GUID]
+        public Guid? Id { get; set; }
         public string? Content { get; set; } // [field cập nhật]
         public int Order { get; set; } // [field cập nhật]
         public string? MainImageBase64 { get; set; } // [field cập nhật]

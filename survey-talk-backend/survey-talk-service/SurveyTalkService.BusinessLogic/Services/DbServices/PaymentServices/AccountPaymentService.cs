@@ -14,6 +14,7 @@ using SurveyTalkService.Common.AppConfigurations.Payos.interfaces;
 using Net.payOS;
 using Net.payOS.Types;
 using SurveyTalkService.BusinessLogic.DTOs.Transaction;
+using System.Linq.Expressions;
 
 namespace SurveyTalkService.BusinessLogic.Services.DbServices.PaymentServices
 {
@@ -34,13 +35,14 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.PaymentServices
         private readonly BcryptHelpers _bcryptHelpers;
         private readonly JwtHelpers _jwtHelpers;
         private readonly FileHelpers _fileHelpers;
+        private readonly ImageHelpers _imageHelpers;
 
 
         // UNIT OF WORK
         private readonly IUnitOfWork _unitOfWork;
 
         // REPOSITORIES
-        IGenericRepository<Account> _accountGenericRepository;  
+        IGenericRepository<Account> _accountGenericRepository;
         IGenericRepository<AccountBalanceTransaction> _accountBalanceTransactionGenericRepository;
 
 
@@ -56,6 +58,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.PaymentServices
             IGenericRepository<AccountBalanceTransaction> accountBalanceTransactionGenericRepository,
 
             FileHelpers fileHelpers,
+            ImageHelpers imageHelpers,
             IFilePathConfig filePathConfig,
             IAppConfig appConfig,
             IPayosConfig payosConfig
@@ -71,6 +74,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.PaymentServices
             _accountBalanceTransactionGenericRepository = accountBalanceTransactionGenericRepository;
 
             _fileHelpers = fileHelpers;
+            _imageHelpers = imageHelpers;
             _filePathConfig = filePathConfig;
             _appConfig = appConfig;
             _payosConfig = payosConfig;
@@ -131,6 +135,48 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.PaymentServices
 
         }
 
+        public async Task WithdrawAccountBalance(Account account, AccountBalanceWithdrawalDTO accountBalanceWithdrawalDTO)
+        {
+            using (var transaction = await _appDbContext.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    if (account.Balance < accountBalanceWithdrawalDTO.Amount)
+                    {
+                        throw new Exception("Số dư không đủ để rút tiền.");
+                    }
+
+                    // AccountBalanceTransaction accountBalanceTransaction = new AccountBalanceTransaction
+                    // {
+                    //     AccountId = account.Id,
+                    //     Amount = accountBalanceWithdrawalDTO.Amount,
+                    //     TransactionTypeId = 6, // Rút tiền
+                    //     TransactionStatusId = 1, // Chờ xử lý
+                    //     BankAccountNumber = accountBalanceWithdrawalDTO.BankAccountNumber,
+                    //     BankCode = accountBalanceWithdrawalDTO.BankCode,
+                    //     Description = accountBalanceWithdrawalDTO.Description
+                    // };
+
+                    // Save withdrawal request to the database
+                    // await _accountBalanceTransactionGenericRepository.CreateAsync(accountBalanceTransaction);
+
+                    // Update account balance
+                    account.Balance -= accountBalanceWithdrawalDTO.Amount;
+                    await _accountGenericRepository.UpdateAsync(account.Id, account);
+
+                    // Commit the transaction
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    Console.WriteLine(ex.Message);
+                    Console.WriteLine("\n" + ex.StackTrace + "\n");
+                    throw new HttpRequestException("Rút tiền không thành công, lỗi: " + ex.Message);
+                }
+            }
+        }
+
         public async Task ConfirmPayment(WebhookType webhookBody)
         {
             using (var transaction = await _appDbContext.Database.BeginTransactionAsync())
@@ -141,7 +187,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.PaymentServices
                     {
                         throw new Exception("Invalid webhook data.");
                     }
-                    if(webhookBody.data.description == "VQRIO123")
+                    if (webhookBody.data.description == "VQRIO123")
                     {
                         return;
                     }
@@ -156,18 +202,21 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.PaymentServices
 
                     if (webhookBody.code == "00")
                     {
-                        accountBalanceTransaction.TransactionStatusId = 2; 
+                        accountBalanceTransaction.TransactionStatusId = 2;
                     }
                     else
                     {
-                        accountBalanceTransaction.TransactionStatusId = 4; 
+                        accountBalanceTransaction.TransactionStatusId = 4;
                     }
 
                     await _accountBalanceTransactionGenericRepository.UpdateAsync(accountBalanceTransaction.Id, accountBalanceTransaction);
 
-                    if(accountBalanceTransaction.TransactionTypeId == 5) { 
-                    accountBalanceTransaction.Account.Balance += accountBalanceTransaction.Amount;
-                    }else if(accountBalanceTransaction.TransactionTypeId == 6) {
+                    if (accountBalanceTransaction.TransactionTypeId == 5)
+                    {
+                        accountBalanceTransaction.Account.Balance += accountBalanceTransaction.Amount;
+                    }
+                    else if (accountBalanceTransaction.TransactionTypeId == 6)
+                    {
                         accountBalanceTransaction.Account.Balance -= accountBalanceTransaction.Amount;
                     }
                     await _accountGenericRepository.UpdateAsync(accountBalanceTransaction.Account.Id, accountBalanceTransaction.Account);
@@ -185,5 +234,120 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.PaymentServices
             }
         }
 
+        public async Task<List<AccountBalanceTransactionDTO>> GetAccountBalanceDepositHistory(Account account)
+        {
+            try
+            {
+
+                // Retrieve the deposit history for the account
+                var transactions = await _accountBalanceTransactionGenericRepository.FindAll(
+                    predicate: transaction => transaction.TransactionTypeId == 5 && (transaction.TransactionStatusId != 3 && transaction.TransactionStatusId != 4)
+                    &&
+                    // nếu là manager thì lấy hết account, nếu là customer thì chỉ lấy account của mình
+                    (account.RoleId == 2 || account.RoleId == 4 && transaction.AccountId == account.Id)
+                    ,
+                    includeProperties: new Expression<Func<AccountBalanceTransaction, object>>[] {
+                        t => t.Account,
+                        t => t.TransactionType,
+                        t => t.TransactionStatus
+                    }
+                ).ToListAsync();
+
+                var history = new List<AccountBalanceTransactionDTO>();
+                foreach (var t in transactions)
+                {
+                    history.Add(new AccountBalanceTransactionDTO
+                    {
+                        Id = t.Id,
+                        Account = new AccountBalanceTransactionDTOAccountDTO
+                        {
+                            Id = t.Account.Id,
+                            Email = t.Account.Email,
+                            FullName = t.Account.FullName,
+                            Phone = t.Account.Phone,
+                            MainImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.ACCOUNt_IMAGE_PATH, t.Account.Id.ToString(), "main")
+                        },
+                        Amount = t.Amount,
+                        CreatedAt = t.CreatedAt,
+                        TransactionStatus = new TransactionStatusDTO
+                        {
+                            Id = t.TransactionStatus.Id,
+                            Name = t.TransactionStatus.Name
+                        },
+                        TransactionType = new TransactionTypeDTO
+                        {
+                            Id = t.TransactionType.Id,
+                            Name = t.TransactionType.Name,
+                            OperationType = t.TransactionType.OperationType
+                        }
+                    });
+                }
+
+                return history;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine("\n" + ex.StackTrace + "\n");
+                throw new HttpRequestException("Lấy lịch sử nạp tiền không thành công, lỗi: " + ex.Message);
+            }
+
+        }
+
+        public async Task<List<AccountBalanceTransactionDTO>> GetAccountBalanceWithdrawalHistory(Account account)
+        {
+            try
+            {
+                // Retrieve the withdraw history for the account
+                var transactions = await _accountBalanceTransactionGenericRepository.FindAll(
+                    predicate: transaction => transaction.TransactionTypeId == 6 && (transaction.TransactionStatusId != 3 && transaction.TransactionStatusId != 4)
+                    &&
+                    // nếu là manager thì lấy hết account, nếu là customer thì chỉ lấy account của mình
+                    (account.RoleId == 2 || account.RoleId == 4 && transaction.AccountId == account.Id)
+                    ,
+                    includeProperties: new Expression<Func<AccountBalanceTransaction, object>>[] {
+                        t => t.Account,
+                        t => t.TransactionType,
+                        t => t.TransactionStatus
+                    }
+                ).ToListAsync();
+                var history = new List<AccountBalanceTransactionDTO>();
+                foreach (var t in transactions)
+                {
+                    history.Add(new AccountBalanceTransactionDTO
+                    {
+                        Id = t.Id,
+                        Account = new AccountBalanceTransactionDTOAccountDTO
+                        {
+                            Id = t.Account.Id,
+                            Email = t.Account.Email,
+                            FullName = t.Account.FullName,
+                            Phone = t.Account.Phone,
+                            MainImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.ACCOUNt_IMAGE_PATH, t.Account.Id.ToString(), "main")
+                        },
+                        Amount = t.Amount,
+                        CreatedAt = t.CreatedAt,
+                        TransactionStatus = new TransactionStatusDTO
+                        {
+                            Id = t.TransactionStatus.Id,
+                            Name = t.TransactionStatus.Name
+                        },
+                        TransactionType = new TransactionTypeDTO
+                        {
+                            Id = t.TransactionType.Id,
+                            Name = t.TransactionType.Name,
+                            OperationType = t.TransactionType.OperationType
+                        }
+                    });
+                }
+                return history;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine("\n" + ex.StackTrace + "\n");
+                throw new HttpRequestException("Lấy lịch sử rút tiền không thành công, lỗi: " + ex.Message);
+            }
+        } 
     }
 }

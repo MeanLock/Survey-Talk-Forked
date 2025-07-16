@@ -539,7 +539,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                     {
                         await this.TrackingOnline(account.Id);
                         decimal levelBonusRate = (decimal)systemConfigProfile.AccountLevelSettingConfigs.Where(c => c.Level == account.Level).Select(c => c.BonusRate).FirstOrDefault();
-                        account.Balance += moneyEarned * (decimal)survey.AllocLevelAmount * levelBonusRate;
+                        account.Balance += moneyEarned + (decimal)survey.AllocLevelAmount * levelBonusRate;
                         account.Xp += xpEarned;
 
                         // tính toán lại level

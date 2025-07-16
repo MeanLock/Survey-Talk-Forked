@@ -38,7 +38,7 @@ namespace SurveyTalkService.DataAccess.Repositories
         }
 
 
-        public async Task<T?> FindByIdAsync(int id, params Expression<Func<T, object>>[] includeProperties)
+        public async Task<T?> FindByIdAsync(object id, params Expression<Func<T, object>>[] includeProperties)
         {
             var query = _appDbContext.Set<T>().AsQueryable();
 
@@ -48,7 +48,18 @@ namespace SurveyTalkService.DataAccess.Repositories
                 query = query.Include(includeProperty);
             }
 
-            return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
+            if (id is Guid guidId)
+            {
+                return await query.FirstOrDefaultAsync(e => EF.Property<Guid>(e, "Id") == guidId);
+            }
+            else if (id is int intId)
+            {
+                return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == intId);
+            }
+            else
+            {
+                throw new ArgumentException("Id must be of type int or Guid", nameof(id));
+            }
         }
 
         public async Task<T?> CreateAsync(T entity)
@@ -58,7 +69,7 @@ namespace SurveyTalkService.DataAccess.Repositories
             return entry.Entity;
         }
 
-        public async Task<T?> UpdateAsync(int id, T entity)
+        public async Task<T?> UpdateAsync(object id, T entity)
         {
             if (entity == null)
             {

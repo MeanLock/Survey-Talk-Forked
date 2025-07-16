@@ -271,6 +271,7 @@ namespace SurveyTalkService.API.Controllers.SurveyControllers
         public async Task<IActionResult> GetMyCommunitySurveys(
             [FromQuery] SurveyDeadlineQueryEnum? deadline = null,
             [FromQuery] string? keywords = null,
+            [FromQuery] SurveyStatusQueryEnum? status = null,
             [FromQuery] int? limit = null
         )
         {
@@ -299,6 +300,31 @@ namespace SurveyTalkService.API.Controllers.SurveyControllers
                     return BadRequest("Invalid DeadlineQueryType.");
                 }
             }
+            
+            if (status.HasValue)
+            {
+                if (status == SurveyStatusQueryEnum.Editing)
+                {
+                    surveys = surveys.Where(s => s.SurveyStatusId == 1).OrderByDescending(s => s.SurveyPrivateData.UpdatedAt).Take(limit ?? 100).ToList();
+                }
+                else if (status == SurveyStatusQueryEnum.Published)
+                {
+                    surveys = surveys.Where(s => s.SurveyStatusId == 2).OrderByDescending(s => s.SurveyPrivateData.UpdatedAt).Take(limit ?? 100).ToList();
+                }
+                else if (status == SurveyStatusQueryEnum.Completed)
+                {
+                    surveys = surveys.Where(s => s.SurveyStatusId == 3).OrderByDescending(s => s.SurveyPrivateData.UpdatedAt).Take(limit ?? 100).ToList();
+                }
+                else if (status == SurveyStatusQueryEnum.Deactivated)
+                {
+                    surveys = surveys.Where(s => s.SurveyStatusId == 5).OrderByDescending(s => s.SurveyPrivateData.UpdatedAt).Take(limit ?? 100).ToList();
+                }
+                else
+                {
+                    return BadRequest("Invalid StatusQueryType.");
+                }
+            }
+
             return Ok(new
             {
                 Surveys = surveys
@@ -370,6 +396,20 @@ namespace SurveyTalkService.API.Controllers.SurveyControllers
                 FilterTags = summarizedFilterTags.FilterTags,
                 MaxKpi = summarizedFilterTags.MaxKpi,
                 R = summarizedFilterTags.R
+            });
+        }
+
+        // DELETE /api/Survey/core/surveys/{SurveyId}
+        [HttpDelete("surveys/{surveyId}")]
+        [Authorize(Policy = "LoginRequired")]
+        public async Task<IActionResult> DeleteSurvey(int surveyId)
+        {
+            int userId = int.Parse(User.FindFirst("id")?.Value);
+            Account account = HttpContext.Items["LoggedInAccount"] as Account;
+            await _surveyCoreService.DeleteSurvey(surveyId, account);
+            return Ok(new
+            {
+                Message = "Xóa survey thành công",
             });
         }
 

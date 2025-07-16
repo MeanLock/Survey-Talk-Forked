@@ -38,6 +38,11 @@ namespace SurveyTalkService.API.Authorizations.Handlers
                 Console.WriteLine($"0000000000000000000000000000000000000000000000000000000Account role mismatch: {account.RoleId} != {roleId}");
                 context.Fail();
             }
+            else if (account.IsVerified == false)
+            {
+                Console.WriteLine($"0000000000000000000000000000000000000000000000000000000Account is not verified: {account.IsVerified}");
+                context.Fail(); 
+            }
             else if (account.DeactivatedAt != null)
             {
                 Console.WriteLine($"0000000000000000000000000000000000000000000000000000000Account is deactivated: {account.DeactivatedAt}");

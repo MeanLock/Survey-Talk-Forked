@@ -3,7 +3,6 @@ use SurveyTalkDB_test_1
 
 SELECT * from Account
 SELECT * from AccountOnlineTracking
-SELECT * from AccountProfile
 SELECT * from FilterTag
 SELECT * from TakerTagFilter 
 SELECT * from SurveyTopicFavorite where accountid=6
@@ -15,12 +14,14 @@ Delete from SurveyTakenResult where surveyId = 1
 
 INSERT INTO SurveyRewardTracking(surveyId, rewardPrice ,rewardXp) VALUES (6, 10000, 1331);
 
-SELECT * from SurveyTakerSegment where surveyId = 7
+SELECT * from AccountProfile where accountid = 3
+SELECT * from SurveyTakerSegment where surveyId = 8
 SELECT * from Survey where surveyTypeId = 1 and id = 1
 SELECT * from SurveyRewardTracking where surveyId = 10
 SELECT * from SurveyStatusTracking where surveyId = 7
 
 SELECT * from SurveyGeneralConfig 
+SELECT * from SurveyQuestion
 
 SELECT * from SurveyTagFilter where surveyId =6
 
@@ -35,6 +36,7 @@ SELECT * from SurveyTakenResultTagFilter where surveyTakenResultId =84
 SELECT * from SurveyResponse where SurveyTakenResultId = 1
 SELECT * from PaymentHistory
 SELECT * from AccountGeneralConfig
+SELECT * from AccountLevelSettingConfig
 
 
 
