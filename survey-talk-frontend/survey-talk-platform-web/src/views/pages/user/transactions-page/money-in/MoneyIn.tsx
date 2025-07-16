@@ -12,6 +12,7 @@ import type { RootState } from "../../../../../redux/rootReducer";
 import { updateAuthUser } from "../../../../../redux/auth/authSlice";
 import { callAxiosRestApi } from "../../../../../core/api/rest-api/main/api-call";
 import { loginRequiredAxiosInstance } from "../../../../../core/api/rest-api/config/instances/v2";
+import { ENV_CONFIG } from "@/config";
 interface Props {
   balance: number | null;
 }
@@ -22,7 +23,26 @@ interface MoneyInRecord {
   CreatedAt: string;
   StatusId: number;
 }
-
+interface TransactionHistory {
+  Id: number;
+  Amount: number;
+  CreatedAt: string;
+  Account: {
+    Id: number;
+    FullName: string;
+    Email: string;
+    Phone: string;
+    MainImageUrl: string;
+  };
+  TransactionStatus: {
+    Id: number;
+    Name: string;
+  };
+  TransactionType: {
+    Id: number;
+    Name: string;
+  };
+}
 // Custom cell renderer for Amount column
 const AmountCellRenderer = (params: any) => {
   return (
@@ -65,76 +85,114 @@ const DateCellRenderer = (params: any) => {
 };
 
 export const MoneyIn: React.FC<Props> = ({ balance }) => {
-  //TASK FAKE DATA, PHẢI BỎ KHI ĐÃ CÓ API
-  const fake = useSelector((state: RootState) => state.fake);
+  const [transactions, setTransactions] = useState<TransactionHistory[]>([]);
+  const [loading, setLoading] = useState(false);
+
   const user = useSelector((state: RootState) => state.auth.user);
   // STATES
   const [pushAmount, setPushAmount] = useState<string>("");
   const dispatch = useDispatch();
 
-  const [targetDay, setTargetDay] = useState(null);
 
   // HOOKS
   useEffect(() => {
-    fetchMockAPI();
+    const fetchTransactionHistory = async () => {
+      setLoading(true);
+      try {
+        const response = await callAxiosRestApi({
+          instance: loginRequiredAxiosInstance,
+          method: "get",
+          url: "Payment/account/balance-deposits/history",
+        });
+
+        if (response.success) {
+          setTransactions(response.data.TransactionHistory);
+        }
+      } catch (error) {
+        console.error("Error fetching transaction history:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTransactionHistory();
   }, []);
 
-  const fetchMockAPI = async () => {
-    const apiUrl = "https://685b91fb89952852c2d9fd1e.mockapi.io/MoneyFlow";
-    const res = await fetch(apiUrl);
-    const data = await res.json();
-    setTargetDay(data[5]);
-  };
+
 
   const columnDefs: ColDef[] = useMemo(
     () => [
       {
         headerName: "Mã Giao Dịch",
         field: "Id",
-        width: 150,
         cellClass: "transaction-id-cell",
+        flex: 0.8,
+      },
+      {
+        headerName: "Họ Tên",
+        field: "Account.FullName",
+        flex: 1,
       },
       {
         headerName: "Số Tiền Nạp",
         field: "Amount",
-        width: 180,
         cellRenderer: AmountCellRenderer,
       },
       {
         headerName: "Ngày Nạp",
         field: "CreatedAt",
-        width: 200,
-        cellRenderer: DateCellRenderer,
+        cellRenderer: (params: any) => {
+          const date = new Date(params.value);
+          return date.toLocaleString("vi-VN");
+        },
       },
       {
         headerName: "Trạng Thái",
-        field: "StatusId",
-        width: 150,
-        cellRenderer: StatusCellRenderer,
+        field: "TransactionStatus.Name",
+        flex: 1,
+        cellRenderer: (params: any) => {
+          const getStatusLabel = (status: any) => {
+            if (params.data.TransactionStatus.Id === 2) {
+              return "Thành công";
+            }
+            return status;
+          };
+
+          return (
+            <Chip
+              label={getStatusLabel(params.value)}
+              className={`status-chip ${params.data.TransactionStatus.Id === 2
+                  ? "status-success"
+                  : "status-unknown"
+                }`}
+              size="small"
+            />
+          );
+        },
       },
+
     ],
     []
   );
-
   const handlePushMoney = async () => {
     const amount = Number.parseInt(pushAmount);
     try {
-      // const response = await callAxiosRestApi({
-      //   instance: loginRequiredAxiosInstance,
-      //   method: "post",
-      //   url: `Payment/account/balance-deposits/create-payment-link`,
-      //   data: {
-      //     Amount: Number.parseInt(pushAmount),
-      //     ReturnUrl: `http://localhost:3007/user/transactions/payment-result?type=1&amount=${amount}`,
-      //     CancelUrl: `http://localhost:3007/user/transactions/payment-result?type=1&amount=${amount}`,
-      //   },
-      // });
+      const response = await callAxiosRestApi({
+        instance: loginRequiredAxiosInstance,
+        method: "post",
+        url: `Payment/account/balance-deposits/create-payment-link`,
+        data: {
+          Amount: Number.parseInt(pushAmount),
+          ReturnUrl: `${ENV_CONFIG.REST_API_BASE_URL}/user/transactions/payment-result?type=1&amount=${amount}`,
+          CancelUrl: `${ENV_CONFIG.REST_API_BASE_URL}/user/transactions/payment-result?type=1&amount=${amount}`,
+        },
+      });
       updateMoneyInById(7, amount);
-      // if (response.success) {
+      if (response.success) {
 
-      //   const PaymentLink = response.data.PaymentLink;
-      //   window.open(PaymentLink, "_blank");
-      // }
+        const PaymentLink = response.data.PaymentLink;
+        window.open(PaymentLink, "_blank");
+      }
     } catch (error) {
       console.error("Error creating payment link:", error);
     }
@@ -192,18 +250,19 @@ export const MoneyIn: React.FC<Props> = ({ balance }) => {
           <h3 className="table-title">Lịch sử nạp tiền</h3>
           <div className="ag-theme-alpine table-container">
             <AgGridReact
-              rowData={fake.MoneyInData}
+              rowData={transactions}
               columnDefs={columnDefs}
-              domLayout="autoHeight"
-              suppressHorizontalScroll={false}
-              pagination={true} // Bật pagination
-              paginationPageSize={8}
+              domLayout="normal"
               rowHeight={50}
+              paginationPageSize={5}
+              pagination={true}
+              suppressHorizontalScroll={false}
               defaultColDef={{
                 sortable: true,
                 filter: true,
                 resizable: true,
               }}
+
             />
           </div>
         </div>

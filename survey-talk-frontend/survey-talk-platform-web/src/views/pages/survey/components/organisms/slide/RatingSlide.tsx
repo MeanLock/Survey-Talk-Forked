@@ -100,7 +100,7 @@ const RatingSlide = ({ data }: Props) => {
     );
 
     const handleSelect = (index: number) => {
-        if (isValid) return;
+        //if (isValid) return;
         dispatch(
             handleUpdateRating({
                 idChoose: data?.ValueJson?.QuestionContent?.Id,
@@ -110,32 +110,38 @@ const RatingSlide = ({ data }: Props) => {
     };
 
     return (
-        <div className="">
-            <Box className="flex justify-center space-x-4">
-                {Array.from({ length: length }).map((_, index) => (
-                    <Box
-                        key={index}
-                        className="flex flex-col items-center cursor-pointer"
-                        onClick={() => handleSelect(index)}
+        <div className="relative"> {/* Add relative positioning */}
+        {isValid && (
+            <div 
+                className="absolute inset-0 bg-gray-200/50 z-10 rounded-lg"
+                style={{ cursor: 'not-allowed' }}
+            />
+        )}
+        <Box className="flex justify-center space-x-4">
+            {Array.from({ length: length }).map((_, index) => (
+                <Box
+                    key={index}
+                    className="flex flex-col items-center cursor-pointer"
+                    onClick={() => handleSelect(index)}
+                >
+                    {handleRenderIcons(selected >= index + 1)}
+                    <Typography
+                        variant="body2"
+                        style={{
+                            color:
+                                selected >= index + 1
+                                    ? getColorFromGradient(buttonBgColor)
+                                    : "#6b7280",
+                            marginTop: "4px",
+                        }}
                     >
-                        {handleRenderIcons(selected >= index + 1)}
-                        <Typography
-                            variant="body2"
-                            style={{
-                                color:
-                                    selected >= index + 1
-                                        ? getColorFromGradient(buttonBgColor)
-                                        : "#6b7280",
-                                marginTop: "4px",
-                            }}
-                        >
-                            {index + 1}
-                        </Typography>
-                    </Box>
-                ))}
-            </Box>
-            <HiddenCheck id={data?.ValueJson.QuestionContent.QuestionTypeId} />
-        </div>
+                        {index + 1}
+                    </Typography>
+                </Box>
+            ))}
+        </Box>
+        <HiddenCheck id={data?.ValueJson.QuestionContent.QuestionTypeId} />
+    </div>
     );
 };
 

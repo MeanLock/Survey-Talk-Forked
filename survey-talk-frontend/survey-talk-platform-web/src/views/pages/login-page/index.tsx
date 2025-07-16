@@ -174,13 +174,14 @@ const LoginPage: FC<LoginPageProps> = (props) => {
             LocalStorageUtil.setAuthUserToPersistLocalStorage(user);
 
             // NAVIGATE TO PREVIOUS ROUTE IF NEEDED
-            const redirectUrl = localStorage.getItem("redirectUrl");
-            if (redirectUrl) {
-              localStorage.removeItem("redirectUrl");
-              window.location.href = redirectUrl;
-            } else {
-              window.location.href = "/";
-            }
+            // const redirectUrl = localStorage.getItem("redirectUrl");
+            // if (redirectUrl) {
+            //   localStorage.removeItem("redirectUrl");
+            //   window.location.href = redirectUrl;
+            // } else {
+            //   window.location.href = "/";
+            // }
+            window.location.href = "/";
           }
         } else if (response.isAppError) {
           // errorAlert(

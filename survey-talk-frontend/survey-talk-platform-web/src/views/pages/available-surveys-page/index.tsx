@@ -179,7 +179,7 @@ const AvailableSurveys: React.FC<AvailableSurveyProps> = () => {
 
   const getTopicName = (id: number) => {
     // return SurveyTopics.filter((t) => t.id === id)[0].name;
-    return "Ê";
+    return "Chưa xác định";
   };
 
   const handleTopicFilterChange = (topicId: number) => {

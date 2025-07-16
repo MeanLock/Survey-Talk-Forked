@@ -21,7 +21,7 @@ const MultiChooseSlide = ({ data }: Props) => {
   // const isValid = useMemo(() => data?.IsValid, [data]);
   const handleSelect = useCallback(
     (id: string) => {
-      if (isValid) return;
+      // if (isValid) return;
       dispatch(
         handleUpdateMutilChoice({
           idChoose: id,
@@ -32,15 +32,18 @@ const MultiChooseSlide = ({ data }: Props) => {
     [data?.ValueJson?.QuestionContent?.Id, dispatch]
   );
 
-  return (
-    <div className="flex flex-col gap-4 w-[90%] max-w-5xl mx-auto mt-6">
-      {/* {!isValid ? (
-                <Error message="Câu hỏi này chưa được trả lời" />
-            ) : null} */}
+ return (
+  <div className="flex flex-col gap-4 w-[90%] max-w-5xl mx-auto mt-6">
+    <div className="relative"> {/* Add wrapper div for options */}
+      {isValid && (
+        <div 
+          className="absolute inset-0 bg-gray-200/50 z-10 rounded-lg"
+          style={{ cursor: 'not-allowed' }}
+        />
+      )}
       {(data?.ValueJson?.QuestionContent?.Options || []).map(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (op: any) => (
-          <div className="flex justify-center items-center gap-5 w-[100%]">
+          <div className="flex justify-center items-center gap-5 w-[100%] mb-4">
             {op?.MainImageUrl && !op.MainImageUrl.includes("unknown.jpg") ? (
               <img
                 alt="image"
@@ -51,17 +54,13 @@ const MultiChooseSlide = ({ data }: Props) => {
 
             <button
               key={op?.Id}
-              disabled={isValid}
               onClick={() => handleSelect(op?.Id || 0)}
-              className={`text-left px-5 py-2 rounded transition-all duration-150 font-medium text-lg flex-1 ${
-                isValid && "opacity-[0.6] cursor-not-allowed"
-              }
-                        ${
-                          idsSelected.includes(op?.Id)
-                  ? "text-white border-none"
-                  : "bg-transparent text-white border border-white"
-                }
-                    `}
+              className={`text-left px-5 py-2 rounded transition-all duration-150 font-medium text-lg flex-1
+                ${
+                  idsSelected.includes(op?.Id)
+                    ? "text-white border-none"
+                    : "bg-transparent text-white border border-white"
+                }`}
               style={{
                 background: idsSelected.includes(op?.Id)
                   ? config?.ConfigJson?.ButtonBackgroundColor || "#24738a"
@@ -76,10 +75,10 @@ const MultiChooseSlide = ({ data }: Props) => {
           </div>
         )
       )}
-
-      <HiddenCheck id={data?.ValueJson.QuestionContent.QuestionTypeId} />
     </div>
-  );
+    <HiddenCheck id={data?.ValueJson.QuestionContent.QuestionTypeId} />
+  </div>
+);
 };
 
 export default MultiChooseSlide;

@@ -39,7 +39,7 @@ const SingleSliderSlide = ({ data }: Props) => {
     );
     const dispatch = useDispatch();
     const handleSliderChange = (_event: Event, newValue: number | number[]) => {
-        if (isValid) return;
+        //if (isValid) return;
         if (typeof newValue === "number") {
             dispatch(
                 handleChangeSlider({
@@ -50,7 +50,13 @@ const SingleSliderSlide = ({ data }: Props) => {
         }
     };
     return (
-        <Box className="single-slider  p-6 rounded-lg flex flex-col gap-6">
+         <Box className="single-slider p-6 rounded-lg flex flex-col gap-6 relative"> {/* Added relative */}
+        {isValid && (
+            <div 
+                className="absolute inset-0 bg-gray-200/50 z-10 rounded-lg"
+                style={{ cursor: 'not-allowed' }}
+            />
+        )}
             <Box className="flex flex-col items-center w-full">
                 <Box className="flex justify-between w-full px-1 mb-2">
                     <Typography

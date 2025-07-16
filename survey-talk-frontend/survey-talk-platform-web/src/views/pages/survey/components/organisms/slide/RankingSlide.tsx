@@ -30,7 +30,7 @@ const RankingSlide = ({ data }: Props) => {
     const options = data?.ValueJson?.QuestionContent?.Options || [];
 
     const handleRank = (id: string, content: string) => {
-        if (isValid) return;
+        // if (isValid) return;
         const idx = ranking.findIndex((r) => r.SurveyOptionId === id);
         let newRanking;
         if (idx > -1) {
@@ -63,8 +63,15 @@ const RankingSlide = ({ data }: Props) => {
 
     return (
         <div className="flex flex-col gap-4 w-[90%] max-w-5xl mx-auto mt-6">
+        <div className="relative"> {/* Add wrapper div for options */}
+            {isValid && (
+                <div 
+                    className="absolute inset-0 bg-gray-200/50 z-10 rounded-lg"
+                    style={{ cursor: 'not-allowed' }}
+                />
+            )}
             {options.map((op: any) => (
-                <div className="flex justify-center items-center gap-5 w-[100%]">
+                <div className="flex justify-center items-center gap-5 w-[100%] mb-4">
                     {op?.MainImageUrl && !op.MainImageUrl.includes("unknown.jpg") ? (
                         <img
                             alt="image"
@@ -103,8 +110,9 @@ const RankingSlide = ({ data }: Props) => {
                     </button>
                 </div>
             ))}
-            <HiddenCheck id={data?.ValueJson.QuestionContent.QuestionTypeId} />
         </div>
+        <HiddenCheck id={data?.ValueJson.QuestionContent.QuestionTypeId} />
+    </div>
     );
 };
 

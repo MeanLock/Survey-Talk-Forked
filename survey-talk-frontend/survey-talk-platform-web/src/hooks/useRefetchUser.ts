@@ -8,7 +8,7 @@ export const useRefetchUser = () => {
   const dispatch = useDispatch();
   const token = useSelector((state: RootState) => state.auth.token);
   const refetchUser = async () => {
-    alert("Chạy hàm update User!");
+    
     const user = await getAccountMe();
     if (user) {
       dispatch(updateAuthUser({ token: token, user: user.user }));

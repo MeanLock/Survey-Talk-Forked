@@ -4,7 +4,12 @@ import { SurveyTopics } from "../../../../core/mockData/mockData";
 import "./styles.scss";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+// import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+
 import { Label } from "@/components/ui/label";
 import {
   DropdownMenu,
@@ -277,8 +282,7 @@ const ManageSurveyPage = () => {
     });
     if (response && response.success) {
       navigate(0);
-       toast.success("Xóa khảo sát thành công");
-
+      toast.success("Xóa khảo sát thành công");
     }
   };
 
@@ -314,7 +318,7 @@ const ManageSurveyPage = () => {
       <p className="surveys-me__title mb-2">Tài liệu khảo sát của tôi</p>
 
       {/* Filter Radio Group với styling cải thiện */}
-      <div className="surveys-me__filter-container pl-3 pr-5 py-3 gap-5 flex items-center justify-around">
+      {/* <div className="surveys-me__filter-container pl-3 pr-5 py-3 gap-5 flex items-center justify-around">
         <RadioGroup
           value={filterOption}
           onValueChange={handleFilter}
@@ -416,6 +420,103 @@ const ManageSurveyPage = () => {
               Deactivated
             </Label>
           </div>
+        </RadioGroup>
+      </div> */}
+      <div className="surveys-me__filter-container pl-3 pr-5 py-3 gap-5 flex items-center justify-around">
+        <RadioGroup
+          row
+          value={filterOption}
+          onChange={(e) => handleFilter(e.target.value)}
+          className="flex flex-row gap-6 items-center"
+        >
+          <FormControlLabel
+            value="All"
+            control={
+              <Radio
+                sx={{ color: "#3E5DAB", "&.Mui-checked": { color: "#3E5DAB" } }}
+                size="small"
+              />
+            }
+            label="All"
+            className="text-sm"
+          />
+          <FormControlLabel
+            value="Editing"
+            control={
+              <Radio
+                sx={{ color: "#3E5DAB", "&.Mui-checked": { color: "#3E5DAB" } }}
+                size="small"
+              />
+            }
+            label="Đang chỉnh sửa"
+            className="text-sm"
+          />
+          <FormControlLabel
+            value="Published"
+            control={
+              <Radio
+                sx={{ color: "#3E5DAB", "&.Mui-checked": { color: "#3E5DAB" } }}
+                size="small"
+              />
+            }
+            label="Đang Chạy"
+            className="text-sm"
+          />
+          <FormControlLabel
+            value="NearDeadline"
+            control={
+              <Radio
+                sx={{ color: "#3E5DAB", "&.Mui-checked": { color: "#3E5DAB" } }}
+                size="small"
+              />
+            }
+            label="Near Deadline"
+            className="text-sm"
+          />
+          <FormControlLabel
+            value="OnDeadline"
+            control={
+              <Radio
+                sx={{ color: "#3E5DAB", "&.Mui-checked": { color: "#3E5DAB" } }}
+                size="small"
+              />
+            }
+            label="On Deadline"
+            className="text-sm"
+          />
+          <FormControlLabel
+            value="LateForDeadline"
+            control={
+              <Radio
+                sx={{ color: "#3E5DAB", "&.Mui-checked": { color: "#3E5DAB" } }}
+                size="small"
+              />
+            }
+            label="Late For Deadline"
+            className="text-sm"
+          />
+          <FormControlLabel
+            value="Completed"
+            control={
+              <Radio
+                sx={{ color: "#3E5DAB", "&.Mui-checked": { color: "#3E5DAB" } }}
+                size="small"
+              />
+            }
+            label="Hoàn Thành"
+            className="text-sm"
+          />
+          <FormControlLabel
+            value="Deactivated"
+            control={
+              <Radio
+                sx={{ color: "#3E5DAB", "&.Mui-checked": { color: "#3E5DAB" } }}
+                size="small"
+              />
+            }
+            label="Deactivated"
+            className="text-sm"
+          />
         </RadioGroup>
       </div>
 
