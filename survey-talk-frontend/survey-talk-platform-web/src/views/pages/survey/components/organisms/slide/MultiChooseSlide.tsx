@@ -11,7 +11,7 @@ interface Props {
 
 const MultiChooseSlide = ({ data }: Props) => {
   const config = useAppSelector((state) => state.appSlice.infoSurvey);
-  const isValid = useAppSelector((state) => state.appSlice?.isValid || true);
+  const isValid = useAppSelector((state) => state.appSlice.isValid);
 
   const dispatch = useAppDispatch();
   const idsSelected = useMemo(
@@ -19,10 +19,9 @@ const MultiChooseSlide = ({ data }: Props) => {
     [data]
   );
   // const isValid = useMemo(() => data?.IsValid, [data]);
-
   const handleSelect = useCallback(
-    (id: number) => {
-      if (!isValid) return;
+    (id: string) => {
+      if (isValid) return;
       dispatch(
         handleUpdateMutilChoice({
           idChoose: id,
@@ -52,15 +51,16 @@ const MultiChooseSlide = ({ data }: Props) => {
 
             <button
               key={op?.Id}
+              disabled={isValid}
               onClick={() => handleSelect(op?.Id || 0)}
               className={`text-left px-5 py-2 rounded transition-all duration-150 font-medium text-lg flex-1 ${
-                !isValid && "opacity-[0.6] cursor-not-allowed"
+                isValid && "opacity-[0.6] cursor-not-allowed"
               }
                         ${
                           idsSelected.includes(op?.Id)
-                            ? "text-white border-none"
-                            : "bg-transparent text-white border border-white"
-                        }
+                  ? "text-white border-none"
+                  : "bg-transparent text-white border border-white"
+                }
                     `}
               style={{
                 background: idsSelected.includes(op?.Id)

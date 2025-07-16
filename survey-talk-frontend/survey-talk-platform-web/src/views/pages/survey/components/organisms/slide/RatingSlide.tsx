@@ -20,6 +20,8 @@ interface Props {
 
 const RatingSlide = ({ data }: Props) => {
     const config = useAppSelector((state) => state.appSlice.infoSurvey);
+        const isValid = useAppSelector((state) => state.appSlice.isValid);
+
     const buttonBgColor = useMemo(
         () => config?.ConfigJson?.ButtonBackgroundColor || "#007bff",
         [config?.ConfigJson?.ButtonBackgroundColor]
@@ -98,6 +100,7 @@ const RatingSlide = ({ data }: Props) => {
     );
 
     const handleSelect = (index: number) => {
+        if (isValid) return;
         dispatch(
             handleUpdateRating({
                 idChoose: data?.ValueJson?.QuestionContent?.Id,

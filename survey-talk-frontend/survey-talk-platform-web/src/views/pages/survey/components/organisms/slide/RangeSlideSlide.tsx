@@ -11,7 +11,7 @@ interface Props {
 }
 
 const RangeSlideSlide = ({ data }: Props) => {
-    const isValid = useAppSelector((state) => state.appSlice?.isValid || true);
+    const isValid = useAppSelector((state) => state.appSlice.isValid);
     const config = useAppSelector((state) => state.appSlice.infoSurvey);
 
     const value = useMemo(
@@ -44,7 +44,7 @@ const RangeSlideSlide = ({ data }: Props) => {
     const dispatch = useDispatch();
     const handleSliderChange = (_event: Event, newValue: number | number[]) => {
         if (Array.isArray(newValue)) {
-            if (!isValid) return;
+            if (isValid) return;
             dispatch(
                 handleChangeRangeSlide({
                     idChoose: data?.ValueJson?.QuestionContent?.Id,

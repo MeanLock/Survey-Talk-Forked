@@ -13,10 +13,11 @@ interface Props {
 const RankingSlide = ({ data }: Props) => {
     const dispatch = useDispatch();
     const config = useAppSelector((state) => state.appSlice.infoSurvey);
+    const isValid = useAppSelector((state) => state.appSlice.isValid);
 
     const questionId = data?.ValueJson?.QuestionContent?.Id;
 
-    const ranking: { SurveyOptionId: number; RankIndex: number }[] =
+    const ranking: { SurveyOptionId: string; RankIndex: number }[] =
         useSelector(
             (state: RootState) =>
                 (
@@ -28,7 +29,8 @@ const RankingSlide = ({ data }: Props) => {
 
     const options = data?.ValueJson?.QuestionContent?.Options || [];
 
-    const handleRank = (id: number, content: string) => {
+    const handleRank = (id: string, content: string) => {
+        if (isValid) return;
         const idx = ranking.findIndex((r) => r.SurveyOptionId === id);
         let newRanking;
         if (idx > -1) {

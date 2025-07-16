@@ -17,7 +17,7 @@ interface Props {
 
 const SingleInputSlide = ({ data }: Props) => {
     // console.log(data);
-    const isValid = useAppSelector((state) => state.appSlice?.isValid || true);
+    const isValid = useAppSelector((state) => state.appSlice.isValid );
     const config = useAppSelector((state) => state.appSlice.infoSurvey);
     const dispatch = useDispatch();
 
@@ -39,7 +39,7 @@ const SingleInputSlide = ({ data }: Props) => {
                             ""
                         }
                         onChange={(e) => {
-                            if (!isValid) return;
+                            if (isValid) return;
                             dispatch(
                                 handleUpdateForm({
                                     idChoose:
