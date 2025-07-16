@@ -1,7 +1,5 @@
 import { useState, type FC } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { useForm, Controller } from "react-hook-form";
 import { callAxiosRestApi } from "../../../core/api/rest-api/main/api-call";
 import { publicAxiosInstance } from "../../../core/api/rest-api/config/instances/v2";
 import { errorAlert, successAlert } from "../../../core/utils/alert.util";
@@ -30,52 +28,30 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-const formSchema = z
-  .object({
-    email: z.string().email("Email không hợp lệ"),
-    fullName: z
-      .string()
-      .min(2, "Tên phải có ít nhất 2 ký tự")
-      .regex(/^[A-Z]/, "Chữ cái đầu tiên phải viết hoa"),
-    YOB: z.string().min(1, "Ngày sinh không được để trống"),
-    phone: z
-      .string()
-      .min(10, "Số điện thoại phải có từ 10 đến 15 chữ số")
-      .max(15, "Số điện thoại phải có từ 10 đến 15 chữ số"),
-    password: z
-      .string()
-      .min(6, "Mật khẩu phải có ít nhất 6 ký tự")
-      .regex(
-        /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*\d).{6,}$/,
-        "Mật khẩu phải có ít nhất 1 ký tự viết hoa, 1 ký tự đặc biệt và ít nhất 6 ký tự"
-      ),
-    rePassword: z.string(),
-    gender: z.enum(["male", "female"]),
-  })
-  .refine((data) => data.password === data.rePassword, {
-    message: "Nhập lại mật khẩu không khớp!",
-    path: ["rePassword"],
-  });
-
 interface RegisterPageProps {
   disableCustomTheme?: boolean;
 }
 
-const RegistersPage: FC<RegisterPageProps> = (props) => {
-  // REDUX
-  const dispatch = useDispatch();
+type RegisterFormValues = {
+  email: string;
+  fullName: string;
+  YOB: string;
+  phone: string;
+  password: string;
+  rePassword: string;
+  gender: string;
+};
 
-  // STATES
+const RegistersPage: FC<RegisterPageProps> = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
   const [imgBase64, setImgBase64] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showRePassword, setShowRePassword] = useState(false);
 
-  // HOOKS
-  const navigate = useNavigate();
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<RegisterFormValues>({
     defaultValues: {
       email: "",
       fullName: "",
@@ -85,12 +61,17 @@ const RegistersPage: FC<RegisterPageProps> = (props) => {
       rePassword: "",
       gender: "male",
     },
+    mode: "onBlur",
   });
 
-  const handleRegisterMember = async (values: z.infer<typeof formSchema>) => {
+  const handleRegisterMember = async (values: RegisterFormValues) => {
+    if (values.password !== values.rePassword) {
+      errorAlert("Nhập lại mật khẩu không khớp!");
+      return;
+    }
+
     setLoading(true);
 
-    // Gọi API
     const addMember = await callAxiosRestApi({
       instance: publicAxiosInstance,
       method: "post",
@@ -110,40 +91,11 @@ const RegistersPage: FC<RegisterPageProps> = (props) => {
     });
 
     if (addMember.success) {
-      // Hiển thị thông báo đăng ký thành công
-      await successAlert(
-        "Đăng ký tài khoản thành công, vui lòng xác thực tài khoản."
-      );
-
-      // Hiển thị yêu cầu nhập mã xác thực
-      const { value: verifyCode } = await Swal.fire({
-        title: "Xác thực tài khoản",
-        input: "text",
-        inputPlaceholder: "Nhập mã xác thực",
-        showCancelButton: true,
-        confirmButtonText: "Xác nhận",
-        cancelButtonText: "Hủy",
-        inputValidator: (value) => {
-          if (!value) {
-            return "Bạn phải nhập mã xác thực!";
-          }
-        },
-      });
-
-      // Kiểm tra mã xác thực
-      if (verifyCode === "123456") {
-        // Mã đúng, chuyển qua trang login
-        successAlert("Xác thực thành công! Vui lòng đăng nhập.");
-        localStorage.setItem("isRegister", "true");
-        window.location.href = "/login"; // Chuyển hướng đến trang login
-      } else {
-        // Mã sai, thông báo và yêu cầu nhập lại
-        errorAlert("Mã xác thực không đúng, vui lòng thử lại.");
-        handleRegisterMember(values); // Gọi lại hàm đăng ký để người dùng nhập lại mã
-      }
+      navigate(`/account-verification?email=${values.email}`);
     } else if (!addMember.isAppError) {
       errorAlert(addMember.message.content + ". Vui lòng thử lại!");
     }
+
     setLoading(false);
   };
 
@@ -163,7 +115,7 @@ const RegistersPage: FC<RegisterPageProps> = (props) => {
         <div className="w-full h-full flex items-center justify-center p-8">
           <img
             className="max-w-full max-h-full object-contain"
-            src={RegisGif || "/placeholder.svg"}
+            src={RegisGif}
             alt="Registration decoration"
           />
         </div>
@@ -173,7 +125,7 @@ const RegistersPage: FC<RegisterPageProps> = (props) => {
         <Card className="w-full max-w-md shadow-lg">
           <CardHeader className="text-center pb-4">
             <img
-              src={Logo || "/placeholder.svg"}
+              src={Logo}
               className="w-[120px] h-[65px] mx-auto mb-2 object-contain"
               alt="Logo"
             />
@@ -187,15 +139,18 @@ const RegistersPage: FC<RegisterPageProps> = (props) => {
                 <FormField
                   control={form.control}
                   name="email"
+                  rules={{
+                    required: "Email là bắt buộc",
+                    pattern: {
+                      value: /^\S+@\S+$/i,
+                      message: "Email không hợp lệ",
+                    },
+                  }}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input
-                          type="email"
-                          placeholder="Ex: example@gmail.com"
-                          {...field}
-                        />
+                        <Input type="email" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -205,15 +160,22 @@ const RegistersPage: FC<RegisterPageProps> = (props) => {
                 <FormField
                   control={form.control}
                   name="fullName"
+                  rules={{
+                    required: "Họ tên là bắt buộc",
+                    minLength: {
+                      value: 2,
+                      message: "Tên phải có ít nhất 2 ký tự",
+                    },
+                    pattern: {
+                      value: /^[A-Z]/,
+                      message: "Chữ cái đầu tiên phải viết hoa",
+                    },
+                  }}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Họ và Tên</FormLabel>
                       <FormControl>
-                        <Input
-                          type="text"
-                          placeholder="Ex: Nguyen Van A"
-                          {...field}
-                        />
+                        <Input type="text" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -223,6 +185,7 @@ const RegistersPage: FC<RegisterPageProps> = (props) => {
                 <FormField
                   control={form.control}
                   name="YOB"
+                  rules={{ required: "Ngày sinh là bắt buộc" }}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Ngày sinh</FormLabel>
@@ -234,9 +197,14 @@ const RegistersPage: FC<RegisterPageProps> = (props) => {
                   )}
                 />
 
-                <FormField
+                <Controller
                   control={form.control}
                   name="phone"
+                  rules={{
+                    required: "Số điện thoại là bắt buộc",
+                    minLength: { value: 10, message: "Tối thiểu 10 chữ số" },
+                    maxLength: { value: 15, message: "Tối đa 15 chữ số" },
+                  }}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>SĐT</FormLabel>
@@ -306,14 +274,13 @@ const RegistersPage: FC<RegisterPageProps> = (props) => {
                       className="hidden"
                       accept="image/*"
                       onChange={(e) => {
-                        if (e.target.files?.[0]) {
+                        if (e.target.files?.[0])
                           handleImageUpload(e.target.files[0]);
-                        }
                       }}
                     />
                     {imgBase64 && (
                       <img
-                        src={imgBase64 || "/placeholder.svg"}
+                        src={imgBase64}
                         alt="Preview"
                         className="w-[50px] h-[50px] rounded-full object-cover"
                       />
@@ -324,21 +291,28 @@ const RegistersPage: FC<RegisterPageProps> = (props) => {
                 <FormField
                   control={form.control}
                   name="password"
+                  rules={{
+                    required: "Mật khẩu là bắt buộc",
+                    pattern: {
+                      value: /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*\d).{6,}$/,
+                      message:
+                        "Ít nhất 1 chữ in hoa, 1 ký tự đặc biệt và 6 ký tự",
+                    },
+                  }}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel>Mật khẩu</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             type={showPassword ? "text" : "password"}
-                            placeholder="EX: ilovesurveytalk"
                             {...field}
                           />
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            className="absolute right-0 top-0 h-full px-3"
                             onClick={() => setShowPassword(!showPassword)}
                           >
                             {showPassword ? (
@@ -357,21 +331,23 @@ const RegistersPage: FC<RegisterPageProps> = (props) => {
                 <FormField
                   control={form.control}
                   name="rePassword"
+                  rules={{
+                    required: "Vui lòng nhập lại mật khẩu",
+                  }}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Re-Password</FormLabel>
+                      <FormLabel>Nhập lại mật khẩu</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             type={showRePassword ? "text" : "password"}
-                            placeholder="Re-Enter your password"
                             {...field}
                           />
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            className="absolute right-0 top-0 h-full px-3"
                             onClick={() => setShowRePassword(!showRePassword)}
                           >
                             {showRePassword ? (
@@ -400,7 +376,6 @@ const RegistersPage: FC<RegisterPageProps> = (props) => {
 
                 <Button
                   type="submit"
-                  variant="default"
                   className="w-full mb-4"
                   disabled={loading}
                 >
@@ -425,7 +400,7 @@ const RegistersPage: FC<RegisterPageProps> = (props) => {
                   variant="outline"
                   size="icon"
                   className="h-12 w-12"
-                  onClick={() => handleGoogleLogin()}
+                  onClick={handleGoogleLogin}
                 >
                   <Mail className="h-6 w-6 text-red-500" />
                 </Button>

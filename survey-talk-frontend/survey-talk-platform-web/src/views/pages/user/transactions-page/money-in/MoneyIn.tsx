@@ -183,8 +183,8 @@ export const MoneyIn: React.FC<Props> = ({ balance }) => {
         url: `Payment/account/balance-deposits/create-payment-link`,
         data: {
           Amount: Number.parseInt(pushAmount),
-          ReturnUrl: `${ENV_CONFIG.REST_API_BASE_URL}/user/transactions/payment-result?type=1&amount=${amount}`,
-          CancelUrl: `${ENV_CONFIG.REST_API_BASE_URL}/user/transactions/payment-result?type=1&amount=${amount}`,
+          ReturnUrl: `${ENV_CONFIG.VITE_BASE_URL}/user/transactions/payment-result?type=1&amount=${amount}`,
+          CancelUrl: `${ENV_CONFIG.VITE_BASE_URL}/user/transactions/payment-result?type=1&amount=${amount}`,
         },
       });
       updateMoneyInById(7, amount);
@@ -242,7 +242,8 @@ export const MoneyIn: React.FC<Props> = ({ balance }) => {
     <div className="money-in w-full flex flex-col items-start">
       <p className="money-in__remain-title">Số dư khả dụng</p>
       <p className="money-in__remain-value">
-        {user?.Balance?.toLocaleString("vi-VN")}đ
+        {/* {user?.Balance?.toLocaleString("vi-VN")}đ */}
+        {balance?.toLocaleString("vn")} VND
       </p>
 
       <div className="w-full grid grid-cols-2 gap-6 mt-5">

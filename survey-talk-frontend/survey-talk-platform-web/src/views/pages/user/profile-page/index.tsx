@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/redux/rootReducer";
 import { useGetAccountDetails } from "@/services/Profile/get-account-details";
 import { useEffect, useState } from "react";
@@ -16,6 +16,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import NotFoundImg from "@/assets/Image/Logo/notfound.png";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { clearAuthToken } from "@/redux/auth/authSlice";
 
 // Loading component placeholder
 const SurveyTalkLoading = () => (
@@ -27,7 +28,7 @@ const ProfilePage = () => {
   const [showMode, setShowMode] = useState("profile");
   const [showPassword, setShowPassword] = useState(false);
   const [isChanged, setIsChanged] = useState(false);
-
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -109,8 +110,8 @@ const ProfilePage = () => {
   };
 
   const handleLogout = () => {
-    console.log("Logging out user");
-    // TODO: Implement actual logout logic
+    dispatch(clearAuthToken());
+    navigate("/login");
   };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
