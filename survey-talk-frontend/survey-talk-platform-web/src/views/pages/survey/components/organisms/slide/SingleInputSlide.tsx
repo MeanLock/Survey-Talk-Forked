@@ -11,11 +11,12 @@ import { useAppSelector } from "@/app/hooks";
 import { HiddenCheck } from "../../molecules/hiddenCheck/HiddenCheck";
 
 interface Props {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any;
 }
 
 const SingleInputSlide = ({ data }: Props) => {
+
     // console.log(data);
   const isValid = useAppSelector((state) => state.appSlice.isValid);
     const config = useAppSelector((state) => state.appSlice.infoSurvey);
@@ -182,6 +183,7 @@ const SingleInputSlide = ({ data }: Props) => {
         </div>
     </div>
     );
+
 };
 
 export default SingleInputSlide;

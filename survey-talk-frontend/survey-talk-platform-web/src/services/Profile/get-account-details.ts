@@ -26,7 +26,6 @@ export const getEditSessionOptions = () =>
 type UseGetType = {
   //   queryConfig?: QueryConfig<ReturnType<typeof getEditSessionOptions>>;
   queryConfig?: QueryConfig<Awaited<ReturnType<typeof get>>>;
-  id: number;
 };
 
 export const useGetAccountDetails = ({ queryConfig }: UseGetType) => {
