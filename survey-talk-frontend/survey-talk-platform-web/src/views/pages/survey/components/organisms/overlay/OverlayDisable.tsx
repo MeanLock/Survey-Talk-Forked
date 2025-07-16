@@ -16,7 +16,7 @@ export default function OverlayDisable() {
       >
         Trạng thái của khảo sát đã thay đổi, không thể chỉnh sửa tiếp
       </p>
-      <button
+      {/* <button
         className="px-6 py-3 rounded-lg cursor-pointer"
         style={{
           backgroundColor: "#5daf4d",
@@ -25,7 +25,7 @@ export default function OverlayDisable() {
         onClick={() => navigate(routesMap.Home)}
       >
         Về trang chủ
-      </button>
+      </button> */}
     </div>
   );
 }

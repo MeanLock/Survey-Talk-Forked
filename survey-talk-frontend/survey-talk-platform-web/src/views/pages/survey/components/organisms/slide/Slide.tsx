@@ -29,7 +29,7 @@ const Slide = ({ currentQuestionId }: Props) => {
   );
 
   const [timer, setTimer] = useState(-1);
-  const refAudio = useRef<SpeechRecognition | null>(null);
+  //const refAudio = useRef<SpeechRecognition | null>(null);
   const [isActiveAudio, setIsActiveAudio] = useState<boolean>(false);
   const [isTimerInitialized, setIsTimerInitialized] = useState(false);
   const [inputText, setInputText] = useState<string>("");
@@ -80,39 +80,39 @@ const Slide = ({ currentQuestionId }: Props) => {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
+    // const SpeechRecognition =
+    //   window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    if (!SpeechRecognition) {
-      console.warn("Trình duyệt không hỗ trợ SpeechRecognition.");
-      return;
-    }
+    // if (!SpeechRecognition) {
+    //   console.warn("Trình duyệt không hỗ trợ SpeechRecognition.");
+    //   return;
+    // }
 
-    const recognition = new SpeechRecognition();
-    refAudio.current = recognition;
+    // const recognition = new SpeechRecognition();
+    // refAudio.current = recognition;
 
-    recognition.continuous = false;
-    recognition.lang = "vi-VN";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+    // recognition.continuous = false;
+    // recognition.lang = "vi-VN";
+    // recognition.interimResults = false;
+    // recognition.maxAlternatives = 1;
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      setIsActiveAudio(false);
-      setInputText(event.results[0][0].transcript);
-    };
+    // recognition.onresult = (event: SpeechRecognitionEvent) => {
+    //   setIsActiveAudio(false);
+    //   setInputText(event.results[0][0].transcript);
+    // };
 
-    recognition.onspeechend = () => {
-      recognition.stop();
-      console.log("Người dùng ngưng nói");
-    };
+    // recognition.onspeechend = () => {
+    //   recognition.stop();
+    //   console.log("Người dùng ngưng nói");
+    // };
 
-    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      console.error("Lỗi nhận diện:", event.error);
-    };
+    // recognition.onerror = (event: any) => {
+    //   console.error("Lỗi nhận diện:", event.error);
+    // };
 
-    return () => {
-      recognition.stop(); // đảm bảo cleanup khi unmount
-    };
+    // return () => {
+    //   recognition.stop(); // đảm bảo cleanup khi unmount
+    // };
   }, []);
 
   useEffect(() => {
@@ -145,15 +145,15 @@ const Slide = ({ currentQuestionId }: Props) => {
       return;
     }
 
-    if (!refAudio.current) return;
+    // if (!refAudio.current) return;
 
-    if (isActiveAudio) {
-      refAudio.current.stop();
-      setIsActiveAudio(false);
-    } else {
-      refAudio.current.start();
-      setIsActiveAudio(true);
-    }
+    // if (isActiveAudio) {
+    //   refAudio.current.stop();
+    //   setIsActiveAudio(false);
+    // } else {
+    //   refAudio.current.start();
+    //   setIsActiveAudio(true);
+    // }
   };
 
   const handleRender = useCallback(() => {

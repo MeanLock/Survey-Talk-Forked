@@ -46,9 +46,7 @@ const ProfilePage = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const userId = Number(user.Id);
   const { data: userProfiles, isLoading: isLoadingProfiles } =
-    useGetAccountDetails({
-      id: userId,
-    });
+    useGetAccountDetails({});
 
   useEffect(() => {
     if (userProfiles) {

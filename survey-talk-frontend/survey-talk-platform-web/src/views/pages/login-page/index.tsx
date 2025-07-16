@@ -34,12 +34,7 @@ import Swal from "sweetalert2";
 import { jwtDecode } from "jwt-decode";
 import { loginRequiredApi } from "../../../core/api/rest-api/config/instances/v1";
 import { LocalStorageUtil } from "../../../core/utils/storage.util";
-import {
-  clearFakeData,
-  setFakeData,
-  updateFakeData,
-} from "../../../redux/fake/fakeSlice";
-import { requesterFake, takerFake } from "../../../core/mockData/userFake";
+
 import type { RootState } from "../../../redux/rootReducer";
 import { getAccountMe } from "@/services/Profile/get-accounts-me";
 import { JwtUtil } from "@/core/utils/jwt.util";
@@ -50,7 +45,6 @@ interface LoginPageProps {
 const LoginPage: FC<LoginPageProps> = (props) => {
   // REDUX
   const dispatch = useDispatch();
-  const fake = useSelector((root: RootState) => root.fake);
 
   // STATES
   const [manualLoading, setManualLoading] = useState(false);

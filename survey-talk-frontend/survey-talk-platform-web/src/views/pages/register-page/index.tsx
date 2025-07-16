@@ -1,16 +1,16 @@
-import { useState, type FC } from "react";
+import type { FC } from "react";
+import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { callAxiosRestApi } from "../../../core/api/rest-api/main/api-call";
-import { publicAxiosInstance } from "../../../core/api/rest-api/config/instances/v2";
-import { errorAlert, successAlert } from "../../../core/utils/alert.util";
+import { callAxiosRestApi } from "@/core/api/rest-api/main/api-call";
+import { publicAxiosInstance } from "@/core/api/rest-api/config/instances/v2";
+import { errorAlert } from "@/core/utils/alert.util"; // Assuming these are custom utilities
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import RegisGif from "../../../assets/Image/Register/Regis.gif";
-import Swal from "sweetalert2";
-import Logo from "../../../assets/Image/Logo/logo.png";
+import RegisGif from "@/assets/Image/Register/Regis.gif"; // Assuming correct path
+import Logo from "@/assets/Image/Logo/logo.png"; // Assuming correct path
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { Facebook, Mail, Upload, Eye, EyeOff } from "lucide-react";
+import { Facebook, Mail, Upload, Eye, EyeOff, Loader2 } from "lucide-react";
 
 // SHADCN UI
 import { Input } from "@/components/ui/input";
@@ -45,7 +45,6 @@ type RegisterFormValues = {
 const RegistersPage: FC<RegisterPageProps> = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const [loading, setLoading] = useState(false);
   const [imgBase64, setImgBase64] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -69,9 +68,7 @@ const RegistersPage: FC<RegisterPageProps> = () => {
       errorAlert("Nhập lại mật khẩu không khớp!");
       return;
     }
-
     setLoading(true);
-
     const addMember = await callAxiosRestApi({
       instance: publicAxiosInstance,
       method: "post",
@@ -89,17 +86,17 @@ const RegistersPage: FC<RegisterPageProps> = () => {
         },
       },
     });
-
     if (addMember.success) {
       navigate(`/account-verification?email=${values.email}`);
     } else if (!addMember.isAppError) {
       errorAlert(addMember.message.content + ". Vui lòng thử lại!");
     }
-
     setLoading(false);
   };
 
-  const handleGoogleLogin = () => {};
+  const handleGoogleLogin = () => {
+    // Logic for Google Login
+  };
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
@@ -115,17 +112,16 @@ const RegistersPage: FC<RegisterPageProps> = () => {
         <div className="w-full h-full flex items-center justify-center p-8">
           <img
             className="max-w-full max-h-full object-contain"
-            src={RegisGif}
+            src={RegisGif || "/placeholder.svg"}
             alt="Registration decoration"
           />
         </div>
       </div>
-
       <div className="w-full flex items-center justify-center p-4 lg:p-8">
         <Card className="w-full max-w-md shadow-lg">
           <CardHeader className="text-center pb-4">
             <img
-              src={Logo}
+              src={Logo || "/placeholder.svg"}
               className="w-[120px] h-[65px] mx-auto mb-2 object-contain"
               alt="Logo"
             />
@@ -156,7 +152,6 @@ const RegistersPage: FC<RegisterPageProps> = () => {
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name="fullName"
@@ -181,7 +176,6 @@ const RegistersPage: FC<RegisterPageProps> = () => {
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name="YOB"
@@ -196,7 +190,6 @@ const RegistersPage: FC<RegisterPageProps> = () => {
                     </FormItem>
                   )}
                 />
-
                 <Controller
                   control={form.control}
                   name="phone"
@@ -226,7 +219,6 @@ const RegistersPage: FC<RegisterPageProps> = () => {
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name="gender"
@@ -240,7 +232,7 @@ const RegistersPage: FC<RegisterPageProps> = () => {
                           className="flex flex-row space-x-6"
                         >
                           <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="male" id="male" />
+                            <RadioGroupItem  value="male" id="male" />
                             <Label htmlFor="male">Nam</Label>
                           </div>
                           <div className="flex items-center space-x-2">
@@ -253,7 +245,6 @@ const RegistersPage: FC<RegisterPageProps> = () => {
                     </FormItem>
                   )}
                 />
-
                 <div className="space-y-2">
                   <Label>Ảnh đại diện</Label>
                   <div className="flex items-center space-x-4">
@@ -263,7 +254,7 @@ const RegistersPage: FC<RegisterPageProps> = () => {
                       onClick={() =>
                         document.getElementById("image-upload")?.click()
                       }
-                      className="flex items-center space-x-2"
+                      className="flex items-center space-x-2 !bg-transparent !border-[#3e5dab] !text-[#3e5dab] !hover:bg-[#3e5dab]/10"
                     >
                       <Upload className="h-4 w-4" />
                       <span>Chọn ảnh</span>
@@ -280,14 +271,13 @@ const RegistersPage: FC<RegisterPageProps> = () => {
                     />
                     {imgBase64 && (
                       <img
-                        src={imgBase64}
+                        src={imgBase64 || "/placeholder.svg"}
                         alt="Preview"
                         className="w-[50px] h-[50px] rounded-full object-cover"
                       />
                     )}
                   </div>
                 </div>
-
                 <FormField
                   control={form.control}
                   name="password"
@@ -312,7 +302,7 @@ const RegistersPage: FC<RegisterPageProps> = () => {
                             type="button"
                             variant="ghost"
                             size="sm"
-                            className="absolute right-0 top-0 h-full px-3"
+                            className="absolute right-0 top-0 h-full px-3 !bg-[#3e5dab]/50 !text-white"
                             onClick={() => setShowPassword(!showPassword)}
                           >
                             {showPassword ? (
@@ -327,7 +317,6 @@ const RegistersPage: FC<RegisterPageProps> = () => {
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name="rePassword"
@@ -347,7 +336,7 @@ const RegistersPage: FC<RegisterPageProps> = () => {
                             type="button"
                             variant="ghost"
                             size="sm"
-                            className="absolute right-0 top-0 h-full px-3"
+                            className="absolute right-0 top-0 h-full px-3 !bg-[#3e5dab]/50 !text-white"
                             onClick={() => setShowRePassword(!showRePassword)}
                           >
                             {showRePassword ? (
@@ -362,28 +351,32 @@ const RegistersPage: FC<RegisterPageProps> = () => {
                     </FormItem>
                   )}
                 />
-
                 <div className="w-full flex items-center justify-end mb-2">
                   <Button
                     type="button"
                     variant="link"
                     onClick={() => navigate("/login")}
-                    className="text-sm font-bold p-0 h-auto"
+                    className="text-sm font-bold p-0 h-auto !hover:bg-[#3e5dab]/50 !bg-transparent !text-[#3e5dab] !hover:text-[#3e5dab]/90"
                   >
                     Bạn đã có tài khoản?
                   </Button>
                 </div>
-
                 <Button
                   type="submit"
-                  className="w-full mb-4"
+                  className="w-full mb-4 !bg-[#3e5dab] !text-white !hover:bg-[#3e5dab]/90"
                   disabled={loading}
                 >
-                  {loading ? "ĐANG TẠO..." : "TẠO TÀI KHOẢN"}
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ĐANG TẠO...
+                    </>
+                  ) : (
+                    "TẠO TÀI KHOẢN"
+                  )}
                 </Button>
               </form>
             </Form>
-
             <div className="w-full">
               <div className="flex items-center justify-center space-x-4 mb-4">
                 <Separator className="flex-1" />
@@ -393,13 +386,17 @@ const RegistersPage: FC<RegisterPageProps> = () => {
                 <Separator className="flex-1" />
               </div>
               <div className="flex justify-center items-center gap-4">
-                <Button variant="outline" size="icon" className="h-12 w-12">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-12 w-12 !border-[#3e5dab] !text-[#3e5dab] !hover:bg-[#3e5dab]/10 bg-transparent"
+                >
                   <Facebook className="h-6 w-6 text-blue-600" />
                 </Button>
                 <Button
                   variant="outline"
                   size="icon"
-                  className="h-12 w-12"
+                  className="h-12 w-12 !border-[#3e5dab] !text-[#3e5dab] !hover:bg-[#3e5dab]/10 bg-transparent"
                   onClick={handleGoogleLogin}
                 >
                   <Mail className="h-6 w-6 text-red-500" />

@@ -7,21 +7,10 @@ import ProtectedRoute from "./ProtectedRoute";
 import ProtectedRouteNoMargin from "./ProtectedRouteNoMargin";
 import { EndSurveyCustomer, SurveyCustomer } from "@/views/pages/survey/routes";
 
-const SurveyPage = lazy(() => import("../views/pages/survey/survey-take-page"));
-
 export const surveyRoutes: RouteObject = {
   path: "/survey",
   element: <SurveyLayout />,
   children: [
-    {
-      path: "take-survey",
-      element: (
-        <ProtectedRouteNoMargin
-          redirectUrl="survey/take-survey"
-          element={<SurveyPage />}
-        />
-      ),
-    },
     {
       path: "filter-survey",
       element: (

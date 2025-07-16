@@ -46,7 +46,7 @@ const DefaultLayout = () => {
       path: string;
     }[]
   >([]);
-
+const location = window.location.pathname;
   // REDUX
   const auth = useSelector((state: RootState) => state.auth);
 
@@ -65,7 +65,8 @@ const DefaultLayout = () => {
       alert("Không valid");
       dispatch(clearAuthToken());
     }
-  }, []);
+  }, [location, auth.token]); // Re-fetch when location or auth token changes
+
 
   // FUNCTIONS
   const fetch = async () => {

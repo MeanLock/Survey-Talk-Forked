@@ -1,4 +1,3 @@
-import type React from "react";
 import type { SurveyFromSurveyListCustomer } from "../../../../core/types";
 import "./styles.scss";
 import SurveyCardDefaultImg from "../../../../assets/Image/Logo/SurveyCardDefaultImg.png";
