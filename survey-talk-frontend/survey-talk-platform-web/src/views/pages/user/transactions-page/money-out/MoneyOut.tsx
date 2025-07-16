@@ -256,12 +256,6 @@ export const MoneyOut: React.FC<Props> = () => {
         throw new Error('Failed to create withdrawal request');
       }
 
-      // Update user balance
-      // dispatch(
-      //   updateAuthUser({
-      //     Balance: user?.Balance - Number.parseInt(amount),
-      //   })
-      // );
 
       // Reset form
       setBankId("");
