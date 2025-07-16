@@ -17,7 +17,7 @@ interface Props {
 
 const SingleInputSlide = ({ data }: Props) => {
     // console.log(data);
-    const isValid = useAppSelector((state) => state.appSlice.isValid );
+  const isValid = useAppSelector((state) => state.appSlice.isValid);
     const config = useAppSelector((state) => state.appSlice.infoSurvey);
     const dispatch = useDispatch();
 
@@ -39,7 +39,7 @@ const SingleInputSlide = ({ data }: Props) => {
                             ""
                         }
                         onChange={(e) => {
-                            if (isValid) return;
+                           // if (isValid) return;
                             dispatch(
                                 handleUpdateForm({
                                     idChoose:
@@ -69,7 +69,7 @@ const SingleInputSlide = ({ data }: Props) => {
                             ""
                         }
                         onChange={(e) => {
-                            if (!isValid) return;
+                           // if (!isValid) return;
                             dispatch(
                                 handleUpdateForm({
                                     idChoose:
@@ -102,7 +102,7 @@ const SingleInputSlide = ({ data }: Props) => {
                             ""
                         }
                         onChange={(e) => {
-                            if (!isValid) return;
+                            //if (!isValid) return;
                             dispatch(
                                 handleUpdateForm({
                                     idChoose:
@@ -133,7 +133,7 @@ const SingleInputSlide = ({ data }: Props) => {
                                     ?.Value || ""
                             }
                             onChange={(e) => {
-                                if (!isValid) return;
+                                //if (!isValid) return;
                                 dispatch(
                                     handleUpdateForm({
                                         idChoose:
@@ -169,10 +169,18 @@ const SingleInputSlide = ({ data }: Props) => {
     }, [data]);
 
     return (
-        <div className="">
-            {handleRender()}{" "}
+       <div className="relative w-full">
+        {isValid && (
+            <div 
+                className="absolute inset-0 bg-gray-200/50 z-10 rounded-lg"
+                style={{ cursor: 'not-allowed' }}
+            />
+        )}
+        <div className="w-full">
+            {handleRender()}
             <HiddenCheck id={data?.ValueJson.QuestionContent.QuestionTypeId} />
         </div>
+    </div>
     );
 };
 

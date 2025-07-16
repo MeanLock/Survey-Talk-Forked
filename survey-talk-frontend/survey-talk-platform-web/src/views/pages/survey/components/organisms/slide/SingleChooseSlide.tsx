@@ -22,7 +22,6 @@ const SingleChooseSlide = ({ data }: Props) => {
   console.log("data", isValid);
   const handleSelect = useCallback(
     (id: string) => {
-      if (isValid) return;
       console.log("id", isValid);
       dispatch(
         handleUpdateSigleChoose({
@@ -35,15 +34,17 @@ const SingleChooseSlide = ({ data }: Props) => {
   );
 
   return (
-    <div className="flex flex-col gap-4 w-[90%] max-w-5xl mx-auto mt-6">
-      {/* {!isValid ? (
-                <Error message="Câu hỏi này chưa được trả lời" />
-            ) : null} */}
-
+  <div className="flex flex-col gap-4 w-[90%] max-w-5xl mx-auto mt-6">
+    <div className="relative"> 
+      {isValid && (
+        <div 
+          className="absolute inset-0 bg-gray-200/50 z-10 rounded-lg"
+          style={{ cursor: 'not-allowed' }}
+        />
+      )}
       {(data?.ValueJson?.QuestionContent?.Options || []).map(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (op: any) => (
-          <div className="flex justify-center items-center gap-5 w-[100%]">
+          <div className="flex justify-center items-center gap-5 w-[100%] mb-4"> {/* Added margin-bottom */}
             {op?.MainImageUrl &&
               op.MainImageUrl !== "" &&
               !op.MainImageUrl.includes("unknown.jpg") ? (
@@ -58,14 +59,11 @@ const SingleChooseSlide = ({ data }: Props) => {
               onClick={() =>
                 idSelected === op?.Id ? null : handleSelect(op?.Id || 0)
               }
-              disabled={isValid}
-              className={`text-left px-5 py-2 rounded transition-all duration-150 font-medium text-lg flex-1 ${isValid && "opacity-[0.6] cursor-not-allowed"
-                }
-                        ${idSelected === op?.Id
+              className={`text-left px-5 py-2 rounded transition-all duration-150 font-medium text-lg flex-1
+                ${idSelected === op?.Id
                   ? "text-white border-none"
                   : "bg-transparent text-white border border-white"
-                }
-                    `}
+                }`}
               style={{
                 background:
                   idSelected === op?.Id
@@ -82,10 +80,10 @@ const SingleChooseSlide = ({ data }: Props) => {
           </div>
         )
       )}
-
-      <HiddenCheck id={data?.ValueJson.QuestionContent.QuestionTypeId} />
     </div>
-  );
+    <HiddenCheck id={data?.ValueJson.QuestionContent.QuestionTypeId} />
+  </div>
+);
 };
 
 export default SingleChooseSlide;

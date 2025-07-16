@@ -12,7 +12,10 @@ interface Props {
   survey: SurveyFromSurveyListCustomer;
   onShowDetail: (id: number) => void;
 }
-
+const handleTakeSurvey = () => {
+  // Logic to handle taking the survey
+  console.log("Taking survey:");
+}
 export const SurveyCard: React.FC<Props> = ({ survey, onShowDetail }) => {
   // FUNCTIONS
   const timeCal = (questionCount: number, security: number) => {
@@ -39,7 +42,7 @@ export const SurveyCard: React.FC<Props> = ({ survey, onShowDetail }) => {
       className="survey-card__container w-full p-5 cursor-pointer"
     >
       {!survey ? (
-        <div>Con cẹc</div>
+        <div>Chưa có khảo sát</div>
       ) : (
         <div className="w-full flex flex-col gap-3">
           <div className="survey-card__header w-full flex items-center gap-5">
@@ -138,7 +141,14 @@ export const SurveyCard: React.FC<Props> = ({ survey, onShowDetail }) => {
             </div>
 
             <div className="survey-card__actions">
-              <div className="px-3 py-1 bg-[#FF7260] text-white font-bold rounded-md hover:bg-[#EF2D13] cursor-pointer">
+              <div className="px-3 py-1 bg-[#FF7260] text-white font-bold rounded-md hover:bg-[#EF2D13] cursor-pointer"
+                onClick={() =>
+                  window.open(
+                    `/survey/${survey.Id}/taking?taking_subject=Verified`,
+                    "_blank"
+                  )
+                }
+              >
                 Vào Làm Survey
               </div>
             </div>

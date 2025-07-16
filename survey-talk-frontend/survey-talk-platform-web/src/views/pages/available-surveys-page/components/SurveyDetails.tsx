@@ -128,7 +128,14 @@ export const SurveyDetail: React.FC<Props> = ({ survey }) => {
             </div>
 
             <div className="w-full flex items-center justify-center">
-              <div className="px-3 py-1 bg-[#FF7260] text-white font-bold rounded-md hover:bg-[#EF2D13] cursor-pointer">
+              <div className="px-3 py-1 bg-[#FF7260] text-white font-bold rounded-md hover:bg-[#EF2D13] cursor-pointer"
+                onClick={() =>
+                  window.open(
+                    `/survey/${survey.Id}/taking?taking_subject=Verified`,
+                    "_blank"
+                  )
+                }
+              >
                 Vào Làm Survey
               </div>
             </div>

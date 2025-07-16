@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { useSelector, useDispatch } from "react-redux";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
 import {
@@ -27,17 +27,23 @@ import { updateFakeData } from "../../../../../redux/fake/fakeSlice";
 import { banks } from "../../../../../core/mockData/banks";
 import type { RootState } from "../../../../../redux/rootReducer";
 import { updateAuthUser } from "../../../../../redux/auth/authSlice";
+import { callAxiosRestApi } from "@/core/api/rest-api/main/api-call";
+import { loginRequiredAxiosInstance } from "@/core/api/rest-api/config/instances/v2";
+import { toast } from "react-toastify";
 
 type Props = {};
 
 interface MoneyOutRecord {
-  Id: number;
-  Amount: number;
-  CreatedAt: string;
-  AccountId: string;
-  BankName: string;
+  Id: string;
+  CustomerName: string;
+  CreateDate: number;
   StatusId: number;
-  SuccessAt: string | null;
+  TransferDate: number | null;
+  BankId: string;
+  BankName: string;
+  AccountNo: string;
+  Amount: number;
+  AccountName: string;
 }
 
 interface Bank {
@@ -66,11 +72,11 @@ const AmountCellRenderer = (params: any) => {
 const StatusCellRenderer = (params: any) => {
   const getStatusInfo = (statusId: number) => {
     switch (statusId) {
-      case 0:
-        return { label: "Đang xử lý", className: "status-processing" };
       case 1:
-        return { label: "Thành công", className: "status-success" };
+        return { label: "Đang xử lý", className: "status-processing" };
       case 2:
+        return { label: "Thành công", className: "status-success" };
+      case 3:
         return { label: "Thất bại", className: "status-failed" };
       default:
         return { label: "Unknown", className: "status-unknown" };
@@ -102,7 +108,24 @@ const DateCellRenderer = (params: any) => {
 export const MoneyOut: React.FC<Props> = () => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
-  const fake = useSelector((state: RootState) => state.fake);
+  const [withdrawalHistory, setWithdrawalHistory] = useState<MoneyOutRecord[]>([]);
+
+  // Fetch withdrawal history
+  useEffect(() => {
+    const fetchWithdrawalHistory = async () => {
+      try {
+        const response = await fetch('https://6857de4821f5d3463e566b36.mockapi.io/withdrawalRequests');
+        const data = await response.json();
+        // Filter records for current user
+        const userWithdrawals = data.filter(record => record.CustomerName === user?.FullName);
+        setWithdrawalHistory(userWithdrawals);
+      } catch (error) {
+        console.error('Error fetching withdrawal history:', error);
+      }
+    };
+
+    fetchWithdrawalHistory();
+  }, [user?.FullName]);
 
   // STATES
   const [bankId, setBankId] = useState("");
@@ -117,7 +140,6 @@ export const MoneyOut: React.FC<Props> = () => {
         headerName: "Mã Giao Dịch",
         field: "Id",
         width: 120,
-        cellClass: "transaction-id-cell",
       },
       {
         headerName: "Số Tiền Rút",
@@ -129,13 +151,15 @@ export const MoneyOut: React.FC<Props> = () => {
         headerName: "Ngân Hàng",
         field: "BankName",
         width: 200,
-        cellClass: "bank-name-cell",
       },
       {
         headerName: "Thời gian gửi YC",
-        field: "CreatedAt",
+        field: "CreateDate",
         width: 160,
-        cellRenderer: DateCellRenderer,
+        cellRenderer: (params: any) => {
+          const date = new Date(params.value * 1000);
+          return date.toLocaleString('vi-VN');
+        }
       },
       {
         headerName: "Trạng Thái",
@@ -145,14 +169,17 @@ export const MoneyOut: React.FC<Props> = () => {
       },
       {
         headerName: "Thời gian thành công",
-        field: "SuccessAt",
+        field: "TransferDate",
         width: 160,
-        cellRenderer: DateCellRenderer,
+        cellRenderer: (params: any) => {
+          if (!params.value) return '-';
+          const date = new Date(params.value * 1000);
+          return date.toLocaleString('vi-VN');
+        }
       },
     ],
     []
   );
-
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
@@ -187,59 +214,73 @@ export const MoneyOut: React.FC<Props> = () => {
     const selectedBank = banks.find((bank) => bank.code === bankId);
     if (!selectedBank) return;
 
-    // Get next ID
-    const nextId =
-      fake.MoneyOutData.length > 0
-        ? Math.max(...fake.MoneyOutData.map((item) => item.Id)) + 1
-        : 1;
+    try {
+      const withdrawalResponse = await callAxiosRestApi({
+        instance: loginRequiredAxiosInstance,
+        method: "post",
+        url: `Payment/account/balance-withdrawal`,
+        data: {
+          Amount: Number.parseInt(amount),
+          BankAccountNumber: accountNo,
+          BankCode: bankId,
+          Description: `Rút tiền về tài khoản ${accountNo} - ${selectedBank.name}`
+        },
+      });
 
-    // Create current timestamp
-    const now = new Date();
-    const createdAt = `${now.getDate().toString().padStart(2, "0")}/${(
-      now.getMonth() + 1
-    )
-      .toString()
-      .padStart(2, "0")}/${now.getFullYear()} - ${now
-      .getHours()
-      .toString()
-      .padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}:${now
-      .getSeconds()
-      .toString()
-      .padStart(2, "0")}`;
+      if (!withdrawalResponse.success) {
+        toast.error(`Rút tiền tạm thời lỗi, thử lại sau!`);
+        return;
+      }
+      const newWithdrawal = {
+        CustomerName: user?.FullName,
+        CreateDate: Math.floor(Date.now() / 1000), // Current timestamp in seconds
+        StatusId: 1, // Pending
+        TransferDate: null,
+        BankId: bankId,
+        BankName: selectedBank.name,
+        AccountNo: accountNo,
+        Amount: Number.parseInt(amount),
+        AccountName: accountName
+      };
 
-    const newRecord: MoneyOutRecord = {
-      Id: nextId,
-      Amount: Number.parseInt(amount),
-      CreatedAt: createdAt,
-      AccountId: accountNo,
-      BankName: `${selectedBank.shortName} - ${selectedBank.name}`,
-      StatusId: 0,
-      SuccessAt: null,
-    };
+      // Create withdrawal request
+      const response = await fetch('https://6857de4821f5d3463e566b36.mockapi.io/withdrawalRequests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newWithdrawal),
+      });
 
-    // Update fake data
-    const updatedMoneyOutData = [...fake.MoneyOutData, newRecord];
-    dispatch(
-      // updateFakeData({
-      //   MoneyOutData: updatedMoneyOutData,
-      //   Point: fake.Point - Number.parseInt(amount),
-      // })
-      updateAuthUser({
-        Balance: user?.Balance - Number.parseInt(amount),
-      })
-    );
+      if (!response.ok) {
+        throw new Error('Failed to create withdrawal request');
+      }
 
-    await updateMoneyOutById(7, Number.parseInt(amount));
-    console.log(
-      "LINK: ",
-      `"https://img.vietqr.io/image/${bankId}-${accountNo}-compact.png?amount=${amount}&addInfo="Survey Talk Chuyen Tien"&accountName=${accountName}"`
-    );
-    // Reset form
-    setBankId("");
-    setAccountNo("");
-    setAmount("");
-    setAccountName("");
-    setErrors({});
+      // Update user balance
+      // dispatch(
+      //   updateAuthUser({
+      //     Balance: user?.Balance - Number.parseInt(amount),
+      //   })
+      // );
+
+      // Reset form
+      setBankId("");
+      setAccountNo("");
+      setAmount("");
+      setAccountName("");
+      setErrors({});
+
+      // Refresh withdrawal history
+      const updatedHistoryResponse = await fetch('https://6857de4821f5d3463e566b36.mockapi.io/withdrawalRequests');
+      const updatedHistory = await updatedHistoryResponse.json();
+      const userWithdrawals = updatedHistory.filter(record => record.CustomerName === user?.FullName);
+      setWithdrawalHistory(userWithdrawals);
+        toast.success(`Rút tiền thành công!`);
+
+    } catch (error) {
+      console.error('Error creating withdrawal request:', error);
+      // Handle error (show error message to user)
+    }
   };
 
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -297,7 +338,7 @@ export const MoneyOut: React.FC<Props> = () => {
           <h3 className="table-title">Lịch sử rút tiền</h3>
           <div className="ag-theme-alpine table-container">
             <AgGridReact
-              rowData={fake.MoneyOutData}
+              rowData={withdrawalHistory}
               columnDefs={columnDefs}
               domLayout="normal"
               rowHeight={50}
