@@ -10,6 +10,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { User, Lock, LogOut, Eye, EyeOff } from "lucide-react";
+import { callAxiosRestApi } from "@/core/api/rest-api/main/api-call";
+import { loginRequiredAxiosInstance } from "@/core/api/rest-api/config/instances/v2";
+import EditIcon from "@mui/icons-material/Edit";
+import NotFoundImg from "@/assets/Image/Logo/notfound.png";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 // Loading component placeholder
 const SurveyTalkLoading = () => (
@@ -20,6 +26,8 @@ const ProfilePage = () => {
   // STATES
   const [showMode, setShowMode] = useState("profile");
   const [showPassword, setShowPassword] = useState(false);
+  const [isChanged, setIsChanged] = useState(false);
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -54,8 +62,43 @@ const ProfilePage = () => {
     }
   }, [userProfiles]);
 
+  const navigate = useNavigate();
+  useEffect(() => {
+    setIsChanged(checkIfChanged(formData));
+  }, [formData, userProfiles]);
+
+  const checkIfChanged = (newFormData: typeof formData) => {
+    if (!userProfiles) return false;
+
+    return (
+      newFormData.fullName !== (userProfiles.FullName || "") ||
+      newFormData.phone !== (userProfiles.Phone || "") ||
+      newFormData.dob !==
+        (userProfiles.Dob ? userProfiles.Dob.split("T")[0] : "") ||
+      newFormData.gender !== (userProfiles.Gender || "") ||
+      newFormData.address !== (userProfiles.Address || "")
+    );
+  };
+
   // Handler functions
-  const handleProfileUpdate = () => {
+  const handleProfileUpdate = async () => {
+    const response = await callAxiosRestApi({
+      instance: loginRequiredAxiosInstance,
+      method: "put",
+      url: `User/accounts/${userId}`,
+      data: {
+        FullName: formData.fullName,
+        Dob: formData.dob,
+        Gender: formData.gender,
+        Phone: formData.phone,
+      },
+    });
+    if (response && response.success) {
+      toast.success("Cập nhật thông tin thành công!");
+      navigate(0);
+    } else {
+      toast.error("Có lỗi xảy ra, vui lòng thử lại sau ...");
+    }
     console.log("Updating profile with data:", formData);
     // TODO: Implement actual update logic
   };
@@ -68,6 +111,45 @@ const ProfilePage = () => {
   const handleLogout = () => {
     console.log("Logging out user");
     // TODO: Implement actual logout logic
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result?.toString().split(",")[1]; // remove "data:image/xxx;base64,"
+      if (base64) {
+        handleUploadAvatar(base64);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleUploadAvatar = async (base64: string) => {
+    try {
+      const response = await callAxiosRestApi({
+        instance: loginRequiredAxiosInstance,
+        method: "put",
+        url: `User/accounts/${userId}`,
+        data: {
+          FullName: formData.fullName,
+          Dob: formData.dob,
+          Gender: formData.gender,
+          Phone: formData.phone,
+          ImageBase64: base64,
+        },
+      });
+      if (response && response.success) {
+        alert("Ê");
+        toast.success("Cập nhật ảnh thành công!");
+        navigate(0);
+      }
+      // Optionally refetch profile data or update state
+    } catch (error) {
+      console.error("Upload avatar failed:", error);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -86,14 +168,16 @@ const ProfilePage = () => {
 
   const resetChanges = () => {
     if (userProfiles) {
-      setFormData({
+      const resetData = {
         fullName: userProfiles.FullName || "",
         email: userProfiles.Email || "",
         phone: userProfiles.Phone || "",
         dob: userProfiles.Dob ? userProfiles.Dob.split("T")[0] : "",
         gender: userProfiles.Gender || "",
         address: userProfiles.Address || "",
-      });
+      };
+      setFormData(resetData);
+      setIsChanged(false);
     }
   };
 
@@ -114,7 +198,7 @@ const ProfilePage = () => {
           <div className="col-span-3">
             <Card className="w-full">
               <CardContent className="flex flex-col items-center p-6">
-                <Avatar className="w-[150px] h-[150px] mb-5">
+                {/* <Avatar className="w-[150px] h-[150px] mb-5">
                   <AvatarImage
                     src={userProfiles?.MainImageUrl || "/placeholder.svg"}
                     alt={userProfiles?.FullName}
@@ -123,7 +207,33 @@ const ProfilePage = () => {
                   <AvatarFallback className="text-2xl">
                     {userProfiles?.FullName?.charAt(0) || "U"}
                   </AvatarFallback>
-                </Avatar>
+                </Avatar> */}
+
+                <div className="relative w-[150px] h-[150px] mb-5">
+                  <Avatar className="w-full h-full">
+                    <AvatarImage
+                      src={userProfiles?.MainImageUrl || "/placeholder.svg"}
+                      alt={userProfiles?.FullName}
+                      className="object-cover"
+                    />
+                    <AvatarFallback className="text-2xl">
+                      {userProfiles?.FullName?.charAt(0) || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <label htmlFor="avatarUpload">
+                    <div className="absolute bottom-1 right-1 bg-white p-1 rounded-full shadow cursor-pointer hover:bg-gray-100">
+                      <EditIcon fontSize="small" className="text-gray-700" />
+                    </div>
+                  </label>
+                  <input
+                    id="avatarUpload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    className="hidden"
+                  />
+                </div>
 
                 <h2 className="text-2xl font-semibold mb-1">
                   {userProfiles?.FullName}
@@ -310,6 +420,7 @@ const ProfilePage = () => {
                         <Button
                           onClick={handleProfileUpdate}
                           className="px-8 bg-[#3e5dab] hover:bg-[#2d4491]"
+                          disabled={!isChanged}
                         >
                           Lưu các thay đổi
                         </Button>
@@ -324,8 +435,8 @@ const ProfilePage = () => {
                       Bảo mật & Mật Khẩu
                     </h3>
 
-                    <div className="space-y-6 max-w-md">
-                      {/* Current Password */}
+                    {/* <div className="space-y-6 max-w-md">
+                    
                       <div>
                         <Label
                           htmlFor="currentPassword"
@@ -360,7 +471,7 @@ const ProfilePage = () => {
                         </div>
                       </div>
 
-                      {/* New Password */}
+                     
                       <div>
                         <Label
                           htmlFor="newPassword"
@@ -382,7 +493,7 @@ const ProfilePage = () => {
                         />
                       </div>
 
-                      {/* Confirm Password */}
+                     
                       <div>
                         <Label
                           htmlFor="confirmPassword"
@@ -404,7 +515,7 @@ const ProfilePage = () => {
                         />
                       </div>
 
-                      {/* Change Password Button */}
+                    
                       <div className="pt-6">
                         <Button
                           onClick={handlePasswordChange}
@@ -413,6 +524,13 @@ const ProfilePage = () => {
                           Đổi Mật Khẩu
                         </Button>
                       </div>
+                    </div> */}
+
+                    <div className="flex flex-col items-center gap-2">
+                      <img src={NotFoundImg} className="w-[300px] h-[300px]" />
+                      <p className="font-semibold text-xl text-gray-400">
+                        Comming soon...
+                      </p>
                     </div>
                   </div>
                 )}

@@ -1,26 +1,40 @@
-import React, { useEffect, useState } from "react";
+"use client";
+
+import type React from "react";
+import { useEffect, useState } from "react";
 import {
-  Modal,
-  Typography,
-  Button,
-  IconButton,
-  TextField,
-  Slider,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import { useDispatch, useSelector } from "react-redux";
-import type { SurveyType } from "@/core/types/tools";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  X,
+  Loader2,
+  Calendar,
+  DollarSign,
+  Target,
+  Filter,
+  Users,
+} from "lucide-react";
 import { SegmentBasic } from "./SegmentBasic";
 import { SegmentAge } from "./SegmentAge";
-import dayjs from "dayjs"; // Ensure dayjs is installed for date manipulation
+import dayjs from "dayjs";
+import { useDispatch, useSelector } from "react-redux";
+import type { SurveyType } from "@/core/types/tools";
 import type { RootState } from "../../../../../redux/rootReducer";
-import { updateAuthUser } from "../../../../../redux/auth/authSlice";
-import { Balance } from "@mui/icons-material";
 import { callAxiosRestApi } from "../../../../../core/api/rest-api/main/api-call";
 import { loginRequiredAxiosInstance } from "../../../../../core/api/rest-api/config/instances/v2";
 import { toast } from "react-toastify";
 import { useRefetchUser } from "@/hooks/useRefetchUser";
-import { useNavigate } from "react-router-dom";
 
 interface Props {
   survey: SurveyType;
@@ -110,15 +124,19 @@ export const PublishModal: React.FC<Props> = ({
   const user = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch();
   const refetchUser = useRefetchUser();
+  // Loading states
+  const [isFilterLoading, setIsFilterLoading] = useState(false);
+  const [isKPILoading, setIsKPILoading] = useState(false);
+  const [isDeadlineLoading, setIsDeadlineLoading] = useState(false);
+  const [isPublishLoading, setIsPublishLoading] = useState(false);
 
-  // STATES
+  // Existing states
   const [isDoneSegmentFilter, setIsDoneSegmentFilter] =
     useState<boolean>(false);
   const [segmentIndex, setSegmentIndex] = useState(1);
   const [isDonePromptFilter, setIsDonePromptFilter] = useState<boolean>(false);
   const [isKPIEntered, setIsKPIEntered] = useState<boolean>(false);
   const [isDeadlineEntered, setIsDeadlineEntered] = useState<boolean>(false);
-
   const [sex, setSex] = useState("");
   const [sexual, setSexual] = useState("");
   const [age, setAge] = useState("");
@@ -127,34 +145,25 @@ export const PublishModal: React.FC<Props> = ({
   const [education, setEducational] = useState("");
   const [marriage, setMarriage] = useState("");
   const [income, setIncome] = useState("");
-
-  // Prompt Filter
   const [prompt, setPrompt] = useState("");
-  const [accuracy, setAccuracy] = useState(80);
+  const [accuracy, setAccuracy] = useState([80]);
   const [FilterTags, setFilterTags] = useState([]);
-
-  // KPI
   const [suggestedKPI, setSuggestedKPI] = useState(-1);
   const [kpi, setKPI] = useState(0);
   const [errKPI, setErrKPI] = useState(false);
   const [errKPIMesg, setErrKPIMesg] = useState("");
-
-  // Deadline
   const [R, setR] = useState(0);
   const [minRangeDate, setMinRangeDate] = useState(0);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [errEndDate, setErrEndDate] = useState(false);
   const [errEndDateMsg, setErrEndDateMsg] = useState("");
-
-  // Price
   const [userPoint, setUserPoint] = useState(0);
   const [theoryPrice, setTheoryPrice] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
   const [errPrice, setErrPrice] = useState(false);
   const [errPriceMsg, setErrPriceMsg] = useState("");
 
-  // HOOKS
   useEffect(() => {
     if (!user) {
       toast.error("Vui lòng đăng nhập để thực hiện hành động !");
@@ -186,16 +195,13 @@ export const PublishModal: React.FC<Props> = ({
     }
   }, [prompt]);
 
-  // FUNCTIONS
-  // 1. Reset
   const reset = () => {
-    const today = dayjs().format("YYYY-MM-DD"); // Format today's date as YYYY-MM-DD
+    const today = dayjs().format("YYYY-MM-DD");
     setIsDoneSegmentFilter(false);
     setSegmentIndex(1);
     setIsDonePromptFilter(false);
     setIsKPIEntered(false);
     setIsDeadlineEntered(false);
-
     setAge("");
     setSex("");
     setSexual("");
@@ -205,21 +211,17 @@ export const PublishModal: React.FC<Props> = ({
     setEducational("");
     setMarriage("");
     setIncome("");
-
     setPrompt("");
-    setAccuracy(80);
-
+    setAccuracy([80]);
     setSuggestedKPI(-1);
     setKPI(0);
     setErrKPI(false);
     setErrKPIMesg("");
-
     setMinRangeDate(0);
-    setStartDate(today); // Set startDate to today's date
+    setStartDate(today);
     setEndDate("");
     setErrEndDate(false);
     setErrEndDateMsg("");
-
     setUserPoint(user?.Balance || 0); // Retrieve userPoint from Redux user balance
     setTheoryPrice(0);
     setTotalPrice(0);
@@ -227,7 +229,6 @@ export const PublishModal: React.FC<Props> = ({
     setErrPriceMsg("");
   };
 
-  // 2. Render Segment
   const renderSegment = () => {
     switch (segmentIndex) {
       case 1:
@@ -311,7 +312,6 @@ export const PublishModal: React.FC<Props> = ({
     }
   };
 
-  // 3. Navigation (Next/Back)
   const handleNext = () => {
     if (segmentIndex === 7) {
       setIsDoneSegmentFilter(true);
@@ -326,10 +326,10 @@ export const PublishModal: React.FC<Props> = ({
     }
   };
 
-  // 4. Filter
   const handleFilter = async () => {
+    setIsFilterLoading(true);
     try {
-        console.log("Filter response: ", prompt,accuracy,marriage,education);
+      console.log("Filter response: ", prompt, accuracy, marriage, education);
       const response = await callAxiosRestApi({
         instance: loginRequiredAxiosInstance,
         method: "post",
@@ -344,11 +344,11 @@ export const PublishModal: React.FC<Props> = ({
               education.trim() === "Không quan tâm" ? null : education,
             JobField: job.trim() === "Không quan tâm" ? null : job,
             Prompt: prompt,
-            TagFilterAccuracyRate: accuracy,
+            TagFilterAccuracyRate: accuracy[0],
           },
         },
       });
-    
+
       if (response.success) {
         setSuggestedKPI(response.data.MaxKpi);
         setR(response.data.R);
@@ -356,10 +356,11 @@ export const PublishModal: React.FC<Props> = ({
       }
     } catch (error) {
       console.log("Error while filtering: ", error);
+    } finally {
+      setIsFilterLoading(false);
     }
   };
 
-  // 5. KPI
   const handleKPIChange = (value: string) => {
     if (suggestedKPI < Number(value)) {
       setErrKPI(true);
@@ -371,28 +372,30 @@ export const PublishModal: React.FC<Props> = ({
     setKPI(Number(value));
   };
 
-  const handleEnterKPI = () => {
+  const handleEnterKPI = async () => {
     if (kpi <= 0 || R <= 0) {
       setErrKPI(true);
       setErrKPIMesg("KPI hoặc R không hợp lệ. Vui lòng kiểm tra lại!");
       return;
     }
-
-    setIsKPIEntered(true);
-    const minRange = Math.ceil(kpi / Number(R)); // Tính toán số ngày tối thiểu
-    setMinRangeDate(minRange);
-
-    const calculatedEndDate = dayjs(startDate)
-      .add(minRange, "day")
-      .format("YYYY-MM-DD"); // Tính toán ngày kết thúc dựa trên minRangeDate
-    setEndDate(calculatedEndDate); // Đặt endDate là ngày tối thiểu
+    setIsKPILoading(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      setIsKPIEntered(true);
+      const minRange = Math.ceil(kpi / Number(R));
+      setMinRangeDate(minRange);
+      const calculatedEndDate = dayjs(startDate)
+        .add(minRange, "day")
+        .format("YYYY-MM-DD");
+      setEndDate(calculatedEndDate);
+    } finally {
+      setIsKPILoading(false);
+    }
   };
 
-  // 6. Deadline
   const handleEndDateChange = (date: string) => {
     const startDatePlusMinRange = dayjs(startDate).add(minRangeDate, "day");
     const selectedEndDate = dayjs(date);
-
     if (selectedEndDate.isBefore(startDatePlusMinRange)) {
       setErrEndDate(true);
       setErrEndDateMsg(
@@ -406,16 +409,15 @@ export const PublishModal: React.FC<Props> = ({
   };
 
   const handleEnterDeadline = async () => {
+    setIsDeadlineLoading(true);
     try {
       const startDateObj = dayjs(startDate);
       const endDateObj = dayjs(endDate);
-
       if (!endDate || endDateObj.isBefore(startDateObj)) {
         setErrEndDate(true);
         setErrEndDateMsg("Ngày kết thúc không hợp lệ. Vui lòng kiểm tra lại!");
         return;
       }
-
       const realRangeDate = endDateObj.diff(startDateObj, "day"); // Tính số ngày thực tế
       if (realRangeDate < minRangeDate) {
         setErrEndDate(true);
@@ -424,7 +426,6 @@ export const PublishModal: React.FC<Props> = ({
         );
         return;
       }
-
       const RS = realRangeDate / minRangeDate; // Tính tỷ lệ thời gian thực tế
       const response = await callAxiosRestApi({
         instance: loginRequiredAxiosInstance,
@@ -446,10 +447,11 @@ export const PublishModal: React.FC<Props> = ({
       console.error("Error while calculating deadline:", error);
       setErrEndDate(true);
       setErrEndDateMsg("Đã xảy ra lỗi khi tính toán deadline.");
+    } finally {
+      setIsDeadlineLoading(false);
     }
   };
 
-  // 7. Price
   const handleTotalPriceChange = (value: string) => {
     if (theoryPrice > Number(value)) {
       setErrPrice(true);
@@ -473,22 +475,8 @@ export const PublishModal: React.FC<Props> = ({
     }).format(value);
   };
 
-  // 8. Check Data
-  const checkData = () => {
-    console.log("Giới Tính: ", sex);
-    console.log("Xu hướng tính dục: ", sexual);
-    console.log("Độ Tuổi: ", age);
-    console.log("Prompt:", prompt);
-    console.log("Accuracy: ", accuracy);
-    console.log("Income: ", income);
-  };
-
-  const handleAccuracyChange = (value: number) => {
-    setAccuracy(value);
-  };
-
-  // 9. Handle Publish:
   const handlePublish = async () => {
+    setIsPublishLoading(true);
     try {
       const response = await callAxiosRestApi({
         instance: loginRequiredAxiosInstance,
@@ -507,7 +495,7 @@ export const PublishModal: React.FC<Props> = ({
               education.trim() === "Không quan tâm" ? null : education,
             JobField: job.trim() === "Không quan tâm" ? null : job,
             Prompt: prompt,
-            TagFilterAccuracyRate: accuracy,
+            TagFilterAccuracyRate: accuracy[0],
           },
           ExtraPrice: totalPrice - theoryPrice,
           TheoryPrice: theoryPrice,
@@ -518,166 +506,338 @@ export const PublishModal: React.FC<Props> = ({
         await refetchUser();
         // Đóng modal
         onClose();
+        changeStatus();
       }
       console.log("Hoàn thành đăng khảo sát!");
     } catch (error) {
       console.log("Error while publish survey: ", error);
+    } finally {
+      setIsPublishLoading(false);
     }
   };
 
+  const checkData = () => {
+    console.log("Giới Tính: ", sex);
+    console.log("Xu hướng tính dục: ", sexual);
+    console.log("Độ Tuổi: ", age);
+    console.log("Prompt:", prompt);
+    console.log("Accuracy: ", accuracy[0]);
+    console.log("Income: ", income);
+  };
+
   return (
-    <Modal open={open} onClose={onClose}>
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4/5 h-4/5 bg-white shadow-lg rounded-lg p-6 overflow-y-scroll">
-        <div className="flex justify-between items-center mb-4">
-          <Typography variant="h6" component="h2">
-            Đăng Khảo Sát
-          </Typography>
-          <IconButton onClick={onClose} aria-label="Close">
-            <CloseIcon />
-          </IconButton>
-        </div>
-        <div className="mt-5 w-full flex flex-col gap-2">
-          <p className="font-bold text-[#3e5dab]">
-            1. Nhập filter cứng của khảo sát (Accurracy 100%)
-          </p>
-          {renderSegment()}
-          <div className="flex justify-between mt-4">
-            <Button
-              disabled={segmentIndex === 1}
-              onClick={handleBack}
-              variant="contained"
-              size="small"
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="min-w-[90vw] max-w-none max-h-[90vh] overflow-y-auto bg-gradient-to-br from-white to-gray-50 fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] z-[9999] shadow-2xl">
+        <DialogHeader className="border-b border-gray-200 pb-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#3E5DAB] flex items-center justify-center">
+                <Users className="w-5 h-5 text-white" />
+              </div>
+              <DialogTitle className="text-2xl font-bold text-[#3E5DAB]">
+                Đăng Khảo Sát
+              </DialogTitle>
+            </div>
+            {/* <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="hover:bg-gray-100"
             >
-              Quay lại
-            </Button>
+              <X className="w-5 h-5" />
+            </Button> */}
+          </div>
+        </DialogHeader>
+
+        <div className="space-y-8 py-6">
+          {/* Step 1: Segment Filter */}
+          <Card className="border-l-4 border-l-[#3E5DAB] shadow-sm">
+            <CardHeader className="bg-gradient-to-r from-[#3E5DAB]/5 to-transparent">
+              <CardTitle className="flex items-center gap-2 text-[#3E5DAB]">
+                <Users className="w-5 h-5" />
+                1. Nhập filter cứng của khảo sát (Accuracy 100%)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-white rounded-lg p-4 border">
+                {renderSegment()}
+              </div>
+              <div className="flex justify-between items-center pt-4">
+                <Button
+                  disabled={segmentIndex === 1}
+                  onClick={handleBack}
+                  variant="outline"
+                  className="border-[#3E5DAB] text-[#3E5DAB] hover:bg-[#3E5DAB] hover:text-white bg-transparent"
+                >
+                  Quay lại
+                </Button>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-500">
+                    Bước {segmentIndex}/7
+                  </span>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5, 6, 7].map((step) => (
+                      <div
+                        key={step}
+                        className={`w-2 h-2 rounded-full ${
+                          step <= segmentIndex ? "bg-[#3E5DAB]" : "bg-gray-300"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <Button
+                  disabled={(!age && segmentIndex === 1) || segmentIndex === 7}
+                  onClick={handleNext}
+                  variant="outline"
+                  className="!border-[#3E5DAB] !text-[#3E5DAB] !hover:bg-[#3E5DAB] !hover:text-white !bg-transparent"
+                >
+                  {segmentIndex === 7 ? "Hoàn thành" : "Tiếp theo"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Step 2: Prompt Filter */}
+          <Card className="border-l-4 border-l-[#FFC40D] shadow-sm">
+            <CardHeader className="bg-gradient-to-r from-[#FFC40D]/5 to-transparent">
+              <CardTitle className="flex items-center gap-2 text-[#3E5DAB]">
+                <Filter className="w-5 h-5" />
+                2. Nhập filter prompt của khảo sát (Accuracy Max 80%)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="prompt">Prompt Filter</Label>
+                <Textarea
+                  id="prompt"
+                  disabled={!isDoneSegmentFilter}
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Nhập prompt filter của bạn..."
+                  className="min-h-[100px] focus:ring-[#3E5DAB] focus:border-[#3E5DAB]"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Accuracy: {accuracy[0]}%</Label>
+                <Slider
+                  disabled={!isDoneSegmentFilter}
+                  value={accuracy}
+                  onValueChange={setAccuracy}
+                  max={80}
+                  min={10}
+                  step={10}
+                  className="w-1/2"
+                />
+              </div>
+              <Button
+                disabled={
+                  !isDoneSegmentFilter || !isDonePromptFilter || isFilterLoading
+                }
+                onClick={handleFilter}
+                className="!bg-[#FFC40D] !hover:bg-[#FFC40D]/90 !text-black font-medium"
+              >
+                {isFilterLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Đang Filter...
+                  </>
+                ) : (
+                  "Filter"
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Step 3: KPI */}
+          <Card className="border-l-4 border-l-green-500 shadow-sm">
+            <CardHeader className="bg-gradient-to-r from-green-50 to-transparent">
+              <CardTitle className="flex items-center gap-2 text-[#3E5DAB]">
+                <Target className="w-5 h-5" />
+                3. Nhập KPI của bạn
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {suggestedKPI > 0 && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-blue-800">
+                    <strong>Gợi ý:</strong> Dựa vào tiêu chí filter của bạn,
+                    chúng tôi gợi ý{" "}
+                    <Badge
+                      variant="secondary"
+                      className="bg-[#3E5DAB] text-white"
+                    >
+                      {suggestedKPI}
+                    </Badge>{" "}
+                    là KPI tối đa mà bạn có thể set
+                  </p>
+                </div>
+              )}
+              <div className="space-y-2">
+                <Label htmlFor="kpi">KPI của bạn</Label>
+                <Input
+                  id="kpi"
+                  disabled={suggestedKPI <= 0}
+                  value={kpi}
+                  type="number"
+                  onChange={(e) => handleKPIChange(e.target.value)}
+                  placeholder="Nhập KPI..."
+                  className={`focus:ring-[#3E5DAB] focus:border-[#3E5DAB] ${
+                    errKPI ? "border-red-500" : ""
+                  }`}
+                />
+                {errKPI && <p className="text-red-500 text-sm">{errKPIMesg}</p>}
+              </div>
+              <Button
+                disabled={suggestedKPI <= 0 || errKPI || isKPILoading}
+                onClick={handleEnterKPI}
+                className="!bg-green-600 !text-white !hover:bg-green-700"
+              >
+                {isKPILoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Đang xử lý...
+                  </>
+                ) : (
+                  "Xác nhận KPI"
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Step 4: Deadline */}
+          <Card className="border-l-4 border-l-orange-500 shadow-sm">
+            <CardHeader className="bg-gradient-to-r from-orange-50 to-transparent">
+              <CardTitle className="flex items-center gap-2 text-[#3E5DAB]">
+                <Calendar className="w-5 h-5" />
+                4. Nhập Deadline của bạn
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {isKPIEntered && (
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                  <p className="text-orange-800">
+                    <strong>Gợi ý:</strong> Dựa vào KPI của bạn, chúng tôi gợi ý
+                    khoảng thời gian{" "}
+                    <Badge
+                      variant="secondary"
+                      className="bg-orange-600 text-white"
+                    >
+                      TỐI THIỂU {minRangeDate} ngày
+                    </Badge>
+                  </p>
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="startDate">Ngày bắt đầu</Label>
+                  <Input
+                    id="startDate"
+                    type="date"
+                    value={startDate}
+                    disabled
+                    className="bg-gray-50"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="endDate">Ngày kết thúc</Label>
+                  <Input
+                    id="endDate"
+                    type="date"
+                    disabled={minRangeDate === 0}
+                    value={endDate}
+                    onChange={(e) => handleEndDateChange(e.target.value)}
+                    className={`focus:ring-[#3E5DAB] focus:border-[#3E5DAB] ${
+                      errEndDate ? "border-red-500" : ""
+                    }`}
+                  />
+                  {errEndDate && (
+                    <p className="text-red-500 text-sm">{errEndDateMsg}</p>
+                  )}
+                </div>
+              </div>
+              <Button
+                onClick={handleEnterDeadline}
+                disabled={errEndDate || endDate === "" || isDeadlineLoading}
+                className="!bg-orange-600 !hover:bg-orange-700 !text-white"
+              >
+                {isDeadlineLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Đang tính toán...
+                  </>
+                ) : (
+                  "Xác nhận Deadline"
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Step 5: Pricing */}
+          <Card className="border-l-4 border-l-purple-500 shadow-sm">
+            <CardHeader className="bg-gradient-to-r from-purple-50 to-transparent">
+              <CardTitle className="flex items-center gap-2 text-[#3E5DAB]">
+                <DollarSign className="w-5 h-5" />
+                5. Nhập Giá đăng Survey của bạn
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {isDeadlineEntered && (
+                <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                  <p className="text-purple-800">
+                    <strong>Mức giá tối thiểu:</strong> Dựa vào tất cả các thông
+                    tin của bạn, mức giá tối thiểu để đăng survey là{" "}
+                    <Badge
+                      variant="secondary"
+                      className="bg-purple-600 text-white"
+                    >
+                      {formatVND(theoryPrice)}
+                    </Badge>
+                  </p>
+                </div>
+              )}
+              <div className="space-y-2">
+                <Label htmlFor="totalPrice">Giá đăng (VND)</Label>
+                <Input
+                  id="totalPrice"
+                  type="number"
+                  disabled={theoryPrice === 0}
+                  value={totalPrice}
+                  onChange={(e) => handleTotalPriceChange(e.target.value)}
+                  placeholder="Nhập giá đăng..."
+                  className={`focus:ring-[#3E5DAB] focus:border-[#3E5DAB] ${
+                    errPrice ? "border-red-500" : ""
+                  }`}
+                />
+                {errPrice && (
+                  <p className="text-red-500 text-sm">{errPriceMsg}</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Separator />
+
+          {/* Publish Button */}
+          <div className="flex justify-center pt-4">
             <Button
-              disabled={(!age && segmentIndex === 1) || segmentIndex === 7}
-              onClick={handleNext}
-              variant="contained"
-              size="small"
+              onClick={handlePublish}
+              disabled={errPrice || isPublishLoading}
+              size="lg"
+              className="bg-gradient-to-r from-[#3E5DAB] to-[#3E5DAB]/80 hover:from-[#3E5DAB]/90 hover:to-[#3E5DAB]/70 text-white px-8 py-3 text-lg font-semibold shadow-lg"
             >
-              {segmentIndex === 7 ? "Hoàn thành" : "Tiếp theo"}
+              {isPublishLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Đang đăng khảo sát...
+                </>
+              ) : (
+                "Đăng Khảo Sát"
+              )}
             </Button>
           </div>
         </div>
-
-        <div className="mt-5 w-full flex flex-col gap-2">
-          <p className="font-bold text-[#3e5dab]">
-            2. Nhập filter prompt của khảo sát (Accurracy Max 80%)
-          </p>
-          <TextField
-            disabled={!isDoneSegmentFilter}
-            multiline
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-          />
-          <Slider
-            aria-label="Accuracy"
-            disabled={!isDoneSegmentFilter}
-            value={accuracy} // Ensure value is always defined
-            onChange={(e, newValue) => handleAccuracyChange(newValue as number)}
-            getAriaValueText={(value) => `${value}%`}
-            valueLabelDisplay="auto"
-            sx={{ width: "50%" }}
-            step={10}
-            marks
-            min={10}
-            max={80}
-          />
-          <Button
-            disabled={!isDoneSegmentFilter && !isDonePromptFilter}
-            onClick={() => handleFilter()}
-            variant="contained"
-            color="secondary"
-            size="small"
-          >
-            Filter
-          </Button>
-        </div>
-
-        <div className="mt-5 w-full flex flex-col gap-2">
-          <p className="font-bold text-[#3e5dab]">3. Nhập KPI của bạn</p>
-          {suggestedKPI > 0 && (
-            <p className="mb-2">
-              Dựa vào tiêu chí filter của bạn, chúng tôi gợi ý {suggestedKPI} là
-              KPI tối đa mà bạn có thể set
-            </p>
-          )}
-          <TextField
-            disabled={suggestedKPI <= 0}
-            value={kpi}
-            label="KPI của bạn..."
-            type="number"
-            onChange={(e) => handleKPIChange(e.target.value)}
-            error={errKPI}
-            helperText={errKPIMesg}
-          />
-          <Button
-            variant="contained"
-            color="secondary"
-            disabled={suggestedKPI <= 0 && !errKPI}
-            onClick={() => handleEnterKPI()}
-          >
-            Xác nhận KPI
-          </Button>
-        </div>
-
-        <div className="mt-5 w-full flex flex-col gap-2">
-          <p className="font-bold text-[#3e5dab]">4. Nhập Deadline của bạn</p>
-          {isKPIEntered && (
-            <p>
-              Dựa vào KPI của bạn, chúng tôi gợi ý khoảng thời gian TỐI THIỂU LÀ{" "}
-              {minRangeDate} ngày
-            </p>
-          )}
-          <TextField disabled type="date" value={startDate} />
-          <TextField
-            disabled={minRangeDate === 0}
-            type="date"
-            value={endDate}
-            onChange={(e) => handleEndDateChange(e.target.value)}
-            error={errEndDate}
-            helperText={errEndDateMsg}
-          />
-          <Button
-            onClick={() => handleEnterDeadline()}
-            disabled={errEndDate || endDate === ""}
-            variant="contained"
-            color="secondary"
-          >
-            Xác nhận Deadline
-          </Button>
-        </div>
-
-        <div className="mt-5 w-full flex flex-col gap-2">
-          <p className="font-bold text-[#3e5dab]">
-            5. Nhập Giá đăng Survey của bạn
-          </p>
-          {isDeadlineEntered && (
-            <p>
-              Dựa vào tất cả các thông tin của bạn, mức giá tối thiểu để đăng
-              survey là {formatVND(theoryPrice)}
-            </p>
-          )}
-          <TextField
-            type="number"
-            disabled={theoryPrice === 0}
-            value={totalPrice}
-            error={errPrice}
-            helperText={errPriceMsg}
-            onChange={(e) => handleTotalPriceChange(e.target.value)}
-          />
-        </div>
-
-        <Button
-          onClick={() => handlePublish()}
-          variant="contained"
-          color="primary"
-          disabled={errPrice}
-        >
-          Đăng Khảo Sát
-        </Button>
-      </div>
-    </Modal>
+      </DialogContent>
+    </Dialog>
   );
 };

@@ -22,7 +22,7 @@ const SingleChooseSlide = ({ data }: Props) => {
   console.log("data", isValid);
   const handleSelect = useCallback(
     (id: string) => {
-      if (isValid) return;
+      // if (isValid) return;
       console.log("id", isValid);
       dispatch(
         handleUpdateSigleChoose({
@@ -45,8 +45,8 @@ const SingleChooseSlide = ({ data }: Props) => {
         (op: any) => (
           <div className="flex justify-center items-center gap-5 w-[100%]">
             {op?.MainImageUrl &&
-              op.MainImageUrl !== "" &&
-              !op.MainImageUrl.includes("unknown.jpg") ? (
+            op.MainImageUrl !== "" &&
+            !op.MainImageUrl.includes("unknown.jpg") ? (
               <img
                 alt="image"
                 src={op?.MainImageUrl}
@@ -58,13 +58,14 @@ const SingleChooseSlide = ({ data }: Props) => {
               onClick={() =>
                 idSelected === op?.Id ? null : handleSelect(op?.Id || 0)
               }
-              disabled={isValid}
-              className={`text-left px-5 py-2 rounded transition-all duration-150 font-medium text-lg flex-1 ${isValid && "opacity-[0.6] cursor-not-allowed"
-                }
-                        ${idSelected === op?.Id
-                  ? "text-white border-none"
-                  : "bg-transparent text-white border border-white"
-                }
+              className={`text-left px-5 py-2 rounded transition-all duration-150 font-medium text-lg flex-1 ${
+                isValid && "opacity-[0.6] cursor-not-allowed"
+              }
+                        ${
+                          idSelected === op?.Id
+                            ? "text-white border-none"
+                            : "bg-transparent text-white border border-white"
+                        }
                     `}
               style={{
                 background:
