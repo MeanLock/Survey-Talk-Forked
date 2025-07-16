@@ -29,6 +29,9 @@ export default defineConfig({
   },
   server: {
     port: process.env.VITE_PORT ? Number(process.env.VITE_PORT) : 3000,
+    allowedHosts: [
+      'cd9fd37fb126.ngrok-free.app'
+    ],
     proxy: {
       // https://vitejs.dev/config/server-options.html
     },
