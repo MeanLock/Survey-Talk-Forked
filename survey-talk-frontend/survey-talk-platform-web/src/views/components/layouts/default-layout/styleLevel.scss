@@ -1,0 +1,42 @@
+.level-container {
+  display: flex;
+  align-items: center;
+  width: 123px;
+  height: 23px;
+  background-color: app_vars.$text-white;
+  border-radius: 12px; // Bo góc tròn cho thanh
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.level-number {
+  color: app_vars.$text-secondary;
+  border-radius: 50%;
+  height: 23px;
+  width: 23px;
+  background-color: app_vars.$bg-primary;
+}
+
+.progress-bar-container {
+  position: abosulte;
+}
+
+.progress-bar-active {
+  height: 100%;
+  background-color: app_vars.$bg-secondary; // Màu vàng (hoặc app_vas.$text-secondary)
+  border-radius: 12px;
+  position: relative;
+  display: flex;
+  justify-content: end;
+  padding-right: 5px;
+  align-items: center;
+  color: app_vars.$text-primary; // Màu chữ xanh
+  font-weight: bold;
+  font-size: 14px;
+  border-radius: 12px;
+  transition: width 0.3s ease-in-out;
+}
+
+.progress-text {
+  color: app_vars.$text-primary;
+  font-size: 10px;
+}

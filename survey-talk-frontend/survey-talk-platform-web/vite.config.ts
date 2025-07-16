@@ -1,12 +1,13 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import dotenv from 'dotenv'
-import path from 'path'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import dotenv from "dotenv";
+import path from "path";
+import tailwindcss from "@tailwindcss/vite";
 
-dotenv.config()
+dotenv.config();
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   css: {
     preprocessorOptions: {
       scss: {
@@ -22,13 +23,14 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      src: path.resolve(__dirname, 'src'),
+      src: path.resolve(__dirname, "src"),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
   server: {
-      port: process.env.VITE_PORT ? Number(process.env.VITE_PORT) : 3000,
-      proxy: {
-        // https://vitejs.dev/config/server-options.html
-      },
+    port: process.env.VITE_PORT ? Number(process.env.VITE_PORT) : 3000,
+    proxy: {
+      // https://vitejs.dev/config/server-options.html
     },
-})
+  },
+});

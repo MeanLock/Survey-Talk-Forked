@@ -14,8 +14,11 @@ import {
   cilStar,
 } from '@coreui/icons'
 import { CNavGroup, CNavTitle, CNavItem } from '@coreui/react'
-
-
+import StorefrontIcon from '@mui/icons-material/Storefront';
+import PaidOutlinedIcon from '@mui/icons-material/PaidOutlined';
+import PollOutlinedIcon from '@mui/icons-material/PollOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import {
   HardDrives,
   MagicWand,
@@ -35,206 +38,77 @@ import { FcOnlineSupport, FcFactoryBreakdown } from "react-icons/fc";
 
 
 const get_roleNav = (role_id: number, account_id: number) => {
-  //alert('ngu')
   const _roleNav = [
     [],
-    // manager ID: 1   
+    // admin: 1   
     [
       {
         component: CNavItem,
         name: 'Dashboard',
         to: '/dashboard',
-        icon: <Gauge size={35} color="red" weight="duotone" /> ,
-      },
-      {
-        component: CNavTitle,
-        name: 'Accounts Management',
+        icon: <Gauge size={30} weight="duotone" />,
       },
       {
         component: CNavItem,
-        name: 'Customers',
+        name: 'Người Dùng',
         to: '/customers/table',
-        icon: <Users size={35} color="red" weight="duotone" />,
+        icon: <Users size={30} weight="duotone" />,
+
+      },
+        {
+        component: CNavItem,
+        name: 'Người Quản Lý',
+        to: '/managers/table',
+        icon: <Users size={30} weight="duotone" />,
 
       },
       {
         component: CNavItem,
-        name: 'Staffs',
-        to: '/staffs_manager/table',
-        icon: <IdentificationCard size={35} color="red" weight="duotone" />,
+        name: 'Cấp độ',
+        to: '/level-management',
+        icon: <PollOutlinedIcon sx={{ fontSize: 29 }} />,
 
-      },
-      {
-        component: CNavTitle,
-        name: 'Orders Management',
-      },
-      {
-        component: CNavGroup,
-        name: 'Quotes',
-        to: '/quotes_manager',
-        icon: <FileText size={35} color="red" weight="duotone" />,
-        items: [
-          {
-            component: CNavItem,
-            name: 'Main Quotes List',
-            to: '/quotes_manager/table',
-            icon: <ArrowCircleRight size={13} color="lightsalmon" weight="duotone" />
-          },
-          {
-            component: CNavItem,
-            name: 'Price Reporting',
-            to: '/quotes_manager/price_reporting',
-            icon: <ArrowCircleRight size={13} color="lightsalmon" weight="duotone" />
-          },
-        ],
-      },
-      {
-        component: CNavGroup,
-        name: 'Orders',
-        to: '/orders_manager',
-        icon: <ShoppingCartSimple size={35} color="red" weight="duotone" />,
-        items: [
-          {
-            component: CNavItem,
-            name: 'Main Orders List',
-            to: '/orders_manager/table',
-            icon: <ArrowCircleRight size={13} color="lightsalmon" weight="duotone" />
-          },
-          {
-            component: CNavItem,
-            name: 'Price reporting',
-            to: '/orders_manager/price_reporting',
-            icon: <ArrowCircleRight size={13} color="lightsalmon" weight="duotone" />
-          },
-          {
-            component: CNavItem,
-            name: 'Refund List',
-            to: '/orders_manager/refund',
-            icon: <ArrowCircleRight size={13} color="lightsalmon" weight="duotone" />
-          },
-          {
-            component: CNavItem,
-            name: 'Transactions',
-            to: '/orders_manager/transactions',
-            icon: <ArrowCircleRight size={13} color="lightsalmon" weight="duotone" />
-          },
-        ],
-      },
-      {
-        component: CNavTitle,
-        name: 'Resources Management',
-      },
-      {
-        component: CNavGroup,
-        name: 'Resources',
-        to: '/resources',
-        icon: <HardDrives size={35} color="red" weight="duotone" />,
-        items: [
-          {
-            component: CNavGroup,
-            name: 'Mounting',
-            to: '/mounting',
-            icon: <Cube size={30} color="hotpink" weight="duotone" />,
-            items: [
-              {
-                component: CNavItem,
-                name: 'Ring',
-                to: '/mounting/ring/table',
-                icon: <GiBigDiamondRing size={20} color="mediumspringgreen" fontWeight="duotone" />,
-              },
-              {
-                component: CNavItem,
-                name: 'Band',
-                to: '/mounting/band/table',
-                icon: <GiDoorRingHandle size={20} color="mediumspringgreen" />,
-              },
-              {
-                component: CNavItem,
-                name: 'Pendant',
-                to: '/mounting/pendant/table',
-                icon: <GiGemPendant size={20} color="mediumspringgreen" />,
-              },
-            ],
-          },
-          {
-            component: CNavGroup,
-            name: 'Material',
-            to: '/material',
-            icon: <Cube size={30} color="hotpink" weight="duotone" />,
-            items: [
-              {
-                component: CNavItem,
-                name: 'Metal Price Table',
-                to: '/material/metal/table',
-                icon: <GiMetalBar size={20} color="mediumspringgreen" fontWeight="duotone" />
-              },
-              {
-                component: CNavItem,
-                name: 'Diamond Price Table',
-                to: '/material/diamond/table',
-                icon: <GiCheckeredDiamond size={20} color="mediumspringgreen" fontWeight="duotone" />
-              },
-            ],
-          },
-        ],
-      },
-
-
-    ],
-    // sale_staff ID: 2
-    [
-      // {
-      //   component: CNavItem,
-      //   name: 'Dashboard',
-      //   to: '/dashboard',
-      //   // icon: <Gauge size={35} color="red" weight="duotone" />,
-      // },
-      {
-        component: CNavTitle,
-        name: 'Accounts Management',
       },
       {
         component: CNavItem,
-        name: 'Customers',
-        to: '/customers/table',
-        icon: <Users size={35} color="red" weight="duotone" />,
-      },
-      {
-        component: CNavTitle,
-        name: 'Orders Management',
-      },
-      {
-        component: CNavItem,
-        name: 'Assigned Quotes',
-        to: '/quotes_sale_staff/table',
-        icon: <FileText size={35} color={"red"} weight="duotone" />,
-      },
-      {
-        component: CNavGroup,
-        name: 'Assigned Orders',
-        to: '/orders_sale_staff',
-        icon: <ShoppingCartSimple size={35} color="red" weight="duotone" />,
-        items: [
-          {
-            component: CNavItem,
-            name: 'Main Orders List',
-            to: '/orders_sale_staff/table',
-            icon: <ArrowCircleRight size={13} color="lightsalmon" weight="duotone" />
-          },
-          {
-            component: CNavItem,
-            name: 'Design Processes',
-            to: '/orders_sale_staff/design_process',
-            icon: <ArrowCircleRight size={13} color="lightsalmon" weight="duotone" />
-          },
-          {
-            component: CNavItem,
-            name: 'Transactions',
-            to: '/orders_manager/transactions',
-            icon: <ArrowCircleRight size={13} color="lightsalmon" weight="duotone" />
-          }
-        ],
+        name: 'Cài đặt',
+        to: '/staffs_manager/table11',
+        icon: <SettingsOutlinedIcon sx={{ fontSize: 29 }} />,
+
       }
+      
+    ],
+    // manager ID: 2
+    [
+      {
+        component: CNavItem,
+        name: 'Khảo Sát',
+        to: '/community-survey',
+        icon: <IdentificationCard size={30} weight="duotone" />,
+
+      },
+      {
+        component: CNavItem,
+        name: 'Data Market',
+        to: '/data-market',
+        icon: <StorefrontIcon sx={{ fontSize: 28 }} />,
+
+      },
+      {
+        component: CNavItem,
+        name: 'Khảo Sát Lọc',
+        to: '/filter-survey/table',
+        icon: <DescriptionOutlinedIcon sx={{ fontSize: 29 }} />,
+
+      },
+      {
+        component: CNavItem,
+        name: 'Giao dịch',
+        to: '/transactions/table',
+        icon: <PaidOutlinedIcon sx={{ fontSize: 29 }}/>,
+
+      }
+         
     ],
     // design_staff ID: 3
     [
@@ -242,7 +116,7 @@ const get_roleNav = (role_id: number, account_id: number) => {
       //   component: CNavItem,
       //   name: 'Dashboard',
       //   to: '/dashboard',
-      //   // icon: <Gauge size={35} color="red" weight="duotone" />,
+      //   // icon: <Gauge size={30}  weight="duotone" />,
       // },
       {
         component: CNavTitle,
@@ -253,7 +127,7 @@ const get_roleNav = (role_id: number, account_id: number) => {
         show: true,
         name: 'Assigned Orders',
         to: '/orders_design_staff',
-        icon: <ShoppingCartSimple size={35} color="red" weight="duotone" />,
+        icon: <ShoppingCartSimple size={30} weight="duotone" />,
         items: [
           {
             component: CNavItem,
@@ -276,7 +150,7 @@ const get_roleNav = (role_id: number, account_id: number) => {
       //   component: CNavItem,
       //   name: 'Dashboard',
       //   to: '/dashboard',
-      //   // icon: <Gauge size={35} color="red" weight="duotone" />,
+      //   // icon: <Gauge size={30}  weight="duotone" />,
       // },
       {
         component: CNavTitle,
@@ -285,9 +159,9 @@ const get_roleNav = (role_id: number, account_id: number) => {
       {
         component: CNavGroup,
         show: true,
-        name: 'Assigned Orders',
+        name: 'dcm',
         to: '/orders_production_staff',
-        icon: <FcFactoryBreakdown size={35} color="red" fontWeight="duotone" />,
+        icon: <FcFactoryBreakdown size={30} fontWeight="duotone" />,
         items: [
           {
             component: CNavItem,
@@ -313,4 +187,4 @@ const get_roleNav = (role_id: number, account_id: number) => {
 
 
 
-export {get_roleNav}
+export { get_roleNav }

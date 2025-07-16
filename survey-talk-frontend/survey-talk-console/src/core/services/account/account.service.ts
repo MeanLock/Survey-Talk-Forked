@@ -5,26 +5,54 @@ import { AxiosInstance } from "axios";
 import { callGraphQLMutation, callGraphQLQuery } from "../../api/graphql/main/api-call";
 import { callAxiosRestApi } from "../../api/rest-api/main/api-call";
 
+const BASE_URL = "/User/accounts";
 
-export const login = async (instance: AxiosInstance, data : {
-    username: string,
-    password: string,
-} | any) => {
-
-    const bodyData = {
-        login: {
-            Email : data.username,
-            Password : data.password,
-        }
-    }
+export const getCustomerAccounts = async (instance: AxiosInstance) => {
 
     const response = await callAxiosRestApi({
         instance: instance,
-        method: "post",
-        url: "/User/auth/login",
-        data: bodyData,
-    }, "Đăng nhập");
+        method: "get",
+        url: `${BASE_URL}/customer`,
+    });
 
-    console.log("Rest API Response:", response);
     return response;
 }
+
+export const getManagerAccounts = async (instance: AxiosInstance) => {
+
+    const response = await callAxiosRestApi({
+        instance: instance,
+        method: "get",
+        url: `${BASE_URL}/staff`,
+    });
+
+    return response;
+}
+
+export const deactivateAccount = async (instance: AxiosInstance, accountId: number, isDeactivate: boolean) => {
+    const response = await callAxiosRestApi({
+        instance: instance,
+        method: "put",
+        url: `${BASE_URL}/${accountId}/deactivate/${isDeactivate}`,
+    });
+
+    return response;
+};
+
+export const updateAccount = async (instance: AxiosInstance, accountId: number, request_body: {
+    FullName: string,
+    Dob: string,
+    Gender: string,
+    Address: string,
+    Phone: string,
+} | any) => {
+
+    const response = await callAxiosRestApi({
+        instance: instance,
+        method: "put",
+        url: `${BASE_URL}/${accountId}`,
+        data: request_body
+    });
+
+    return response;
+};

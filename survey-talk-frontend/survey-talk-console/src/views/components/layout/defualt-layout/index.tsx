@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../../../redux/root-reducer'
 import { clearAuthToken } from '../../../../redux/auth/auth.slice'
 import { JwtUtil } from '../../../../core/utils/jwt.util'
-
+import "./styles.scss"
 
 const DefaultLayout = () => {
   const dispatch = useDispatch();

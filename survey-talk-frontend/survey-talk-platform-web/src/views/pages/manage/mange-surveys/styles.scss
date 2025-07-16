@@ -1,0 +1,59 @@
+.surveys-me {
+  .surveys-me__title {
+    font-size: 36px;
+    font-weight: bold;
+    font-family: app_vars.$font-primary;
+    color: app_vars.$text-primary;
+  }
+  .surveys-me__filter-container {
+    background-color: app_vars.$text-white;
+    border-radius: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12), 0 3px 6px rgba(0, 0, 0, 0.08);
+    }
+  }
+  .surveys-me__search-topic-sort {
+    .surveys-me__topic {
+      .topic-filter-btn {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: box-shadow 0.3s ease;
+        &:hover {
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12),
+            0 3px 6px rgba(0, 0, 0, 0.08);
+        }
+      }
+    }
+    .surveys-me__sort {
+      .sort-btn {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: box-shadow 0.3s ease;
+        &:hover {
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12),
+            0 3px 6px rgba(0, 0, 0, 0.08);
+        }
+      }
+    }
+  }
+
+  /* Alternative: Sử dụng CSS variables của ShadCN */
+  .surveys-me [role="radio"] {
+    aspect-ratio: 1;
+    height: 1rem;
+    width: 1rem;
+    border-radius: 50%;
+    border: 1px solid hsl(var(--primary));
+    border-color: hsl(var(--border));
+    text-align: center;
+
+    &[data-state="checked"] {
+      background-color: hsl(var(--primary));
+      text-color: hsl(var(--primary-foreground));
+    }
+  }
+}

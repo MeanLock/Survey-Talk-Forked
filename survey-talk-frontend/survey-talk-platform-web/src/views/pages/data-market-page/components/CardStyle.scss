@@ -1,0 +1,63 @@
+.data-card__container {
+  width: 248px;
+  height: 324px;
+  padding: 20px;
+  background: linear-gradient(to bottom, #3f5dab 0%, #ffffff 15%, #ffffff 100%);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Bóng mặc định */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Hiệu ứng chuyển động */
+
+  &:hover {
+    transform: translateY(-5px); /* Nổi lên */
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2); /* Bóng đậm hơn */
+  }
+  .data-card__header {
+    .data-card__header-image {
+      width: 35px;
+      height: 35px;
+      border-radius: 5px;
+      img {
+        width: 35px;
+        height: 35px;
+        object-fit: cover;
+        border-radius: 5px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Bóng mặc định */
+      }
+    }
+    .data-card__header-title-topic {
+      .topic {
+        color: #807d7d;
+        font-size: 10px;
+        font-weight: 600;
+      }
+      .title {
+        font-size: 12px;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .data-card__price {
+    font-family: app_vars.$font-inter;
+    .total-price {
+      font-size: 25px;
+      color: black;
+      font-weight: 400;
+    }
+    .total-contributor {
+      .title {
+        font-size: 10px;
+        font-weight: 700;
+        color: #aeaeae;
+      }
+      .value {
+        font-size: 10px;
+        color: black;
+        font-weight: 700;
+      }
+      .version-details {
+        font-size: 8px;
+      }
+    }
+  }
+}

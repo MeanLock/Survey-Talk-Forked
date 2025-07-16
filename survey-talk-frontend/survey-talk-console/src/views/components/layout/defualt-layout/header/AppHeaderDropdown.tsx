@@ -27,7 +27,6 @@ import { avatar8 } from '../../../../../assets/images'
 type UserType = AuthState['user']
 
 const AppHeaderDropdown : FC<{ user: AuthState['user'] }> = ({user}) => {
-  const Avatar = user.imageUrl
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle className="py-0 pe-0" caret={false}>

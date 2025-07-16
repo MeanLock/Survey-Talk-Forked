@@ -2,21 +2,20 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 export interface UiState {
-  sidebarShow: boolean;
+  sidebarNarrow: boolean;
   theme: string;
 }
 
 const initialState: UiState = {
-  sidebarShow: true,
+  sidebarNarrow: false,
   theme: '123',
-} ;
+};
 
 const uiSlice = createSlice({
   name: 'ui',
   initialState,
   reducers: {
     setUi: (state, action) => {
-      alert('setUi action called');
       return { ...state, ...action.payload };
     },
   },

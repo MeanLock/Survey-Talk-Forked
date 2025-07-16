@@ -1,0 +1,56 @@
+.survey-card__container {
+  background-color: app_vars.$text-white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Bóng mặc định */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Hiệu ứng chuyển động */
+
+  &:hover {
+    transform: translateY(-5px); /* Nổi lên */
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2); /* Bóng đậm hơn */
+  }
+  .survey-card__header {
+    .survey-card__header-image {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); /* Bóng mặc định */
+    }
+    .survey-card__header-informations {
+      .survey-card__header-informations__title {
+        color: app_vars.$text-primary;
+        font-size: 20px;
+        font-weight: bold;
+      }
+    }
+    .survey-card__header__slot-count {
+      .survey-card__header__slot-count-container {
+        .number {
+          font-size: 24px;
+          font-weight: bold;
+          color: "#FF4E4E";
+        }
+        .description {
+          font-size: 14px;
+          color: "black";
+        }
+      }
+    }
+  }
+  .survey-card__description {
+    display: block;
+    height: 75px; /* Giới hạn chiều cao tối đa */
+    overflow: hidden; /* Ẩn thanh cuộn của phần tử cha */
+
+    .survey-card__description-content {
+      display: block;
+      overflow-y: auto; /* Cho phép cuộn khi cần */
+      white-space: normal; /* Cho phép xuống dòng */
+      height: 100%; /* Đảm bảo phần tử con có chiều cao bằng với cha */
+
+      /* Ẩn thanh cuộn */
+      -ms-overflow-style: none; /* Cho trình duyệt IE */
+      scrollbar-width: none; /* Cho trình duyệt Firefox */
+    }
+
+    .survey-card__description-content::-webkit-scrollbar {
+      display: none; /* Ẩn thanh cuộn cho trình duyệt Webkit (Chrome, Safari) */
+    }
+  }
+}

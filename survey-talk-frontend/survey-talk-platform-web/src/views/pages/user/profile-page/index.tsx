@@ -1,0 +1,428 @@
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/rootReducer";
+import { useGetAccountDetails } from "@/services/Profile/get-account-details";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { User, Lock, LogOut, Eye, EyeOff } from "lucide-react";
+
+// Loading component placeholder
+const SurveyTalkLoading = () => (
+  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+);
+
+const ProfilePage = () => {
+  // STATES
+  const [showMode, setShowMode] = useState("profile");
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    dob: "",
+    gender: "",
+    address: "",
+  });
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const user = useSelector((state: RootState) => state.auth.user);
+  const userId = Number(user.Id);
+  const { data: userProfiles, isLoading: isLoadingProfiles } =
+    useGetAccountDetails({
+      id: userId,
+    });
+
+  useEffect(() => {
+    if (userProfiles) {
+      setFormData({
+        fullName: userProfiles.FullName || "",
+        email: userProfiles.Email || "",
+        phone: userProfiles.Phone || "",
+        dob: userProfiles.Dob ? userProfiles.Dob.split("T")[0] : "",
+        gender: userProfiles.Gender || "",
+        address: userProfiles.Address || "",
+      });
+    }
+  }, [userProfiles]);
+
+  // Handler functions
+  const handleProfileUpdate = () => {
+    console.log("Updating profile with data:", formData);
+    // TODO: Implement actual update logic
+  };
+
+  const handlePasswordChange = () => {
+    console.log("Changing password:", passwordData);
+    // TODO: Implement actual password change logic
+  };
+
+  const handleLogout = () => {
+    console.log("Logging out user");
+    // TODO: Implement actual logout logic
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handlePasswordInputChange = (field: string, value: string) => {
+    setPasswordData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const resetChanges = () => {
+    if (userProfiles) {
+      setFormData({
+        fullName: userProfiles.FullName || "",
+        email: userProfiles.Email || "",
+        phone: userProfiles.Phone || "",
+        dob: userProfiles.Dob ? userProfiles.Dob.split("T")[0] : "",
+        gender: userProfiles.Gender || "",
+        address: userProfiles.Address || "",
+      });
+    }
+  };
+
+  return (
+    <div className="w-full flex flex-col items-start p-10 bg-gray-50 min-h-screen">
+      <p className="font-bold text-[36px] text-[#3e5dab] mb-10">
+        Trang quản lý thông tin cá nhân
+      </p>
+
+      {isLoadingProfiles ? (
+        <div className="w-full h-56 flex flex-col items-center justify-center">
+          <SurveyTalkLoading />
+          <p className="font-bold text-2xl mt-4">Đang tìm kiếm chính bạn!</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-12 gap-10 w-full">
+          {/* Left Sidebar */}
+          <div className="col-span-3">
+            <Card className="w-full">
+              <CardContent className="flex flex-col items-center p-6">
+                <Avatar className="w-[150px] h-[150px] mb-5">
+                  <AvatarImage
+                    src={userProfiles?.MainImageUrl || "/placeholder.svg"}
+                    alt={userProfiles?.FullName}
+                    className="object-cover"
+                  />
+                  <AvatarFallback className="text-2xl">
+                    {userProfiles?.FullName?.charAt(0) || "U"}
+                  </AvatarFallback>
+                </Avatar>
+
+                <h2 className="text-2xl font-semibold mb-1">
+                  {userProfiles?.FullName}
+                </h2>
+                <p className="text-md font-light text-gray-600 mb-6">
+                  Customer
+                </p>
+
+                <div className="w-full space-y-2">
+                  <div
+                    onClick={() => setShowMode("profile")}
+                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                      showMode === "profile"
+                        ? "bg-blue-100 text-blue-700"
+                        : "hover:bg-gray-100"
+                    }`}
+                  >
+                    <User size={20} />
+                    <span>Thông tin cá nhân</span>
+                  </div>
+
+                  <div
+                    onClick={() => setShowMode("security")}
+                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                      showMode === "security"
+                        ? "bg-blue-100 text-blue-700"
+                        : "hover:bg-gray-100"
+                    }`}
+                  >
+                    <Lock size={20} />
+                    <span>Mật khẩu & Bảo mật</span>
+                  </div>
+
+                  <Separator className="my-2" />
+
+                  <div
+                    onClick={handleLogout}
+                    className="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-red-50 hover:text-red-600 transition-colors"
+                  >
+                    <LogOut size={20} />
+                    <span>Đăng xuất</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Content */}
+          <div className="col-span-9">
+            <Card>
+              <CardContent className="p-8">
+                {showMode === "profile" && (
+                  <div>
+                    <h3 className="text-2xl font-semibold mb-6">
+                      Thông Tin Cá Nhân
+                    </h3>
+
+                    <div className="space-y-6">
+                      {/* Gender Selection */}
+                      <div>
+                        {/* <Label className="text-base font-medium mb-3 block">
+                          Giới tính
+                        </Label> */}
+                        <RadioGroup
+                          value={formData.gender}
+                          onValueChange={(value) =>
+                            handleInputChange("gender", value)
+                          }
+                          className="flex gap-6"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="male" id="male" />
+                            <Label htmlFor="male">Nam</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="female" id="female" />
+                            <Label htmlFor="female">Nữ</Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+
+                      {/* Full Name */}
+                      <div>
+                        <Label
+                          htmlFor="fullName"
+                          className="text-base font-medium"
+                        >
+                          Họ và Tên
+                        </Label>
+                        <Input
+                          id="fullName"
+                          value={formData.fullName}
+                          onChange={(e) =>
+                            handleInputChange("fullName", e.target.value)
+                          }
+                          className="mt-2"
+                        />
+                      </div>
+
+                      {/* Email */}
+                      <div>
+                        <Label
+                          htmlFor="email"
+                          className="text-base font-medium"
+                        >
+                          Email
+                        </Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          disabled
+                          value={formData.email}
+                          onChange={(e) =>
+                            handleInputChange("email", e.target.value)
+                          }
+                          className="mt-2"
+                        />
+                      </div>
+
+                      {/* Phone and Date of Birth */}
+                      <div className="grid grid-cols-2 gap-6">
+                        <div>
+                          <Label
+                            htmlFor="phone"
+                            className="text-base font-medium"
+                          >
+                            Phone Number
+                          </Label>
+                          <Input
+                            id="phone"
+                            value={formData.phone}
+                            onChange={(e) =>
+                              handleInputChange("phone", e.target.value)
+                            }
+                            className="mt-2"
+                          />
+                        </div>
+                        <div>
+                          <Label
+                            htmlFor="dob"
+                            className="text-base font-medium"
+                          >
+                            Date of Birth
+                          </Label>
+                          <Input
+                            id="dob"
+                            type="date"
+                            value={formData.dob}
+                            onChange={(e) =>
+                              handleInputChange("dob", e.target.value)
+                            }
+                            className="mt-2"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Address */}
+                      {/* <div>
+                        <Label
+                          htmlFor="address"
+                          className="text-base font-medium"
+                        >
+                          Địa chỉ
+                        </Label>
+                        <Input
+                          id="address"
+                          value={formData.address}
+                          onChange={(e) =>
+                            handleInputChange("address", e.target.value)
+                          }
+                          className="mt-2"
+                        />
+                      </div> */}
+
+                      {/* Action Buttons */}
+                      <div className="flex gap-4 pt-6">
+                        <Button
+                          variant="outline"
+                          onClick={resetChanges}
+                          className="px-8 bg-transparent"
+                        >
+                          Bỏ các thay đổi
+                        </Button>
+                        <Button
+                          onClick={handleProfileUpdate}
+                          className="px-8 bg-[#3e5dab] hover:bg-[#2d4491]"
+                        >
+                          Lưu các thay đổi
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {showMode === "security" && (
+                  <div>
+                    <h3 className="text-2xl font-semibold mb-6">
+                      Bảo mật & Mật Khẩu
+                    </h3>
+
+                    <div className="space-y-6 max-w-md">
+                      {/* Current Password */}
+                      <div>
+                        <Label
+                          htmlFor="currentPassword"
+                          className="text-base font-medium"
+                        >
+                          Mật khẩu hiện tại
+                        </Label>
+                        <div className="relative mt-2">
+                          <Input
+                            id="currentPassword"
+                            type={showPassword ? "text" : "password"}
+                            value={passwordData.currentPassword}
+                            onChange={(e) =>
+                              handlePasswordInputChange(
+                                "currentPassword",
+                                e.target.value
+                              )
+                            }
+                            className="pr-10"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                          >
+                            {showPassword ? (
+                              <EyeOff size={20} />
+                            ) : (
+                              <Eye size={20} />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* New Password */}
+                      <div>
+                        <Label
+                          htmlFor="newPassword"
+                          className="text-base font-medium"
+                        >
+                          Mật khẩu mới
+                        </Label>
+                        <Input
+                          id="newPassword"
+                          type="password"
+                          value={passwordData.newPassword}
+                          onChange={(e) =>
+                            handlePasswordInputChange(
+                              "newPassword",
+                              e.target.value
+                            )
+                          }
+                          className="mt-2"
+                        />
+                      </div>
+
+                      {/* Confirm Password */}
+                      <div>
+                        <Label
+                          htmlFor="confirmPassword"
+                          className="text-base font-medium"
+                        >
+                          Xác nhận mật khẩu mới
+                        </Label>
+                        <Input
+                          id="confirmPassword"
+                          type="password"
+                          value={passwordData.confirmPassword}
+                          onChange={(e) =>
+                            handlePasswordInputChange(
+                              "confirmPassword",
+                              e.target.value
+                            )
+                          }
+                          className="mt-2"
+                        />
+                      </div>
+
+                      {/* Change Password Button */}
+                      <div className="pt-6">
+                        <Button
+                          onClick={handlePasswordChange}
+                          className="w-full bg-[#3e5dab] hover:bg-[#2d4491]"
+                        >
+                          Đổi Mật Khẩu
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ProfilePage;

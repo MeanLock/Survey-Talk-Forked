@@ -1,0 +1,23 @@
+.page-title {
+  font-size: 64px;
+  font-weight: 700;
+  color: app_vars.$text-primary;
+}
+
+.blue-div {
+  background-color: app_vars.$bg-primary;
+  border-radius: 20px;
+  color: white;
+  font-size: 28px;
+  shake-image: {
+    clip-path: polygon(
+      69% 0,
+      100% 16%,
+      100% 69%,
+      84% 69%,
+      30% 69%,
+      0 69%,
+      0 19%
+    );
+  }
+}
