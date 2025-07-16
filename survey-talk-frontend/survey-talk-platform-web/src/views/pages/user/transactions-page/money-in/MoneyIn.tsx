@@ -12,6 +12,7 @@ import type { RootState } from "../../../../../redux/rootReducer";
 import { updateAuthUser } from "../../../../../redux/auth/authSlice";
 import { callAxiosRestApi } from "../../../../../core/api/rest-api/main/api-call";
 import { loginRequiredAxiosInstance } from "../../../../../core/api/rest-api/config/instances/v2";
+import { ENV_CONFIG } from "@/config";
 interface Props {
   balance: number | null;
 }
@@ -182,8 +183,8 @@ export const MoneyIn: React.FC<Props> = ({ balance }) => {
         url: `Payment/account/balance-deposits/create-payment-link`,
         data: {
           Amount: Number.parseInt(pushAmount),
-          ReturnUrl: `http://localhost:3007/user/transactions/payment-result?type=1&amount=${amount}`,
-          CancelUrl: `http://localhost:3007/user/transactions/payment-result?type=1&amount=${amount}`,
+          ReturnUrl: `${ENV_CONFIG.REST_API_BASE_URL}/user/transactions/payment-result?type=1&amount=${amount}`,
+          CancelUrl: `${ENV_CONFIG.REST_API_BASE_URL}/user/transactions/payment-result?type=1&amount=${amount}`,
         },
       });
       updateMoneyInById(7, amount);
