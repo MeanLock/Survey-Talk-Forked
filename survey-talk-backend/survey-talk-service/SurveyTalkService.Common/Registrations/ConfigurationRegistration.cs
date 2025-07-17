@@ -43,6 +43,7 @@ namespace SurveyTalkService.Common.Registrations
             // BusinessSetting
             services.AddSingleton<ISurveyConfig, SurveyConfig>();
             services.AddSingleton<IEmbeddingVectorModelConfig, EmbeddingVectorModelConfig>();
+            services.AddSingleton<IAccountConfig, AccountConfig>();
 
             // AWS
             services.AddSingleton<IAWSS3Config, AWSS3Config>();

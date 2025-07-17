@@ -66,28 +66,28 @@ namespace SurveyTalkService.BusinessLogic.Helpers
         //     //     .UsingTemplateFromFile(templateFilePath, model)
         //     //     .SendAsync();
         // }
-        public async Task SendEmail(string to, object model)
+        public async Task SendEmail(string to, object model, string templateFilePath, string subject)
         {
 
             try
             {
 
                 
-                string body = await RenderViewToStringAsync("Mail/ForgotPassword", model);
+                string body = await RenderViewToStringAsync(templateFilePath, model);
                 
                 var compiler = new BootstrapCompiler(body);
                 var result = compiler.Multipart();
 
                 // Console.WriteLine($"Email body: {result}");
                 await _fluentEmail.To(to)
-                    .Subject("Quên mật khẩu")
+                    .Subject(subject)
                     .Body(body, isHtml: true)
                     .SendAsync();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error sending email: {ex.Message}");
-                throw;
+                throw new Exception("Gửi mail thất bại", ex);
             }
 
         }

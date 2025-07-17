@@ -2,8 +2,20 @@
 // AuthController
     {
         "method": "POST",
-        "url": "/api/User/auth/login",
+        "url": "/api/User/auth/login-manual",
         "description": "Đăng nhập",
+        "completed": true
+    },
+    {
+        "method": "POST",
+        "url": "/api/User/auth/login-google",
+        "description": "Đăng nhập bằng Google",
+        "completed": true
+    },
+    {
+        "method": "POST",
+        "url": "/api/User/auth/account-verification",
+        "description": "Xác thực tài khoản",
         "completed": true
     },
     {

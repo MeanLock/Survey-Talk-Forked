@@ -23,7 +23,7 @@ namespace SurveyTalkService.DataAccess.Repositories
             return await _appDbContext.Accounts
                 .Include(account => account.Role)
                 .Include(account => account.AccountProfile)
-                .Include(account => account.AccountVerification)
+                .Include(account => account.AccountNationalVerification)
                 .Where(account => account.RoleId == roleId)
                 .ToListAsync();
         }
@@ -33,7 +33,7 @@ namespace SurveyTalkService.DataAccess.Repositories
             return await _appDbContext.Accounts
                 .Include(account => account.Role)
                 .Include(account => account.AccountProfile)
-                .Include(account => account.AccountVerification)
+                .Include(account => account.AccountNationalVerification)
                 .Where(account => roleIds.Contains(account.RoleId))
                 .ToListAsync();
         }
@@ -43,7 +43,7 @@ namespace SurveyTalkService.DataAccess.Repositories
             return await _appDbContext.Accounts
                 .Include(account => account.Role)
                 .Include(account => account.AccountProfile)
-                .Include(account => account.AccountVerification)
+                .Include(account => account.AccountNationalVerification)
                 .FirstOrDefaultAsync(account => account.Email == email);
         }
 
@@ -52,7 +52,7 @@ namespace SurveyTalkService.DataAccess.Repositories
             return await _appDbContext.Accounts
                 .Include(account => account.Role)
                 .Include(account => account.AccountProfile)
-                .Include(account => account.AccountVerification)
+                .Include(account => account.AccountNationalVerification)
                 .Include(account => account.TakerTagFilters)
                 .ThenInclude(takerTagFilter => takerTagFilter.FilterTag)
                 .Include(account => account.SurveyTopicFavorites)

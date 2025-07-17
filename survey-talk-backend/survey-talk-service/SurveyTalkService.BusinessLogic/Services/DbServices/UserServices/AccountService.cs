@@ -15,6 +15,9 @@ using SurveyTalkService.BusinessLogic.Services.DbServices.FilterServices;
 using Microsoft.Extensions.DependencyInjection;
 using SurveyTalkService.BusinessLogic.DTOs.Auth;
 using SurveyTalkService.BusinessLogic.DTOs.Account;
+using SurveyTalkService.Common.AppConfigurations.BusinessSetting.interfaces;
+using SurveyTalkService.BusinessLogic.DTOs.ViewModels.Mail;
+using SurveyTalkService.Common.AppConfigurations.Google.interfaces;
 
 namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
 {
@@ -26,6 +29,8 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
         // CONFIG
         public readonly IAppConfig _appConfig;
         private readonly IFilePathConfig _filePathConfig;
+        private readonly IAccountConfig _accountConfig;
+        private readonly IGoogleMailConfig _googleMailConfig;
 
         // DB CONTEXT
         private readonly AppDbContext _appDbContext;
@@ -36,6 +41,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
         private readonly FileHelpers _fileHelpers;
         private readonly ImageHelpers _imageHelpers;
         private readonly DateHelpers _dateHelpers;
+        private readonly MailHelpers _mailHelpers;
 
 
         // UNIT OF WORK
@@ -58,6 +64,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
             ILogger<AccountService> logger,
             AppDbContext appDbContext,
             BcryptHelpers bcryptHelpers,
+            MailHelpers mailHelpers,
             JwtHelpers jwtHelpers,
             IUnitOfWork unitOfWork,
 
@@ -70,14 +77,17 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
 
             FileHelpers fileHelpers,
             IFilePathConfig filePathConfig,
+            IGoogleMailConfig googleMailConfig,
             AWSS3Service awsS3Service,
             IAppConfig appConfig,
+            IAccountConfig accountConfig,
             ImageHelpers imageHelpers
             )
         {
             _logger = logger;
             _appDbContext = appDbContext;
             _bcryptHelpers = bcryptHelpers;
+            _mailHelpers = mailHelpers;
             _jwtHelpers = jwtHelpers;
             _unitOfWork = unitOfWork;
 
@@ -91,7 +101,8 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
 
             _fileHelpers = fileHelpers;
             _filePathConfig = filePathConfig;
-
+            _accountConfig = accountConfig;
+            _googleMailConfig = googleMailConfig;
 
             _awsS3Service = awsS3Service;
             _appConfig = appConfig;
@@ -138,6 +149,19 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
             return role;
         }
 
+        public static string GenerateRandomVerifyCode(int length)
+        {
+            var random = new Random();
+            var digits = new char[length];
+
+            for (int i = 0; i < length; i++)
+            {
+                digits[i] = (char)('0' + random.Next(0, 10));
+            }
+
+            return new string(digits);
+        }
+
         /////////////////////////////////////////////////////////////
         public async Task RegisterCustomer(CustomerRegisterDTO customerRegisterDTO)
         {
@@ -148,41 +172,76 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
                 {
                     var registerInfo = customerRegisterDTO.RegisterInfo;
                     var customer = await _unitOfWork.AccountRepository.FindByEmailAsync(registerInfo.Email);
+
+
+
+                    //                     Account chưa tồn tại -> tạo Account bình thường và gửi mã securitycode -> Nhận mã securitycode -> Nhập mã Security Code -> Account được verify
+                    // Account tồn tại nhưng chưa verify -> tạo mã security mới và lưu lại và update thông tin tài khoản và gửi đến email  -> Nhận mã securitycode -> Nhập mã Security Code -> Account được verify
+                    // Account tồn tại và đã verify -> báo lỗi tài khoản đã tồn tại
+
                     if (customer != null)
                     {
-                        throw new Exception("email đã tồn tại " + registerInfo.Email);
-                    }
-                    customer = new Account
-                    {
-                        Email = registerInfo.Email,
-                        Password = _bcryptHelpers.HashPassword(registerInfo.Password),
-                        FullName = registerInfo.FullName,
-                        RoleId = 4,
-                        Dob = DateOnly.FromDateTime(registerInfo.Dob),
-                        Gender = registerInfo.Gender,
-                        Address = registerInfo.Address,
-                        Phone = registerInfo.Phone,
-                        IsFilterSurveyRequired = true, 
-                        IsVerified = false, 
-                    };
-                    await _accountGenericRepository.CreateAsync(customer);
+                        if (customer.IsVerified == true)
+                        {
+                            throw new Exception("Đã tồn tại tài khoản đang sử dụng mail này");
+                        }
+                        else
+                        {
+                            string verifyCode = GenerateRandomVerifyCode(_accountConfig.VerifyCodeLength);
 
-                    var AccountProfile = new AccountProfile
+                            customer.Email = registerInfo.Email;
+                            customer.Password = _bcryptHelpers.HashPassword(registerInfo.Password);
+                            customer.FullName = registerInfo.FullName;
+                            customer.RoleId = 4; // RoleId 4: Customer
+                            customer.Dob = DateOnly.FromDateTime(registerInfo.Dob);
+                            customer.Gender = registerInfo.Gender;
+                            customer.Address = registerInfo.Address;
+                            customer.Phone = registerInfo.Phone;
+                            customer.IsFilterSurveyRequired = true;
+                            customer.IsVerified = false;
+                            customer.VerifyCode = verifyCode;
+
+                            await _mailHelpers.SendEmail(registerInfo.Email, new VerifyCodeEmailViewModel
+                            {
+                                Email = registerInfo.Email,
+                                FullName = registerInfo.FullName,
+                                VerifyCode = verifyCode
+                            }, _googleMailConfig.AccountVerification_TemplateViewPath
+                            , _googleMailConfig.AccountVerification_MailSubject);
+                            await _accountGenericRepository.UpdateAsync(customer.Id, customer);
+
+                        }
+                    }
+                    else
                     {
-                        AccountId = customer.Id,
-                        CountryRegion = null,
-                        MaritalStatus = null,
-                        AverageIncome = null,
-                        EducationLevel = null,
-                        JobField = null,
-                        ProvinceCode = null,
-                        DistrictCode = null,
-                        WardCode = null
-                    };
-                    await _accountProfileGenericRepository.CreateAsync(AccountProfile);
-                    Console.WriteLine("AccountProfile created for customer with ID: " + customer.Id);
-                    Console.WriteLine("_filterTagService: " + _filterTagService);
-                    await _filterTagService.RegisterFilterTag(customer.Id);
+                        string verifyCode = GenerateRandomVerifyCode(_accountConfig.VerifyCodeLength);
+
+                        customer = new Account
+                        {
+                            Email = registerInfo.Email,
+                            Password = _bcryptHelpers.HashPassword(registerInfo.Password),
+                            FullName = registerInfo.FullName,
+                            RoleId = 4,
+                            Dob = DateOnly.FromDateTime(registerInfo.Dob),
+                            Gender = registerInfo.Gender,
+                            Address = registerInfo.Address,
+                            Phone = registerInfo.Phone,
+                            IsFilterSurveyRequired = true,
+                            IsVerified = false,
+                            VerifyCode = verifyCode,
+                        };
+
+                        await _mailHelpers.SendEmail(registerInfo.Email, new VerifyCodeEmailViewModel
+                        {
+                            Email = registerInfo.Email,
+                            FullName = registerInfo.FullName,
+                            VerifyCode = verifyCode
+                        }, _googleMailConfig.AccountVerification_TemplateViewPath
+                        , _googleMailConfig.AccountVerification_MailSubject);
+                        await _accountGenericRepository.CreateAsync(customer);
+                    }
+
+                    
 
                     var folderPath = _filePathConfig.ACCOUNt_IMAGE_PATH + "\\" + customer.Id;
                     if (registerInfo.ImageBase64 != null && registerInfo.ImageBase64 != "")

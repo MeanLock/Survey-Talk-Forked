@@ -23,6 +23,8 @@ CREATE TABLE Account (
     level INT NOT NULL DEFAULT(1),
     progressionSurveyCount INT NOT NULL DEFAULT(0),
     isFilterSurveyRequired BIT NOT NULL,
+    googleId VARCHAR(250) NULL,
+    verifyCode NVARCHAR(250) NULL,
     lastFilterSurveyTakenAt DATETIME NULL,
     deactivatedAt DATETIME NULL,
     createdAt DATETIME NOT NULL DEFAULT(CAST(SYSDATETIMEOFFSET() AT TIME ZONE 'N. Central Asia Standard Time' AS DATETIME)),
@@ -38,7 +40,7 @@ CREATE TABLE AccountOnlineTracking (
 );
 
 -- AccountVerification
-CREATE TABLE AccountVerification (
+CREATE TABLE AccountNationalVerification (
     accountId INT PRIMARY KEY REFERENCES Account(id),
     nationalCardNumber INT NOT NULL,
     expirationDate DATE NULL,

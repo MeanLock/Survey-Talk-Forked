@@ -12,7 +12,11 @@ namespace SurveyTalkService.Common.AppConfigurations.Google
         public string? SmtpHost { get; set; }
         public int SmtpPort { get; set; }
         public bool EnableSsl { get; set; }
-        public string? ForgotPasswordTemplateViewPath { get; set; }
+        public string? AccountForgotPassword_TemplateViewPath { get; set; }
+        public string? AccountVerification_TemplateViewPath { get; set; }
+
+        public string? AccountForgotPassword_MailSubject { get; set; }
+        public string? AccountVerification_MailSubject { get; set; }
     }
     public class GoogleMailConfig : IGoogleMailConfig
     {
@@ -23,7 +27,11 @@ namespace SurveyTalkService.Common.AppConfigurations.Google
         public string? SmtpHost { get; set; }
         public int SmtpPort { get; set; }
         public bool EnableSsl { get; set; }
-        public string? ForgotPasswordTemplateViewPath { get; set; }
+        public string? AccountForgotPassword_TemplateViewPath { get; set; }
+        public string? AccountVerification_TemplateViewPath { get; set; }
+
+        public string? AccountForgotPassword_MailSubject { get; set; }
+        public string? AccountVerification_MailSubject { get; set; }
         public GoogleMailConfig(IConfiguration configuration)
         {
             var googleMailConfig = configuration.GetSection("Google:Mail").Get<GoogleMailConfigModel>();
@@ -34,7 +42,10 @@ namespace SurveyTalkService.Common.AppConfigurations.Google
             SmtpHost = googleMailConfig?.SmtpHost;
             SmtpPort = googleMailConfig?.SmtpPort ?? 0;
             EnableSsl = googleMailConfig?.EnableSsl ?? false;
-            ForgotPasswordTemplateViewPath = googleMailConfig?.ForgotPasswordTemplateViewPath;
+            AccountForgotPassword_TemplateViewPath = googleMailConfig?.AccountForgotPassword_TemplateViewPath;
+            AccountVerification_TemplateViewPath = googleMailConfig?.AccountVerification_TemplateViewPath;
+            AccountForgotPassword_MailSubject = googleMailConfig?.AccountForgotPassword_MailSubject;
+            AccountVerification_MailSubject = googleMailConfig?.AccountVerification_MailSubject;
         }
     }
 }

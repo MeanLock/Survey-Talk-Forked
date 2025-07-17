@@ -43,13 +43,17 @@ public partial class Account
 
     public DateTime UpdatedAt { get; set; }
 
+    public string? GoogleId { get; set; }
+
+    public string? VerifyCode { get; set; }
+
     public virtual ICollection<AccountBalanceTransaction> AccountBalanceTransactions { get; set; } = new List<AccountBalanceTransaction>();
+
+    public virtual AccountNationalVerification? AccountNationalVerification { get; set; }
 
     public virtual ICollection<AccountOnlineTracking> AccountOnlineTrackings { get; set; } = new List<AccountOnlineTracking>();
 
     public virtual AccountProfile? AccountProfile { get; set; }
-
-    public virtual AccountVerification? AccountVerification { get; set; }
 
     public virtual ICollection<DataPurchase> DataPurchases { get; set; } = new List<DataPurchase>();
 

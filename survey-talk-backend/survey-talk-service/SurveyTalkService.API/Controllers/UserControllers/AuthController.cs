@@ -68,17 +68,32 @@ namespace SurveyTalkService.API.Controllers.UserControllers
             _httpClientFactory = httpClientFactory;
         }
 
-        // POST /api/User/auth/login
-        [HttpPost("login")]
+        // POST /api/User/auth/login-manual
+        [HttpPost("login-manual")]
         public async Task<IActionResult> Login([FromBody] ManualLoginDTO loginData)
         {
-            JObject login = await _authService.Login(loginData);
+            JObject login = await _authService.LoginManual(loginData);
 
             return Ok(new
             {
                 Message = "Đăng nhập thành công",
                 AccessToken = login["Token"].ToString(),
                 // Message = "Login successfully",
+                // User = login["User"],
+                // Data = login.Properties().ToDictionary(p => p.Name, p => p.Value.ToString()),
+            });
+        }
+
+        // POST /api/User/auth/login-google
+        [HttpPost("login-google")]
+        public async Task<IActionResult> LoginGoogle([FromBody] GoogleLoginDTO googleLoginData)
+        {
+            JObject login = await _authService.LoginGoogleAuthorizationCodeFlow(googleLoginData);
+
+            return Ok(new
+            {
+                Message = "Đăng nhập bằng Google thành công",
+                AccessToken = login["Token"].ToString(),
                 // User = login["User"],
                 // Data = login.Properties().ToDictionary(p => p.Name, p => p.Value.ToString()),
             });
@@ -93,6 +108,18 @@ namespace SurveyTalkService.API.Controllers.UserControllers
             return Ok(new
             {
                 Message = "Đăng ký tài khoản thành công",
+            });
+        }
+
+        // POST /api/User/auth/account-verification
+        [HttpPost("account-verification")]
+        public async Task<IActionResult> AccountVerification([FromBody] AccountVerificationDTO verificationData)
+        {
+            await _authService.AccountVerification(verificationData);
+
+            return Ok(new
+            {
+                Message = "Xác thực tài khoản thành công",
             });
         }
 
@@ -138,6 +165,8 @@ namespace SurveyTalkService.API.Controllers.UserControllers
             });
         }
 
+        // 
+
         ///////////////////////////////////////////////////////////////
 
         [HttpGet("get-date")]
@@ -163,11 +192,6 @@ namespace SurveyTalkService.API.Controllers.UserControllers
             });
         }
 
-        [HttpGet("get-send-email")]
-        public async Task GetSendEmail()
-        {
-            await this._mailHelpers.SendEmail("hanguyenhao.20april@gmail.com", "testttttttt");
-        }
 
         [HttpPost("test-postgre")]
         public async Task<IActionResult> TestPostgre([FromBody] JToken data)

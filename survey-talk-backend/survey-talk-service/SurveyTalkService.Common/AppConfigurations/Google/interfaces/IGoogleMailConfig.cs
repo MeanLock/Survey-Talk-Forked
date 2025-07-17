@@ -9,6 +9,9 @@ namespace SurveyTalkService.Common.AppConfigurations.Google.interfaces
         string? SmtpHost { get; set; }
         int SmtpPort { get; set; }
         bool EnableSsl { get; set; }
-        string? ForgotPasswordTemplateViewPath { get; set; }
+        string? AccountForgotPassword_TemplateViewPath { get; set; }
+        string? AccountVerification_TemplateViewPath { get; set; }
+        string? AccountForgotPassword_MailSubject { get; set; }
+        string? AccountVerification_MailSubject { get; set; }
     }
 }

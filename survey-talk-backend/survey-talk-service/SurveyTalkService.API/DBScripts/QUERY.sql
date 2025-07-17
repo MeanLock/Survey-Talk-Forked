@@ -10,7 +10,7 @@ SELECT * from SurveyTopicFavorite where accountid=6
 
 Delete from SurveyTakenResultTagFilter where surveyTakenResultId = 14
 Delete from SurveyResponse where surveyTakenResultId = 14
-Delete from SurveyTakenResult where surveyId = 1
+Delete from SurveyTakenResult where id = 206
 
 INSERT INTO SurveyRewardTracking(surveyId, rewardPrice ,rewardXp) VALUES (6, 10000, 1331);
 
@@ -18,10 +18,11 @@ SELECT * from AccountProfile where accountid = 3
 SELECT * from SurveyTakerSegment where surveyId = 8
 SELECT * from Survey where surveyTypeId = 1 and id = 1
 SELECT * from SurveyRewardTracking where surveyId = 10
-SELECT * from SurveyStatusTracking where surveyId = 7
+SELECT * from SurveyStatusTracking where surveyId = 4
 
 SELECT * from SurveyGeneralConfig 
 SELECT * from SurveyQuestion
+SELECT * from  SurveySecurityMode 
 
 SELECT * from SurveyTagFilter where surveyId =6
 
@@ -30,15 +31,18 @@ SELECT * from SurveyMarketVersionStatusTracking where surveyId = 12 and version 
 SELECT * from SurveyMarket where surveyId = 12
 SELECT * from SurveyQuestion where surveyId =7
 SELECT * from SurveyOption order by id desc
-SELECT * from SurveyRewardTracking
-SELECT * from SurveyTakenResult where surveyId = 3
-SELECT * from SurveyTakenResultTagFilter where surveyTakenResultId =84
+SELECT * from SurveyRewardTracking where surveyId = 290
+SELECT * from SurveyTakenResult where surveyId = 283
+SELECT * from SurveyTakenResultTagFilter where surveyTakenResultId =147
 SELECT * from SurveyResponse where SurveyTakenResultId = 1
-SELECT * from PaymentHistory
+SELECT * from AccountBalanceTransaction
+SELECT * from TransactionType
+DBCC CHECKIDENT ('AccountBalanceTransaction', RESEED, 42);
+
+
 SELECT * from AccountGeneralConfig
 SELECT * from AccountLevelSettingConfig
-
-
+SELECT * from SurveySecurityModeConfig
 
 SELECT * from SurveyTimeRateConfig 
 
@@ -112,4 +116,11 @@ VALUES
 (13, N'Việt Nam', N'Kết hôn | Độc thân', N'Từ 3 đến 7 triệu/tháng | Từ 15 đến 30 triệu/tháng', N'Cao học (Cao đẳng, Học nghề) | Đại học', N'Y tế | Công nghệ thông tin'),
 (14, N'Việt Nam', N'Ly hôn', N'Từ 7 đến 15 triệu/tháng', N'Cao học (Cao đẳng, Học nghề) | Trung học cơ sở', N'Giáo dục');
 
+
+EXEC sp_rename 'AccountVerification', 'AccountNationalVerification';
+ALTER TABLE Account
+ADD googleId VARCHAR(250) NULL,
+    verifyCode NVARCHAR(250) NULL;
+
+	UPDATE Account SET isVerified = 1;
 

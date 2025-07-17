@@ -570,7 +570,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                         var newSurveyCommunityTransaction = new SurveyCommunityTransaction
                         {
                             AccountId = userId,
-                            Amount = moneyEarned * (decimal)survey.AllocLevelAmount * levelBonusRate,
+                            Amount = moneyEarned + (decimal)survey.AllocLevelAmount * levelBonusRate,
                             TransactionStatusId = 2,
                             TransactionTypeId = 2,
                             SurveyId = surveyId
