@@ -58,7 +58,7 @@ const location = window.location.pathname;
       dispatch(clearAuthToken());
     } else if (auth.token && JwtUtil.isTokenValid(auth.token)) {
       // CALL API TO GET USER INFORMATIONS
-      fetch();
+      fetchForUpdate();
       setNavItems(_loginNav);
     } else {
       console.log("Không valid rồiiiii");
@@ -68,8 +68,25 @@ const location = window.location.pathname;
   }, [location, auth.token]); // Re-fetch when location or auth token changes
 
 
+  useEffect(() => {
+    setIsLoading(true);
+    setFooterNavItems(_footerNav);
+    if (!auth.token) {
+      setNavItems(_nonLoginNav);
+      dispatch(clearAuthToken());
+    } else if (auth.token && JwtUtil.isTokenValid(auth.token)) {
+      // CALL API TO GET USER INFORMATIONS
+      fetchForFirst();
+      setNavItems(_loginNav);
+    } else {
+      console.log("Không valid rồiiiii");
+      alert("Không valid");
+      dispatch(clearAuthToken());
+    }
+  }, []);
+
   // FUNCTIONS
-  const fetch = async () => {
+  const fetchForFirst = async () => {
     try {
       const user = await getAccountMe();
       if (user) {
@@ -118,14 +135,33 @@ const location = window.location.pathname;
             allowOutsideClick: false,
             allowEscapeKey: false,
           }).then((result) => {
+            console.log("Hủy cập nhật thông tin: ", result.isConfirmed);
             if (result.isConfirmed) {
               navigate("/survey/filter-survey");
             } else {
+              console.log("Hủy cập nhật thông tin: ", result.isConfirmed);
+              alert("Ê")
               dispatch(clearAuthToken());
               navigate("/login");
             }
           });
         }
+      }
+      setIsLoading(false);
+    } catch (error) {}
+  };
+
+  const fetchForUpdate = async () => {
+    try {
+      const user = await getAccountMe();
+      if (user) {
+        dispatch(
+          updateAuthUser({
+            token: auth.token,
+            user: user.user,
+          })
+        );
+      setUserInformations(user.user); 
       }
       setIsLoading(false);
     } catch (error) {}
