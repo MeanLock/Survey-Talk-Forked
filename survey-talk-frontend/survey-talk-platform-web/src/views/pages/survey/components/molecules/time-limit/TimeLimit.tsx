@@ -119,6 +119,11 @@ const TimeLimit = ({
   };
 
   const handleChangeValue = (value: number) => {
+    if(value < 0){
+      
+      handleUpdateQuestion("TimeLimit", 0);
+      toast.error("Thời gian không thể nhỏ hơn 0 giây");
+    }
     handleUpdateQuestion("TimeLimit", value);
   };
 
@@ -168,6 +173,7 @@ const TimeLimit = ({
               placeholder="Thời gian (giây)"
               value={value}
               type="number"
+              inputProps={{ min: 0 }}
               onChange={(e) => handleChangeValue(Number(e.target.value))}
             />
             <p>{value} giây</p>

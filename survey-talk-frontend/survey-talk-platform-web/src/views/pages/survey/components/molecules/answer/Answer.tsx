@@ -25,7 +25,7 @@ const Answer = ({
   formData,
 }: Props) => {
   const [showImage, setShowImage] = useState(false);
-
+  console.log("Formdata: ", formData);
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     handleUpdateOption({ ...data, Content: event.target.value });
   };
@@ -61,8 +61,28 @@ const Answer = ({
           className="answer-input flex-grow"
           placeholder="Nhập câu trả lời tại đây"
           onChange={handleChange}
-          style={{
-            color: `${formData?.ConfigJson?.ContentColor}`,
+          // style={{
+          //   color: `#ffffff`,
+          // }}
+           sx={{
+              "& .MuiInputBase-input": {
+                color: `${formData?.ConfigJson?.ContentColor}`, // màu chữ nhập vào
+              },
+              // "& .MuiOutlinedInput-notchedOutline": {
+              //   borderColor: "#ffffff", // viền trắng nếu muốn
+              // },
+              // "& .MuiInputBase-root": {
+              //   color: "#ffffff", // placeholder nếu dùng customized
+              // },
+              // "& .MuiInputLabel-root": {
+              //   color: "#ffffff", // label nếu dùng
+              // },
+              // "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
+              //   borderColor: "#ffffff",
+              // },
+              // "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              //   borderColor: "#ffffff",
+              // },
           }}
         />
         <input
