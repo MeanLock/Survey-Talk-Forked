@@ -39,7 +39,7 @@ export function HoverRating() {
     );
 }
 
-export function StaticRating({ rate }) {
+export function StaticRating({ rate }: { rate: number }) {
     const [value, setValue] = React.useState<number | null>(2);
 
     return (

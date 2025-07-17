@@ -1,6 +1,5 @@
 import {
     EndSurveyCustomer,
-    Home,
     MySurvey,
     SurveyCustomer,
     SurveyEdit,
@@ -15,12 +14,7 @@ export const routes = [
     //     element: <ToDo />,
     //     requiresAuth: false,
     // },
-    {
-        name: "Home",
-        path: "/",
-        element: <Home />,
-        requiresAuth: false,
-    },
+ 
     {
         name: "SurveyNew",
         path: "/survey/new",

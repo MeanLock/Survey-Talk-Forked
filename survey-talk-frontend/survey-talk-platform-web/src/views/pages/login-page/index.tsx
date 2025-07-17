@@ -10,7 +10,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useDispatch, useSelector } from "react-redux";
 import { useGoogleLogin } from "@react-oauth/google";
-import { CssBaseline, Icon, IconButton } from "@mui/material";
+import { CircularProgress, CssBaseline, Icon, IconButton } from "@mui/material";
 import {
   loginRequiredAxiosInstance,
   publicAxiosInstance,
@@ -34,12 +34,7 @@ import Swal from "sweetalert2";
 import { jwtDecode } from "jwt-decode";
 import { loginRequiredApi } from "../../../core/api/rest-api/config/instances/v1";
 import { LocalStorageUtil } from "../../../core/utils/storage.util";
-import {
-  clearFakeData,
-  setFakeData,
-  updateFakeData,
-} from "../../../redux/fake/fakeSlice";
-import { requesterFake, takerFake } from "../../../core/mockData/userFake";
+
 import type { RootState } from "../../../redux/rootReducer";
 import { getAccountMe } from "@/services/Profile/get-accounts-me";
 import { JwtUtil } from "@/core/utils/jwt.util";
@@ -50,7 +45,6 @@ interface LoginPageProps {
 const LoginPage: FC<LoginPageProps> = (props) => {
   // REDUX
   const dispatch = useDispatch();
-  const fake = useSelector((root: RootState) => root.fake);
 
   // STATES
   const [manualLoading, setManualLoading] = useState(false);
@@ -134,7 +128,7 @@ const LoginPage: FC<LoginPageProps> = (props) => {
         {
           instance: publicAxiosInstance,
           method: "post",
-          url: "User/auth/login",
+          url: "User/auth/login-manual",
           data: { LoginInfo: Login_Info },
         },
         "Login Manual"
@@ -203,57 +197,90 @@ const LoginPage: FC<LoginPageProps> = (props) => {
   const handleLoginGoogleOAuth2 = useGoogleLogin({
     flow: "auth-code",
     onSuccess: async (codeResponse) => {
-      // console.log('Login Successsss:', codeResponse);
-      const authorizationCode = codeResponse.code;
+      setGoogleLoading(true); // Thêm loading state
 
-      // console.log("authorization_code", authorizationCode)
+      try {
+        const authorizationCode = codeResponse.code;
 
-      const login_result = await callAxiosRestApi(
-        {
-          instance: publicAxiosInstance,
-          method: "post",
-          url: "/auth/google/login-authorization-code-flow",
-          data: {
-            authorizationCode: authorizationCode,
-            redirectUri: import.meta.env.VITE_BASE_URL,
+        const login_result = await callAxiosRestApi(
+          {
+            instance: publicAxiosInstance,
+            method: "post",
+            url: "User/auth/login-google",
+            data: {
+              GoogleAuth: {
+                AuthorizationCode: authorizationCode,
+                RedirectUri: import.meta.env.VITE_BASE_URL,
+              },
+            },
           },
-        },
-        "Login with Google"
-      );
-
-      if (login_result.success) {
-        const token = login_result.data.auth.token;
-        const user = login_result.data.auth.member;
-
-        const redirectUrl = localStorage.getItem("redirectUrl");
-        if (redirectUrl) {
-          localStorage.removeItem("redirectUrl");
-          window.location.href = redirectUrl;
-        } else {
-          window.location.href = "/";
-        }
-        dispatch(
-          setAuthToken({
-            token: token,
-            user: user,
-          })
+          "Login with Google"
         );
-      } else {
-        // instantAlertMaker('error', 'Login failed', login_result.error);
-        console.log("ERROR", login_result.message.content);
-      }
 
-      setGoogleLoading(false);
+        if (login_result.success) {
+          const token = login_result.data.AccessToken;
+          const decoded = JwtUtil.decodeToken(token);
+
+          if (decoded.role_id !== "4") {
+            toast.error(
+              "Tài khoản của bạn không phải khách hàng của trang web!"
+            );
+            setGoogleLoading(false);
+            return;
+          }
+
+          if (token) {
+            console.log("Token: ", token);
+            // Lưu token vào Redux
+            dispatch(
+              setAuthToken({
+                token: token,
+              })
+            );
+
+            // Lưu token vào LocalStorage
+            LocalStorageUtil.setAuthTokenToPersistLocalStorage(token);
+
+            // CALL API GET USER INFORMATIONS
+            const user = await getAccountMe();
+            if (user) {
+              dispatch(
+                setAuthToken({
+                  token: token,
+                  user: user.user,
+                })
+              );
+
+              // Lưu user vào LocalStorage
+              LocalStorageUtil.setAuthUserToPersistLocalStorage(user);
+
+              window.location.href = "/";
+            } else {
+              toast.error("Không thể lấy thông tin người dùng!");
+            }
+          } else {
+            toast.error("Không nhận được token từ server!");
+          }
+        } else {
+          console.log("ERROR", login_result.message.content);
+          toast.error("Đăng nhập Google thất bại!");
+        }
+      } catch (error) {
+        console.log("Error during Google login:", error);
+        toast.error("Có lỗi xảy ra khi đăng nhập với Google!");
+      } finally {
+        setGoogleLoading(false);
+      }
     },
     onError: (error) => {
-      // instantAlertMaker('error', 'Login failed', error);
-      alert("Error: " + error.error);
-      console.log("Error", error);
+      console.log("Google OAuth Error:", error);
+      toast.error("Lỗi xác thực Google: " + error.error);
+      setGoogleLoading(false);
     },
   });
 
   const handleGoogleLogin = () => {
-    setGoogleLoading(true);
+    if (googleLoading) return; // Prevent multiple clicks
     handleLoginGoogleOAuth2();
   };
 
@@ -359,8 +386,15 @@ const LoginPage: FC<LoginPageProps> = (props) => {
                   sx={{ color: "#3E5DAB", fontSize: "50px" }}
                 />
               </IconButton>
-              <IconButton onClick={() => handleGoogleLogin()}>
-                <GoogleIcon sx={{ color: "#3E5DAB", fontSize: "50px" }} />
+              <IconButton
+                onClick={() => handleGoogleLogin()}
+                disabled={googleLoading}
+              >
+                {googleLoading ? (
+                  <CircularProgress size={24} sx={{ color: "#3E5DAB" }} />
+                ) : (
+                  <GoogleIcon sx={{ color: "#3E5DAB", fontSize: "50px" }} />
+                )}
               </IconButton>
             </div>
           </div>

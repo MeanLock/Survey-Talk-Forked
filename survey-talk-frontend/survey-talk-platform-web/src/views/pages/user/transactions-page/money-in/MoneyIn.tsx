@@ -1,4 +1,3 @@
-import type React from "react";
 import { useState, useMemo, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
@@ -7,7 +6,6 @@ import { useDispatch, useSelector } from "react-redux";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import "./styles.scss";
-import { updateFakeData } from "../../../../../redux/fake/fakeSlice";
 import type { RootState } from "../../../../../redux/rootReducer";
 import { updateAuthUser } from "../../../../../redux/auth/authSlice";
 import { callAxiosRestApi } from "../../../../../core/api/rest-api/main/api-call";
@@ -183,8 +181,8 @@ export const MoneyIn: React.FC<Props> = ({ balance }) => {
         url: `Payment/account/balance-deposits/create-payment-link`,
         data: {
           Amount: Number.parseInt(pushAmount),
-          ReturnUrl: `${ENV_CONFIG.REST_API_BASE_URL}/user/transactions/payment-result?type=1&amount=${amount}`,
-          CancelUrl: `${ENV_CONFIG.REST_API_BASE_URL}/user/transactions/payment-result?type=1&amount=${amount}`,
+          ReturnUrl: `${ENV_CONFIG.VITE_BASE_URL}/user/transactions/payment-result?type=1&amount=${amount}`,
+          CancelUrl: `${ENV_CONFIG.VITE_BASE_URL}/user/transactions/payment-result?type=1&amount=${amount}`,
         },
       });
       updateMoneyInById(7, amount);
@@ -242,7 +240,8 @@ export const MoneyIn: React.FC<Props> = ({ balance }) => {
     <div className="money-in w-full flex flex-col items-start">
       <p className="money-in__remain-title">Số dư khả dụng</p>
       <p className="money-in__remain-value">
-        {user?.Balance?.toLocaleString("vi-VN")}đ
+        {/* {user?.Balance?.toLocaleString("vi-VN")}đ */}
+        {balance?.toLocaleString("vn")} VND
       </p>
 
       <div className="w-full grid grid-cols-2 gap-6 mt-5">

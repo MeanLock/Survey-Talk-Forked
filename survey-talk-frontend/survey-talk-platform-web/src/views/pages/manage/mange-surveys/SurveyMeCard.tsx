@@ -1,5 +1,4 @@
-import type React from "react";
-import type { Survey } from "../../../../core/types";
+
 import { SurveyStatuses } from "../../../../core/mockData/mockData";
 
 // ICONS
@@ -11,7 +10,7 @@ import IconButton from "@mui/material/IconButton";
 import UnpublishedIcon from "@mui/icons-material/Unpublished";
 import { Tooltip } from "@mui/material";
 interface Props {
-  data: Survey;
+  data: any;
   onEdit: (id: number) => void;
   onViewDetails: (id: number) => void;
   onPublish: (id: number) => void;
@@ -28,7 +27,7 @@ export const SurveyMeCard: React.FC<Props> = ({
   onDelete,
 }) => {
   // FUNCTIONS
-  const countTakenResult = (survey: Survey): string => {
+  const countTakenResult = (survey: any): string => {
     console.log("Survey: ", survey);
     if (survey.SurveyStatusId !== 2) {
       return "Khảo sát chưa đăng";

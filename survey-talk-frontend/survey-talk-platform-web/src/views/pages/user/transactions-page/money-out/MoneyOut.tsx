@@ -1,6 +1,4 @@
-"use client";
 
-import type React from "react";
 
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useMemo, useEffect } from "react";
@@ -23,15 +21,17 @@ import {
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import "./styles.scss";
-import { updateFakeData } from "../../../../../redux/fake/fakeSlice";
 import { banks } from "../../../../../core/mockData/banks";
 import type { RootState } from "../../../../../redux/rootReducer";
 import { updateAuthUser } from "../../../../../redux/auth/authSlice";
 import { callAxiosRestApi } from "@/core/api/rest-api/main/api-call";
 import { loginRequiredAxiosInstance } from "@/core/api/rest-api/config/instances/v2";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
-type Props = {};
+type Props = {
+  balance: number;
+};
 
 interface MoneyOutRecord {
   Id: string;
@@ -105,22 +105,28 @@ const DateCellRenderer = (params: any) => {
   return <span className="date-cell">{formatDate(params.value)}</span>;
 };
 
-export const MoneyOut: React.FC<Props> = () => {
+export const MoneyOut: React.FC<Props> = ({ balance }) => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
-  const [withdrawalHistory, setWithdrawalHistory] = useState<MoneyOutRecord[]>([]);
-
+  const [withdrawalHistory, setWithdrawalHistory] = useState<MoneyOutRecord[]>(
+    []
+  );
+  const navigate = useNavigate();
   // Fetch withdrawal history
   useEffect(() => {
     const fetchWithdrawalHistory = async () => {
       try {
-        const response = await fetch('https://6857de4821f5d3463e566b36.mockapi.io/withdrawalRequests');
+        const response = await fetch(
+          "https://6857de4821f5d3463e566b36.mockapi.io/withdrawalRequests"
+        );
         const data = await response.json();
         // Filter records for current user
-        const userWithdrawals = data.filter(record => record.CustomerName === user?.FullName);
+        const userWithdrawals = data.filter(
+          (record: any) => record.CustomerName === user?.FullName
+        );
         setWithdrawalHistory(userWithdrawals);
       } catch (error) {
-        console.error('Error fetching withdrawal history:', error);
+        console.error("Error fetching withdrawal history:", error);
       }
     };
 
@@ -158,8 +164,8 @@ export const MoneyOut: React.FC<Props> = () => {
         width: 160,
         cellRenderer: (params: any) => {
           const date = new Date(params.value * 1000);
-          return date.toLocaleString('vi-VN');
-        }
+          return date.toLocaleString("vi-VN");
+        },
       },
       {
         headerName: "Trạng Thái",
@@ -172,10 +178,10 @@ export const MoneyOut: React.FC<Props> = () => {
         field: "TransferDate",
         width: 160,
         cellRenderer: (params: any) => {
-          if (!params.value) return '-';
+          if (!params.value) return "-";
           const date = new Date(params.value * 1000);
-          return date.toLocaleString('vi-VN');
-        }
+          return date.toLocaleString("vi-VN");
+        },
       },
     ],
     []
@@ -200,7 +206,7 @@ export const MoneyOut: React.FC<Props> = () => {
       newErrors.amount = "Vui lòng nhập số tiền";
     } else if (amountNum < 50000) {
       newErrors.amount = "Số tiền rút tối thiểu là 50,000đ";
-    } else if (amountNum > user?.Balance) {
+    } else if (amountNum > balance) {
       newErrors.amount = "Số dư không đủ";
     }
 
@@ -223,7 +229,7 @@ export const MoneyOut: React.FC<Props> = () => {
           Amount: Number.parseInt(amount),
           BankAccountNumber: accountNo,
           BankCode: bankId,
-          Description: `Rút tiền về tài khoản ${accountNo} - ${selectedBank.name}`
+          Description: `Rút tiền về tài khoản ${accountNo} - ${selectedBank.name}`,
         },
       });
 
@@ -240,28 +246,25 @@ export const MoneyOut: React.FC<Props> = () => {
         BankName: selectedBank.name,
         AccountNo: accountNo,
         Amount: Number.parseInt(amount),
-        AccountName: accountName
+        AccountName: accountName,
       };
 
       // Create withdrawal request
-      const response = await fetch('https://6857de4821f5d3463e566b36.mockapi.io/withdrawalRequests', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newWithdrawal),
-      });
+      const response = await fetch(
+        "https://6857de4821f5d3463e566b36.mockapi.io/withdrawalRequests",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newWithdrawal),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to create withdrawal request');
+        throw new Error("Failed to create withdrawal request");
       }
 
-      // Update user balance
-      // dispatch(
-      //   updateAuthUser({
-      //     Balance: user?.Balance - Number.parseInt(amount),
-      //   })
-      // );
 
       // Reset form
       setBankId("");
@@ -271,14 +274,18 @@ export const MoneyOut: React.FC<Props> = () => {
       setErrors({});
 
       // Refresh withdrawal history
-      const updatedHistoryResponse = await fetch('https://6857de4821f5d3463e566b36.mockapi.io/withdrawalRequests');
+      const updatedHistoryResponse = await fetch(
+        "https://6857de4821f5d3463e566b36.mockapi.io/withdrawalRequests"
+      );
       const updatedHistory = await updatedHistoryResponse.json();
-      const userWithdrawals = updatedHistory.filter(record => record.CustomerName === user?.FullName);
+      const userWithdrawals = updatedHistory.filter(
+        (record : any) => record.CustomerName === user?.FullName
+      );
+      navigate(0);
       setWithdrawalHistory(userWithdrawals);
-        toast.success(`Rút tiền thành công!`);
-
+      toast.success(`Rút tiền thành công!`);
     } catch (error) {
-      console.error('Error creating withdrawal request:', error);
+      console.error("Error creating withdrawal request:", error);
       // Handle error (show error message to user)
     }
   };
@@ -293,7 +300,7 @@ export const MoneyOut: React.FC<Props> = () => {
     return Number.parseInt(value).toLocaleString("vi-VN");
   };
 
-  async function updateMoneyOutById(id, amountToAdd) {
+  async function updateMoneyOutById(id: any, amountToAdd: any) {
     const apiUrl = `https://685b91fb89952852c2d9fd1e.mockapi.io/MoneyFlow/${id}`;
 
     try {
@@ -330,7 +337,7 @@ export const MoneyOut: React.FC<Props> = () => {
     <div className="money-out w-full flex flex-col items-start">
       <p className="money-out__remain-title">Số dư khả dụng</p>
       <p className="money-out__remain-value">
-        {user?.Balance.toLocaleString("vi-VN")}đ
+        {balance.toLocaleString("vi-VN")}đ
       </p>
 
       <div className="w-full grid grid-cols-2 gap-6 mt-5">
@@ -435,10 +442,9 @@ export const MoneyOut: React.FC<Props> = () => {
               helperText={errors.amount}
             />
 
-            {Number.parseInt(amount) > user?.Balance && (
+            {Number.parseInt(amount) > balance && (
               <Alert severity="error" className="balance-error">
-                Số dư không đủ. Số dư hiện tại:{" "}
-                {user?.Balance.toLocaleString("vi-VN")}đ
+                Số dư không đủ. Số dư hiện tại: {balance}đ
               </Alert>
             )}
 
@@ -453,7 +459,7 @@ export const MoneyOut: React.FC<Props> = () => {
                 !accountName.trim() ||
                 !amount ||
                 Number.parseInt(amount) < 50000 ||
-                Number.parseInt(amount) > user?.Balance
+                Number.parseInt(amount) > balance
               }
             >
               Tạo yêu cầu rút tiền

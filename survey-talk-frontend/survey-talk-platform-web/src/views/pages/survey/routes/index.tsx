@@ -1,6 +1,5 @@
 import { lazy } from "react";
 
-export const Home = lazy(() => import("../pages/Home/index"));
 export const SurveyNew = lazy(() => import("../pages/SurveyNew/index"));
 export const MySurvey = lazy(() => import("../pages/MySurvey/index"));
 export const SurveyEdit = lazy(() => import("../pages/SurveyUpdate/index"));

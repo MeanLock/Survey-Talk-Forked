@@ -336,22 +336,37 @@ const Start = ({
           (index) => dataStore[index]
         );
         const newData = duplicatedItems.map((i, indexChild) => {
+          const duplicatedQuestion = {
+            ...i,
+            parentId: i?.ValueJson?.QuestionContent?.Id,
+            ValueJson: {
+              ...i.ValueJson,
+              QuestionContent: {
+                ...i?.ValueJson?.QuestionContent,
+                Id: uuidv4(), // Tạo ID mới
+              },
+              QuestionResponse: {
+                Input: null,
+                Range: null,
+                Ranking: null,
+                SingleChoice: null,
+                MultipleChoice: null,
+                SpeechText: null, // Reset dữ liệu câu trả lời
+              },
+            },
+          };
+
+          // Nếu là câu hỏi cuối cùng trong danh sách duplicate
           if (indexChild === duplicatedItems.length - 1) {
             return {
-              ...i,
-              parentId: i?.ValueJson?.QuestionContent?.Id,
+              ...duplicatedQuestion,
               isUnPost: true,
-              isEnd: true,
-              ValueJson: {
-                ...i.ValueJson,
-                QuestionContent: {
-                  ...i?.ValueJson?.QuestionContent,
-                  Id: uuidv4(),
-                },
-              },
+              isEnd: true, // Đánh dấu là câu hỏi kết thúc
             };
           }
-          return i;
+
+          // Các câu hỏi khác trong danh sách duplicate
+          return duplicatedQuestion;
         });
         dataStore = [...dataStore, ...newData];
       }

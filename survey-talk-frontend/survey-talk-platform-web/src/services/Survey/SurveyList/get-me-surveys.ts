@@ -44,7 +44,7 @@ export const getMeSurveysOptions = (params: {
   });
 
 type UseGetType = {
-  queryConfig?: QueryConfig<ReturnType<typeof get>>;
+  queryConfig?: QueryConfig<Awaited<ReturnType<typeof get>>>;
   Keywords: string | null;
   Deadline: string | null;
   Status: string | null;

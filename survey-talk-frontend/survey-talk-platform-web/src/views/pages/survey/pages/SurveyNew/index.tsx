@@ -508,7 +508,16 @@ const SurveyNew = () => {
   console.log("isSaving:", isSaving, "isSuccess:", isSuccess);
   return (
     <MainTemPlate>
-      {isDisable && <OverlayDisable />}
+     {isDisable && (
+        <OverlayDisable
+          onClose={() => { }}
+          onDelete={() => { }}
+          onSwap={() => { }}
+          formData={formData}
+          orderCurrent={formData}
+          setIsOpenOverlay={setIsDisable}
+        />
+      )}
       {isLoading ? (
         <div className="w-full h-[829px] flex flex-col items-center justify-center gap-3">
           <div className="spinner"></div>

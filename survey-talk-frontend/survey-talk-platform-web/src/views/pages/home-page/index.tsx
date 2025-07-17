@@ -22,7 +22,6 @@ import { homeSurveysData } from "../../../core/mockData/mockData";
 import { CircularProgress } from "@mui/material";
 import { SurveysCarousel } from "./SurveysCarousel";
 import { clearAuthToken } from "../../../redux/auth/authSlice";
-import { requesterFake, takerFake } from "../../../core/mockData/userFake";
 import { useGetFeatureSurveys } from "@/services/Survey/Home/get-feature-surveys";
 
 const progressVisualizeSteps = [
@@ -72,7 +71,6 @@ interface HomePageProps { }
 const HomePage: FC<HomePageProps> = () => {
   // REDUX
   const user = useSelector((state: RootState) => state.auth.user);
-  const fake = useSelector((state: RootState) => state.fake);
 
   // STATES
   const [isLoading, setIsLoading] = useState(true);

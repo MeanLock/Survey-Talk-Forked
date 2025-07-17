@@ -3,7 +3,7 @@ import { useAppDispatch } from "@/app/hooks";
 import { handleUpdateInvalidReason } from "@/app/appSlice";
 
 type Props = {
-  id: number;
+  id: string;
 };
 
 export const HiddenCheck = ({ id }: Props) => {

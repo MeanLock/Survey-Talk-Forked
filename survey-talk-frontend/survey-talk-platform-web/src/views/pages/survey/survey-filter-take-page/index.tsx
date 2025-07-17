@@ -134,10 +134,9 @@ const JobFieldQuestions = {
     "Nghiên cứu, Khoa học & Phát triển công nghệ",
     "Bất động sản & Quản lý tài sản",
     "An ninh mạng & Viễn thông",
-    "Toán học, Thống kê & Khoa học dữ liệu"
+    "Toán học, Thống kê & Khoa học dữ liệu",
   ],
 };
-
 
 const AverageIncomeQuestions = {
   question: "Thu nhập trung bình của bạn?",
@@ -146,7 +145,7 @@ const AverageIncomeQuestions = {
     "3 - 7 triệu/tháng",
     "7 - 15 triệu/tháng",
     "15 - 30 triệu/tháng",
-    "> 30 triệu/tháng"
+    "> 30 triệu/tháng",
   ],
 };
 
@@ -681,7 +680,7 @@ export default function SurveyFilterPage() {
         <div className="survey-filter-page">
           <Card className="survey-card">
             <CardContent className="survey-content">
-              <div className="survey-header">
+              <div className="survey-header flex flex-col">
                 <Typography variant="h4" className="survey-title">
                   Cập Nhật Thông Tin Cá Nhân Của Bạn
                 </Typography>
@@ -713,7 +712,7 @@ export default function SurveyFilterPage() {
               </div>
 
               {/* Content Area */}
-              <div className="content-area">{renderStepContent()}</div>
+              <div className="content-area mt-52">{renderStepContent()}</div>
 
               {/* Navigation */}
               <div className="navigation">

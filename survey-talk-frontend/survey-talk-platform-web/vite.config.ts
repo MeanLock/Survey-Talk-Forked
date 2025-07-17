@@ -12,11 +12,11 @@ export default defineConfig({
     preprocessorOptions: {
       scss: {
         additionalData: `
-          @use "src/styles/variables/app-variables" as app_vars;
-          @use "src/styles/variables/FunctionArea/function-side-bar-variables" as functionSideBar_vars;
-          @use "src/styles/variables/MainArea/chat-box-variables" as chatBox_vars;
-          @use "src/styles/variables/MainArea/chat-box-info-variables" as chatBoxInfo_vars;
-          @use "src/styles/variables/MainArea/room-browser-variables" as roomBrowser_vars;
+          @use "./src/styles/variables/app-variables.scss" as app_vars;
+          @use "./src/styles/variables/FunctionArea/function-side-bar-variables" as functionSideBar_vars;
+          @use "./src/styles/variables/MainArea/chat-box-variables" as chatBox_vars;
+          @use "./src/styles/variables/MainArea/chat-box-info-variables" as chatBoxInfo_vars;
+          @use "./src/styles/variables/MainArea/room-browser-variables" as roomBrowser_vars;
         `,
       },
     },
@@ -29,6 +29,9 @@ export default defineConfig({
   },
   server: {
     port: process.env.VITE_PORT ? Number(process.env.VITE_PORT) : 3000,
+    allowedHosts: [
+      'cd9fd37fb126.ngrok-free.app'
+    ],
     proxy: {
       // https://vitejs.dev/config/server-options.html
     },
