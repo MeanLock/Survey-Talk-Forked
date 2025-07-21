@@ -81,3 +81,13 @@ export const updateMaxXpCommunitySurvey = async (instance: AxiosInstance, survey
 
     return response;
 };
+
+export const deleteSurvey = async (instance: AxiosInstance, surveyId: number) => {
+    const response = await callAxiosRestApi({
+        instance: instance,
+        method: "delete",
+        url: `${BASE_URL}/surveys/${surveyId}`,
+    });
+
+    return response;
+};

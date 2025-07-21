@@ -6,7 +6,9 @@ import App from './App'
 import { PersistGate } from 'redux-persist/integration/react'
 import { persistor, store } from './redux/store'
 import useAuthTabsSync from './hooks/useAuthTabsSync.hook'
-
+import './styles/index.css'
+import { QueryClientProvider } from '@tanstack/react-query'
+import queryClient from './lib/query'
 const root = document.getElementById('root') as HTMLElement
 if (!root) {
   throw new Error('Root element not found')
@@ -21,7 +23,9 @@ const AppWithAuthSync = () => {
 createRoot(root).render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
-      <AppWithAuthSync />
+      <QueryClientProvider client={queryClient}>
+        <AppWithAuthSync />
+      </QueryClientProvider>
     </PersistGate>
   </Provider>,
 );

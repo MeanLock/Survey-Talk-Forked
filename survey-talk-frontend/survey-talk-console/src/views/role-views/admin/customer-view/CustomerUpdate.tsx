@@ -65,8 +65,8 @@ const CustomForm: React.FC<CustomerUpdateProps> = ({ account, onClose }) => {
             <CCol md={12} className="d-flex gap-4 mt-2">
         <div className="d-flex align-items-center gap-2">
           <span className="text-muted">Khảo sát đầu vào:</span>
-          <span className={`badge ${account.IsFilterSurveyRequired ? 'bg-success' : 'bg-danger'}`}>
-            {account.IsFilterSurveyRequired ? 'Đã làm' : 'Chưa làm'}
+          <span className={`badge ${!account.IsFilterSurveyRequired ? 'bg-success' : 'bg-danger'}`}>
+            {!account.IsFilterSurveyRequired ? 'Đã làm' : 'Chưa làm'}
           </span>
         </div>
         <div className="d-flex align-items-center gap-2">

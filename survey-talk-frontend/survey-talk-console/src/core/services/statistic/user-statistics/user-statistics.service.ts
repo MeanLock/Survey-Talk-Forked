@@ -12,3 +12,12 @@ export const getSummaryCountAccountRegistration = async (instance: AxiosInstance
 
     return response;
 }
+export const getPlatformFeedback = async (instance: AxiosInstance, reportPeriod?: string) => {
+    const response = await callAxiosRestApi({
+        instance: instance,
+        method: "get",
+        url: `${BASE_URL}/platform-feedback?report_period=${reportPeriod}`,
+    });
+
+    return response;
+}
