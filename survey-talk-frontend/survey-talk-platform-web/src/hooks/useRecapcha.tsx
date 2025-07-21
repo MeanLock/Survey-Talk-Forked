@@ -1,5 +1,5 @@
 import Turnstile, { useTurnstile } from "react-turnstile";
-import  { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 interface TurnstileWidgetProps {
   setIsVerified: (isVerified: boolean) => void;
