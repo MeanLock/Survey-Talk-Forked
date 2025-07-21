@@ -40,7 +40,7 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.Session.V2
 
     public class SurveyEditingSessionQuestionDTO
     {
-        public Guid? Id { get; set; } 
+        public Guid Id { get; set; } 
         public int? QuestionTypeId { get; set; } // [field cập nhật]
         public string? MainImageBase64 { get; set; } // [field cập nhật]
         public int? Version { get; set; }
@@ -121,7 +121,7 @@ namespace SurveyTalkService.BusinessLogic.DTOs.Survey.Session.V2
 
     public class SurveyEditingSessionOptionDTO
     {
-        public Guid? Id { get; set; }
+        public Guid Id { get; set; }
         public string? Content { get; set; } // [field cập nhật]
         public int Order { get; set; } // [field cập nhật]
         public string? MainImageBase64 { get; set; } // [field cập nhật]

@@ -38,6 +38,18 @@ namespace SurveyTalkService.API.Controllers.ReportControllers
             return Ok(accountRegistrationSummaryReport);
         }
 
+        // GET /api/Report/user/platform-feedback
+        [HttpGet("platform-feedback")]
+        [Authorize(Policy = "AdminRequiredOnly")]
+        public async Task<IActionResult> GetPlatformFeedbackReport()
+        {
+            var platformFeedbackReport = await _userStatisticsService.GetPlatformFeedbackReport();
+
+            return Ok(platformFeedbackReport);
+        }
+
+
+
 
         // // GET /api/Report/transaction/community/summary-profit
         // [HttpGet("community/summary-profit")]

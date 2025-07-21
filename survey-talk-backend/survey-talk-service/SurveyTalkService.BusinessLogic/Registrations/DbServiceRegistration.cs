@@ -4,6 +4,7 @@ using SurveyTalkService.BusinessLogic.Services.DbServices.FilterServices;
 using SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices;
 using SurveyTalkService.BusinessLogic.Services.DbServices.PaymentServices;
 using SurveyTalkService.BusinessLogic.Services.DbServices.ReportServices;
+using SurveyTalkService.BusinessLogic.Services.DbServices.MiscServices;
 
 namespace SurveyTalkService.BusinessLogic.Registrations
 {
@@ -35,6 +36,8 @@ namespace SurveyTalkService.BusinessLogic.Registrations
             services.AddScoped<TransactionStatisticsService>();
             services.AddScoped<UserStatisticsService>();
 
+            // MiscServices
+            services.AddScoped<PlatformFeedbackService>();
 
 
 

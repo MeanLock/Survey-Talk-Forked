@@ -26,6 +26,7 @@ using Microsoft.EntityFrameworkCore;
 using SurveyTalkService.Common.AppConfigurations.BusinessSetting.interfaces;
 using Duende.IdentityServer.Extensions;
 using SurveyTalkService.BusinessLogic.DTOs.Report;
+using SurveyTalkService.BusinessLogic.DTOs.Feedback;
 
 namespace SurveyTalkService.BusinessLogic.Services.DbServices.ReportServices
 {
@@ -55,7 +56,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.ReportServices
         private readonly IUnitOfWork _unitOfWork;
 
         // REPOSITORIES
-
+        private readonly IGenericRepository<PlatformFeedback> _platformFeedbackGenericRepository;
 
         // AWS SERVICE
         private readonly AWSS3Service _awsS3Service;
@@ -76,7 +77,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.ReportServices
             DateHelpers dateHelpers,
             IUnitOfWork unitOfWork,
 
-
+            IGenericRepository<PlatformFeedback> platformFeedbackGenericRepository,
 
 
             FileHelpers fileHelpers,
@@ -98,7 +99,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.ReportServices
             _dateHelpers = dateHelpers;
             _unitOfWork = unitOfWork;
 
-
+            _platformFeedbackGenericRepository = platformFeedbackGenericRepository;
 
             _fileHelpers = fileHelpers;
             _imageHelpers = imageHelpers;
@@ -129,7 +130,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.ReportServices
                     return new AccountRegistrationSummaryCountDTO
                     {
                         NewRegistrationCount = registrationCount,
-                        PercentChange = previousRegistrationCount == 0 ? 100 :  Math.Round(((double)(registrationCount - previousRegistrationCount) / (double)previousRegistrationCount * 100), 2, MidpointRounding.AwayFromZero),
+                        PercentChange = previousRegistrationCount == 0 ? 100 : Math.Round(((double)(registrationCount - previousRegistrationCount) / (double)previousRegistrationCount * 100), 2, MidpointRounding.AwayFromZero),
                     };
 
                 }
@@ -195,6 +196,27 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.ReportServices
             {
                 Console.WriteLine("\n" + ex.StackTrace + "\n");
                 throw new HttpRequestException("Lấy báo cáo đăng ký tài khoản thất bại, lí do: " + ex.Message);
+            }
+        }
+
+        public async Task<List<PlatformFeedbackDTO>> GetPlatformFeedbackReport()
+        {
+            try
+            {
+                var feedbacks = await _platformFeedbackGenericRepository.FindAll().ToListAsync();
+                return feedbacks.Select(feedback => new PlatformFeedbackDTO
+                {
+                    AccountId = feedback.AccountId,
+                    RatingScore = feedback.RatingScore,
+                    Comment = feedback.Comment,
+                    CreatedAt = feedback.CreatedAt,
+                    UpdatedAt = feedback.UpdatedAt
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("\n" + ex.StackTrace + "\n");
+                throw new HttpRequestException("Lấy báo cáo phản hồi nền tảng thất bại, lí do: " + ex.Message);
             }
         }
 

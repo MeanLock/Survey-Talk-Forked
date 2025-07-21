@@ -321,7 +321,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
             }
 
         }
-        public async Task<JArray> GetCustomerAccounts()
+        public async Task<List<AccountListItemDTO>> GetCustomerAccounts()
         {
             try
             {
@@ -333,11 +333,11 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
 
                 var result = await Task.WhenAll(customers.Select(async item =>
                 {
-                    return new
+                    return new AccountListItemDTO
                     {
                         Id = item.Id,
                         Email = item.Email,
-                        Role = new
+                        Role = new RoleDTO
                         {
                             Id = item.Role.Id,
                             Name = item.Role.Name
@@ -357,11 +357,12 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
                         DeactivatedAt = item.DeactivatedAt?.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
                         CreatedAt = item.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
                         UpdatedAt = item.UpdatedAt.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
-                        MainImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.ACCOUNt_IMAGE_PATH, item.Id.ToString(), "main")
+                        MainImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.ACCOUNt_IMAGE_PATH, item.Id.ToString(), "main"),
+                        IsPlatformFeedbackGiven = item.PlatformFeedback != null,
                     };
                 }));
 
-                return JArray.FromObject(result);
+                return result.ToList();
             }
             catch (Exception ex)
             {
@@ -371,7 +372,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
 
         }
 
-        public async Task<JArray> GetStaffAccounts()
+        public async Task<List<AccountListItemDTO>> GetStaffAccounts()
         {
             try
             {
@@ -384,11 +385,11 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
 
                 var result = await Task.WhenAll(staffs.Select(async item =>
                 {
-                    return new
+                    return new AccountListItemDTO
                     {
                         Id = item.Id,
                         Email = item.Email,
-                        Role = new
+                        Role = new RoleDTO
                         {
                             Id = item.Role.Id,
                             Name = item.Role.Name
@@ -412,7 +413,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
                     };
                 }));
 
-                return JArray.FromObject(result);
+                return result.ToList();
             }
             catch (Exception ex)
             {
@@ -422,16 +423,16 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
 
         }
 
-        public async Task<JObject> GetAccountById(int accountId)
+        public async Task<AccountDetailDTO> GetAccountById(int accountId)
         {
             try
             {
                 var account = await this.GetExistAccountById(accountId);
-                return JObject.FromObject(new
+                return new AccountDetailDTO
                 {
                     Id = account.Id,
                     Email = account.Email,
-                    Role = new
+                    Role = new RoleDTO
                     {
                         Id = account.Role.Id,
                         Name = account.Role.Name
@@ -452,9 +453,8 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
                     CreatedAt = account.CreatedAt.ToString(),
                     UpdatedAt = account.UpdatedAt.ToString(),
                     MainImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.ACCOUNt_IMAGE_PATH, account.Id.ToString(), "main"),
-                    Profile = new
+                    Profile = new AccountProfileDTO
                     {
-                        AccountId = account.AccountProfile?.AccountId,
                         CountryRegion = account.AccountProfile?.CountryRegion,
                         MaritalStatus = account.AccountProfile?.MaritalStatus,
                         AverageIncome = account.AccountProfile?.AverageIncome,
@@ -464,7 +464,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
                         DistrictCode = account.AccountProfile?.DistrictCode,
                         WardCode = account.AccountProfile?.WardCode
                     }
-                });
+                };
             }
             catch (Exception ex)
             {
@@ -475,16 +475,16 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
 
         }
 
-        public async Task<JObject> GetMe(int accountId)
+        public async Task<AccountDetailDTO> GetMe(int accountId)
         {
             try
             {
                 var account = await this.GetExistAccountById(accountId);
-                return JObject.FromObject(new
+                return new AccountDetailDTO
                 {
                     Id = account.Id,
                     Email = account.Email,
-                    Role = new
+                    Role = new RoleDTO
                     {
                         Id = account.Role.Id,
                         Name = account.Role.Name
@@ -505,9 +505,8 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
                     CreatedAt = account.CreatedAt.ToString(),
                     UpdatedAt = account.UpdatedAt.ToString(),
                     MainImageUrl = await _imageHelpers.GenerateImageUrl(_filePathConfig.ACCOUNt_IMAGE_PATH, account.Id.ToString(), "main"),
-                    Profile = new
+                    Profile = new AccountProfileDTO
                     {
-                        AccountId = account.AccountProfile?.AccountId,
                         CountryRegion = account.AccountProfile?.CountryRegion,
                         MaritalStatus = account.AccountProfile?.MaritalStatus,
                         AverageIncome = account.AccountProfile?.AverageIncome,
@@ -516,8 +515,9 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
                         ProvinceCode = account.AccountProfile?.ProvinceCode,
                         DistrictCode = account.AccountProfile?.DistrictCode,
                         WardCode = account.AccountProfile?.WardCode
-                    }
-                });
+                    },
+                    IsPlatformFeedbackGiven = account.PlatformFeedback != null
+                };
             }
             catch (Exception ex)
             {

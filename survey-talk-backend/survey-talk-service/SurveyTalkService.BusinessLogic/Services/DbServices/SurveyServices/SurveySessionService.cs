@@ -212,7 +212,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
 
                     // 5. Xử lý các question
                     // var dtoQuestionIds = surveyEditingSessionDTO.Questions?.Where(q => q.Id != null).Select(q => q.Id).ToHashSet() ?? new HashSet<Guid?>(); // [CHỈNH LẠI] sau sẽ có id mới
-                    var dtoQuestionIds = surveyEditingSessionDTO.Questions?.Select(q => q.Id).ToHashSet() ?? new HashSet<Guid?>();
+                    var dtoQuestionIds = surveyEditingSessionDTO.Questions?.Select(q => q.Id).ToHashSet() ?? new HashSet<Guid>();
                     var dbQuestions = survey.SurveyQuestions.ToList();
                     // Xóa question không còn trong DTO
                     foreach (var dbQ in dbQuestions)
@@ -243,8 +243,8 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                             // Thêm mới question
                             var newQ = new SurveyQuestion
                             {
+                                Id = dtoQ.Id,
                                 SurveyId = survey.Id,
-
                                 QuestionTypeId = dtoQ.QuestionTypeId,
                                 IsReanswerRequired = dtoQ.IsReanswerRequired,
                                 ReferenceSurveyQuestionId = dtoQ.ReferenceSurveyQuestionId,
@@ -270,6 +270,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                                 // {
                                 var newO = new SurveyOption
                                 {
+                                    Id = dtoO.Id,
                                     SurveyQuestionId = newQ.Id,
                                     Content = dtoO.Content,
                                     Order = (byte)dtoO.Order
@@ -307,7 +308,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
 
                         // Xử lý option
                         // var dtoOptionIds = dtoQ.Options?.Where(o => o.Id != null).Select(o => o.Id).ToHashSet() ?? new HashSet<Guid?>(); // [CHỈNH LẠI] sau sẽ có id mới
-                        var dtoOptionIds = dtoQ.Options?.Select(o => o.Id).ToHashSet() ?? new HashSet<Guid?>();
+                        var dtoOptionIds = dtoQ.Options?.Select(o => o.Id).ToHashSet() ?? new HashSet<Guid>();
                         var dbOptions = dbQ.SurveyOptions.ToList();
                         // Xóa option không còn trong DTO
                         foreach (var dbO in dbOptions)

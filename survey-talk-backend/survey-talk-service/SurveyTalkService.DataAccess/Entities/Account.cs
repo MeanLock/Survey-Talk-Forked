@@ -59,6 +59,8 @@ public partial class Account
 
     public virtual ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
 
+    public virtual PlatformFeedback? PlatformFeedback { get; set; }
+
     public virtual Role Role { get; set; } = null!;
 
     public virtual ICollection<SurveyCommunityTransaction> SurveyCommunityTransactions { get; set; } = new List<SurveyCommunityTransaction>();

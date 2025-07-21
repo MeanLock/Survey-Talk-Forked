@@ -45,7 +45,7 @@ namespace SurveyTalkService.API.Controllers.PaymentControllers
 
             return Ok(new
             {
-                Message = "Payment link created successfully.",
+                Message = "Tạo liên kết thanh toán thành công",
                 PaymentLink = paymentLink
             });
         }

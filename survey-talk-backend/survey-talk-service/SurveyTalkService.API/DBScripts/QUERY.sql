@@ -11,6 +11,7 @@ SELECT * from SurveyTopicFavorite where accountid=6
 Delete from SurveyTakenResultTagFilter where surveyTakenResultId = 14
 Delete from SurveyResponse where surveyTakenResultId = 14
 Delete from SurveyTakenResult where id = 206
+Delete from Account where id = 30
 
 INSERT INTO SurveyRewardTracking(surveyId, rewardPrice ,rewardXp) VALUES (6, 10000, 1331);
 

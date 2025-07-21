@@ -61,10 +61,10 @@ namespace SurveyTalkService.API.Controllers.UserControllers
         {
             var roleId = User.FindFirst("role_id")?.Value;
 
-            var account = await _accountService.GetAccountById(accountId);
-            dynamic a = account.ToObject<dynamic>();
+            AccountDetailDTO account = await _accountService.GetAccountById(accountId);
+            
 
-            if (a != null && a.Role.Id == 1 && int.Parse(roleId) != 1)
+            if (account != null && account.Role.Id == 1 && int.Parse(roleId) != 1)
             {
                 return Forbid();
             }
@@ -119,7 +119,7 @@ namespace SurveyTalkService.API.Controllers.UserControllers
 
         // GET /api/User/accounts/me
         [HttpGet("me")]
-        [Authorize]
+        [Authorize(Policy = "LoginRequired")]
         public async Task<IActionResult> GetMe()
         {
             int userId = int.Parse(User.FindFirst("id")?.Value);

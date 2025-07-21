@@ -24,6 +24,7 @@ namespace SurveyTalkService.DataAccess.Repositories
                 .Include(account => account.Role)
                 .Include(account => account.AccountProfile)
                 .Include(account => account.AccountNationalVerification)
+                .Include(account => account.PlatformFeedback)
                 .Where(account => account.RoleId == roleId)
                 .ToListAsync();
         }
@@ -34,6 +35,7 @@ namespace SurveyTalkService.DataAccess.Repositories
                 .Include(account => account.Role)
                 .Include(account => account.AccountProfile)
                 .Include(account => account.AccountNationalVerification)
+                .Include(account => account.PlatformFeedback)
                 .Where(account => roleIds.Contains(account.RoleId))
                 .ToListAsync();
         }
@@ -44,6 +46,7 @@ namespace SurveyTalkService.DataAccess.Repositories
                 .Include(account => account.Role)
                 .Include(account => account.AccountProfile)
                 .Include(account => account.AccountNationalVerification)
+                .Include(account => account.PlatformFeedback)
                 .FirstOrDefaultAsync(account => account.Email == email);
         }
 
@@ -56,6 +59,7 @@ namespace SurveyTalkService.DataAccess.Repositories
                 .Include(account => account.TakerTagFilters)
                 .ThenInclude(takerTagFilter => takerTagFilter.FilterTag)
                 .Include(account => account.SurveyTopicFavorites)
+                .Include(account => account.PlatformFeedback)
                 .FirstOrDefaultAsync(account => account.Id == id);
         }
 

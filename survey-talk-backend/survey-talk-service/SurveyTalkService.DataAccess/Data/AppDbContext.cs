@@ -38,6 +38,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
+    public virtual DbSet<PlatformFeedback> PlatformFeedbacks { get; set; }
+
     public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<Survey> Surveys { get; set; }
@@ -116,7 +118,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Account>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Account__3213E83FE5E4C0F2");
+            entity.HasKey(e => e.Id).HasName("PK__Account__3213E83F400FC8AC");
 
             entity.ToTable("Account", tb => tb.HasTrigger("trg_Account_Update"));
 
@@ -184,7 +186,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<AccountBalanceTransaction>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__AccountB__3213E83F75E192F6");
+            entity.HasKey(e => e.Id).HasName("PK__AccountB__3213E83F071A0E36");
 
             entity.ToTable("AccountBalanceTransaction");
 
@@ -218,7 +220,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<AccountGeneralConfig>(entity =>
         {
-            entity.HasKey(e => e.ConfigProfileId).HasName("PK__AccountG__D540A124E8147A14");
+            entity.HasKey(e => e.ConfigProfileId).HasName("PK__AccountG__D540A124F72E0A62");
 
             entity.ToTable("AccountGeneralConfig");
 
@@ -256,7 +258,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<AccountNationalVerification>(entity =>
         {
-            entity.HasKey(e => e.AccountId).HasName("PK__AccountV__F267251ECF63D029");
+            entity.HasKey(e => e.AccountId).HasName("PK__AccountN__F267251E7DC4A6F1");
 
             entity.ToTable("AccountNationalVerification");
 
@@ -272,12 +274,12 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Account).WithOne(p => p.AccountNationalVerification)
                 .HasForeignKey<AccountNationalVerification>(d => d.AccountId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__AccountVe__accou__4E53A1AA");
+                .HasConstraintName("FK__AccountNa__accou__4C6B5938");
         });
 
         modelBuilder.Entity<AccountOnlineTracking>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__AccountO__3213E83F83E2AA84");
+            entity.HasKey(e => e.Id).HasName("PK__AccountO__3213E83FFFA89AC5");
 
             entity.ToTable("AccountOnlineTracking");
 
@@ -293,12 +295,12 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Account).WithMany(p => p.AccountOnlineTrackings)
                 .HasForeignKey(d => d.AccountId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__AccountOn__accou__4C6B5938");
+                .HasConstraintName("FK__AccountOn__accou__4D5F7D71");
         });
 
         modelBuilder.Entity<AccountProfile>(entity =>
         {
-            entity.HasKey(e => e.AccountId).HasName("PK__AccountP__F267251E6B7B5752");
+            entity.HasKey(e => e.AccountId).HasName("PK__AccountP__F267251E6D17F4C9");
 
             entity.ToTable("AccountProfile");
 
@@ -327,12 +329,12 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Account).WithOne(p => p.AccountProfile)
                 .HasForeignKey<AccountProfile>(d => d.AccountId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__AccountPr__accou__4D5F7D71");
+                .HasConstraintName("FK__AccountPr__accou__4E53A1AA");
         });
 
         modelBuilder.Entity<DataPurchase>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__DataPurc__3213E83FCA68A950");
+            entity.HasKey(e => e.Id).HasName("PK__DataPurc__3213E83FEB333056");
 
             entity.ToTable("DataPurchase");
 
@@ -377,7 +379,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<FilterTag>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__FilterTa__3213E83F402A3798");
+            entity.HasKey(e => e.Id).HasName("PK__FilterTa__3213E83F0F33CA4E");
 
             entity.ToTable("FilterTag");
 
@@ -401,7 +403,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<FilterTagType>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__FilterTa__3213E83F047287EA");
+            entity.HasKey(e => e.Id).HasName("PK__FilterTa__3213E83F232C7785");
 
             entity.ToTable("FilterTagType");
 
@@ -415,11 +417,11 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<PasswordResetToken>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Password__3213E83F2EFE72CF");
+            entity.HasKey(e => e.Id).HasName("PK__Password__3213E83F88B01957");
 
             entity.ToTable("PasswordResetToken");
 
-            entity.HasIndex(e => e.Token, "UQ__Password__CA90DA7A3D5C25F3").IsUnique();
+            entity.HasIndex(e => e.Token, "UQ__Password__CA90DA7A529DFF4F").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.AccountId).HasColumnName("accountId");
@@ -441,9 +443,37 @@ public partial class AppDbContext : DbContext
                 .HasConstraintName("FK__PasswordR__accou__540C7B00");
         });
 
+        modelBuilder.Entity<PlatformFeedback>(entity =>
+        {
+            entity.HasKey(e => e.AccountId);
+
+            entity.ToTable("PlatformFeedback");
+
+            entity.Property(e => e.AccountId)
+                .ValueGeneratedNever()
+                .HasColumnName("accountId");
+            entity.Property(e => e.Comment)
+                .HasMaxLength(500)
+                .HasColumnName("comment");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(CONVERT([datetime],(sysdatetimeoffset() AT TIME ZONE 'N. Central Asia Standard Time')))")
+                .HasColumnType("datetime")
+                .HasColumnName("createdAt");
+            entity.Property(e => e.RatingScore).HasColumnName("ratingScore");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(CONVERT([datetime],(sysdatetimeoffset() AT TIME ZONE 'N. Central Asia Standard Time')))")
+                .HasColumnType("datetime")
+                .HasColumnName("updatedAt");
+
+            entity.HasOne(d => d.Account).WithOne(p => p.PlatformFeedback)
+                .HasForeignKey<PlatformFeedback>(d => d.AccountId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__PlatformF__accou__09746778");
+        });
+
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Role__3213E83F45D362A8");
+            entity.HasKey(e => e.Id).HasName("PK__Role__3213E83F89D19A1F");
 
             entity.ToTable("Role");
 
@@ -457,7 +487,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Survey>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Survey__3213E83F32BD0062");
+            entity.HasKey(e => e.Id).HasName("PK__Survey__3213E83FF249DA10");
 
             entity.ToTable("Survey", tb => tb.HasTrigger("trg_Survey_Update"));
 
@@ -540,7 +570,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyCommunityTransaction>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyCo__3213E83FC2A0C9A8");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyCo__3213E83F7F7DA325");
 
             entity.ToTable("SurveyCommunityTransaction");
 
@@ -583,7 +613,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyDefaultBackgroundTheme>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyDe__3213E83FBD3B3A35");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyDe__3213E83FADCF50ED");
 
             entity.ToTable("SurveyDefaultBackgroundTheme");
 
@@ -633,7 +663,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyFieldInputType>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyFi__3213E83F8FB1F28C");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyFi__3213E83F2CA4DEC7");
 
             entity.ToTable("SurveyFieldInputType");
 
@@ -647,7 +677,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyGeneralConfig>(entity =>
         {
-            entity.HasKey(e => e.ConfigProfileId).HasName("PK__SurveyGe__D540A124D633F4F4");
+            entity.HasKey(e => e.ConfigProfileId).HasName("PK__SurveyGe__D540A12483C2D622");
 
             entity.ToTable("SurveyGeneralConfig");
 
@@ -705,7 +735,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyMarketConfig>(entity =>
         {
-            entity.HasKey(e => e.ConfigProfileId).HasName("PK__SurveyMa__D540A124471BADCF");
+            entity.HasKey(e => e.ConfigProfileId).HasName("PK__SurveyMa__D540A124510EA9D3");
 
             entity.ToTable("SurveyMarketConfig");
 
@@ -737,7 +767,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyMarketTransaction>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyMa__3213E83F12BCBB2D");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyMa__3213E83F1434CA03");
 
             entity.ToTable("SurveyMarketTransaction");
 
@@ -780,7 +810,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyMarketVersionStatusTracking>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyMa__3213E83F05D4DDA1");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyMa__3213E83FD446CCBF");
 
             entity.ToTable("SurveyMarketVersionStatusTracking");
 
@@ -871,7 +901,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyQuestionType>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyQu__3213E83F29F0AAF7");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyQu__3213E83F51798212");
 
             entity.ToTable("SurveyQuestionType");
 
@@ -892,7 +922,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyResponse>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyRe__3213E83FAB354308");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyRe__3213E83F254FB030");
 
             entity.ToTable("SurveyResponse");
 
@@ -915,7 +945,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyRewardTracking>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyRe__3213E83FA9A8A19F");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyRe__3213E83F4CD2008A");
 
             entity.ToTable("SurveyRewardTracking");
 
@@ -938,7 +968,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveySecurityMode>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveySe__3213E83FEEF39B95");
+            entity.HasKey(e => e.Id).HasName("PK__SurveySe__3213E83F1AE7FB4A");
 
             entity.ToTable("SurveySecurityMode");
 
@@ -974,7 +1004,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveySpecificTopic>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveySp__3213E83F494AAE8D");
+            entity.HasKey(e => e.Id).HasName("PK__SurveySp__3213E83FBAA5D3E9");
 
             entity.ToTable("SurveySpecificTopic");
 
@@ -992,7 +1022,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyStatus>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveySt__3213E83F20DA1E2A");
+            entity.HasKey(e => e.Id).HasName("PK__SurveySt__3213E83F83035A63");
 
             entity.ToTable("SurveyStatus");
 
@@ -1006,7 +1036,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyStatusTracking>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveySt__3213E83F8EB87478");
+            entity.HasKey(e => e.Id).HasName("PK__SurveySt__3213E83F3FAE519E");
 
             entity.ToTable("SurveyStatusTracking");
 
@@ -1052,7 +1082,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyTakenResult>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyTa__3213E83F6BCAE2B3");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyTa__3213E83F11167E23");
 
             entity.ToTable("SurveyTakenResult");
 
@@ -1139,7 +1169,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyTimeRateConfig>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyTi__3213E83F6EFCB768");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyTi__3213E83FF2409E3E");
 
             entity.ToTable("SurveyTimeRateConfig");
 
@@ -1157,7 +1187,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyTopic>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyTo__3213E83FAD0103C4");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyTo__3213E83F9AAF491A");
 
             entity.ToTable("SurveyTopic");
 
@@ -1190,7 +1220,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SurveyType>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SurveyTy__3213E83F4ACE96A5");
+            entity.HasKey(e => e.Id).HasName("PK__SurveyTy__3213E83F02F702C4");
 
             entity.ToTable("SurveyType");
 
@@ -1204,7 +1234,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<SystemConfigProfile>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SystemCo__3213E83FAC587B10");
+            entity.HasKey(e => e.Id).HasName("PK__SystemCo__3213E83FA71BC350");
 
             entity.ToTable("SystemConfigProfile", tb => tb.HasTrigger("trg_SystemConfigProfile_Update"));
 
@@ -1247,7 +1277,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<TransactionStatus>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Transact__3213E83F9973E440");
+            entity.HasKey(e => e.Id).HasName("PK__Transact__3213E83F7EC601F7");
 
             entity.ToTable("TransactionStatus");
 
@@ -1261,7 +1291,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<TransactionType>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Transact__3213E83F6C9F3062");
+            entity.HasKey(e => e.Id).HasName("PK__Transact__3213E83FC44FB825");
 
             entity.ToTable("TransactionType");
 
