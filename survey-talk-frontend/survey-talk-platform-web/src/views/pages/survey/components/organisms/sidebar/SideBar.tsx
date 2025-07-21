@@ -127,14 +127,14 @@ const Sidebar = ({
                 label="Hình ảnh/Video ở đầu câu hỏi"
             /> */}
 
-      <Voice
+      {/* <Voice
         label="Sử dụng Voice"
         isPro={isPro}
         securityModes={securityModes} // Thịnh, thêm dòng này
         setFormData={setFormData}
         question={question}
         handleUpdateQuestion={handleUpdateQuestion}
-      />
+      /> */}
       {listComponent &&
         listComponent.map((Item: any) => {
           return Item.children;
