@@ -29,7 +29,7 @@ const Slide = ({ currentQuestionId }: Props) => {
   );
 
   const [timer, setTimer] = useState(-1);
-  //const refAudio = useRef<SpeechRecognition | null>(null);
+  const refAudio = useRef<SpeechRecognition | null>(null);
   const [isActiveAudio, setIsActiveAudio] = useState<boolean>(false);
   const [isTimerInitialized, setIsTimerInitialized] = useState(false);
   const [inputText, setInputText] = useState<string>("");
@@ -47,73 +47,73 @@ const Slide = ({ currentQuestionId }: Props) => {
 
   const isValid = useAppSelector((state) => state.appSlice.isValid);
 
-  //   useEffect(() => {
-  //     // https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API
-  //     const SpeechRecognition =
-  //       window.SpeechRecognition || window.webkitSpeechRecognition;
-  //     const recognition = new SpeechRecognition();
-  //     refAudio.current = recognition;
-  //     recognition.continuous = false;
-  //     recognition.lang = "vi";
-  //     recognition.interimResults = false;
-  //     recognition.maxAlternatives = 1;
+  useEffect(() => {
+    // https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    refAudio.current = recognition;
+    recognition.continuous = false;
+    recognition.lang = "vi";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
-  //     recognition.onresult = function (event: any) {
-  //       setIsActiveAudio(false);
-  //       setInputText(event.results[0][0].transcript);
-  //     };
+    recognition.onresult = function (event: any) {
+      setIsActiveAudio(false);
+      setInputText(event.results[0][0].transcript);
+    };
 
-  //     recognition.onspeechend = function () {
-  //       recognition.stop();
-  //     };
-  //     recognition.onspeechend = function (e: any) {
-  //       console.log(e);
-  //     };
+    recognition.onspeechend = function () {
+      recognition.stop();
+    };
+    recognition.onspeechend = function (e: any) {
+      console.log(e);
+    };
 
-  //     recognition.onerror = function (event: any) {
-  //       console.log(event);
-  //       console.log(event.error);
-  //     };
-  //   }, []);
+    recognition.onerror = function (event: any) {
+      console.log(event);
+      console.log(event.error);
+    };
+  }, []);
 
   // LỖI !!!!!!!!!!!!!!!
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+  // useEffect(() => {
+  //   if (typeof window === "undefined") return;
 
-    // const SpeechRecognition =
-    //   window.SpeechRecognition || window.webkitSpeechRecognition;
+  // const SpeechRecognition =
+  //   window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    // if (!SpeechRecognition) {
-    //   console.warn("Trình duyệt không hỗ trợ SpeechRecognition.");
-    //   return;
-    // }
+  // if (!SpeechRecognition) {
+  //   console.warn("Trình duyệt không hỗ trợ SpeechRecognition.");
+  //   return;
+  // }
 
-    // const recognition = new SpeechRecognition();
-    // refAudio.current = recognition;
+  // const recognition = new SpeechRecognition();
+  // refAudio.current = recognition;
 
-    // recognition.continuous = false;
-    // recognition.lang = "vi-VN";
-    // recognition.interimResults = false;
-    // recognition.maxAlternatives = 1;
+  // recognition.continuous = false;
+  // recognition.lang = "vi-VN";
+  // recognition.interimResults = false;
+  // recognition.maxAlternatives = 1;
 
-    // recognition.onresult = (event: SpeechRecognitionEvent) => {
-    //   setIsActiveAudio(false);
-    //   setInputText(event.results[0][0].transcript);
-    // };
+  // recognition.onresult = (event: SpeechRecognitionEvent) => {
+  //   setIsActiveAudio(false);
+  //   setInputText(event.results[0][0].transcript);
+  // };
 
-    // recognition.onspeechend = () => {
-    //   recognition.stop();
-    //   console.log("Người dùng ngưng nói");
-    // };
+  // recognition.onspeechend = () => {
+  //   recognition.stop();
+  //   console.log("Người dùng ngưng nói");
+  // };
 
-    // recognition.onerror = (event: any) => {
-    //   console.error("Lỗi nhận diện:", event.error);
-    // };
+  // recognition.onerror = (event: any) => {
+  //   console.error("Lỗi nhận diện:", event.error);
+  // };
 
-    // return () => {
-    //   recognition.stop(); // đảm bảo cleanup khi unmount
-    // };
-  }, []);
+  // return () => {
+  //   recognition.stop(); // đảm bảo cleanup khi unmount
+  // };
+  // }, []);
 
   useEffect(() => {
     if (inputText) {
@@ -145,15 +145,15 @@ const Slide = ({ currentQuestionId }: Props) => {
       return;
     }
 
-    // if (!refAudio.current) return;
+    if (!refAudio.current) return;
 
-    // if (isActiveAudio) {
-    //   refAudio.current.stop();
-    //   setIsActiveAudio(false);
-    // } else {
-    //   refAudio.current.start();
-    //   setIsActiveAudio(true);
-    // }
+    if (isActiveAudio) {
+      refAudio.current.stop();
+      setIsActiveAudio(false);
+    } else {
+      refAudio.current.start();
+      setIsActiveAudio(true);
+    }
   };
 
   const handleRender = useCallback(() => {
@@ -267,7 +267,6 @@ const Slide = ({ currentQuestionId }: Props) => {
         return <div className="">Chưa chọn type</div>;
     }
   }, [data]);
-
 
   return (
     <div className="">

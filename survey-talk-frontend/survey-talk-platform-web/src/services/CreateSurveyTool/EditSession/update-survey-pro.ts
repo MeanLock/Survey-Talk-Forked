@@ -22,6 +22,7 @@ const update = async (payload: PayLoadType) => {
     data: dataClone,
   });
   console.log("dataClone: ", dataClone);
+
   return response.data;
 };
 

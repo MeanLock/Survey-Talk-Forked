@@ -1,7 +1,6 @@
 import { useAppSelector } from "@/app/hooks";
 import { useNavigate } from "react-router-dom";
 import { useGetSurveyDefaultBackgroundThemes } from "@/services/CreateSurveyTool/InputDatas/get-default-background-themes";
-import { use, useEffect } from "react";
 import SurveyTalkLoading from "@/views/components/common/loading";
 import { useRefetchUser } from "@/hooks/useRefetchUser";
 
@@ -24,7 +23,9 @@ console.log("bgDefaultThemes: ", info);
   const handleNavigateToHome = async () => {
     const check = await refetchUser();
     if (check) {
-      navigate("/");
+      setTimeout(() => {
+        navigate("/");
+      }, 5000);
     }
   };
 

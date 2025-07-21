@@ -2,6 +2,7 @@ import type React from "react";
 import type { SurveyCommunity, SurveyCommunityCard } from "../../../core/types";
 import SurveyImg from "../../../assets/Image/Surveys/Community/1/image.jpg";
 import "./surveyCardStyle.scss";
+import Gif2 from "@/assets/Image/Home/gif2.gif";
 
 import PaidIcon from "@mui/icons-material/Paid";
 import StarsIcon from "@mui/icons-material/Stars";
@@ -12,11 +13,19 @@ interface Props {
 }
 
 export const SurveyCard: React.FC<Props> = ({ data }) => {
+  // Check if MainImageUrl ends with "unknown.jpg" and replace with Gif2
+  const getImageSrc = () => {
+    if (!data?.MainImageUrl || data.MainImageUrl.endsWith("unknown.jpg")) {
+      return Gif2;
+    }
+    return data.MainImageUrl;
+  };
+
   return (
     <div className="survey-card w-[381px] h-[546px] p-5 gap-5 flex flex-col items-center bg-white">
       <div className="survey-card__image w-[333px] h-[237px]">
         <img
-          src={data?.MainImageUrl}
+          src={getImageSrc()}
           alt={data?.Title}
           className="w-[333px] h-[237px] object-cover"
         />

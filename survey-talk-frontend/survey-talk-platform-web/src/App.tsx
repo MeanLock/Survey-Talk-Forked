@@ -36,7 +36,7 @@ function App() {
         <RouterProvider router={appRouter} />
       </Suspense>
       <ToastContainer />
-      <ReactQueryDevtools initialIsOpen={false} />
+      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </Box>
   );
 }
