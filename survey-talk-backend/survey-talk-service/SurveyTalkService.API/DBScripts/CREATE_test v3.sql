@@ -385,6 +385,16 @@ CREATE TABLE SurveyFeedback (
     CONSTRAINT PK_SurveyFeedback PRIMARY KEY(surveyId, takerId)
 );
 
+-- PlatformFeedback
+CREATE TABLE PlatformFeedback (
+    accountId INT NOT NULL REFERENCES Account(id),
+    ratingScore FLOAT NOT NULL,
+    comment NVARCHAR(500) NULL,
+    createdAt DATETIME NOT NULL DEFAULT(CAST(SYSDATETIMEOFFSET() AT TIME ZONE 'N. Central Asia Standard Time' AS DATETIME)),
+    updatedAt DATETIME NOT NULL DEFAULT(CAST(SYSDATETIMEOFFSET() AT TIME ZONE 'N. Central Asia Standard Time' AS DATETIME)),
+    CONSTRAINT PK_PlatformFeedback PRIMARY KEY(accountId)
+);
+
 
 -- PasswordResetToken
 CREATE TABLE PasswordResetToken (

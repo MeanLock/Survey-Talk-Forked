@@ -34,6 +34,19 @@ BEGIN
 END
 GO
 
+-- Trigger cho PlatformFeedback
+CREATE TRIGGER trg_PlatformFeedback_Update
+ON PlatformFeedback
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE PlatformFeedback
+    SET updatedAt = CAST(SYSDATETIMEOFFSET() AT TIME ZONE 'N. Central Asia Standard Time' AS DATETIME)
+    FROM Inserted
+    WHERE PlatformFeedback.accountId = Inserted.accountId;
+END
+
 -- Trigger cho SurveyMarket
 CREATE TRIGGER trg_SurveyMarket_Update
 ON SurveyMarket

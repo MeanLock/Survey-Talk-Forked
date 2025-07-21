@@ -751,6 +751,10 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
 
                         if (survey.SurveyTypeId == 1)
                         {
+                            if (TakingSubject != SurveyTakingSubjectEnum.Verified)
+                            {
+                                throw new Exception("không thể làm survey loại này");
+                            }
                             surveyFilterObject = new SurveyFilterObject
                             {
                                 IsDeletedContain = false,
@@ -797,6 +801,10 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                         }
                         else if (survey.SurveyTypeId == 3)
                         {
+                            if (TakingSubject != SurveyTakingSubjectEnum.Verified)
+                            {
+                                throw new Exception("không thể làm survey loại này");
+                            }
                             surveyFilterObject = new SurveyFilterObject
                             {
                                 IsDeletedContain = false,
