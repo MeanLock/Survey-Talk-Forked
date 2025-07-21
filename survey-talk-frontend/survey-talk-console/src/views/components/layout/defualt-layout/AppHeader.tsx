@@ -180,7 +180,7 @@ const AppHeader = () => {
         ) : (
           <CHeaderNav >
             <CNavItem className='mx-1'>
-              <CButton href="#/login" title='login' className='bg-info fw-bold'>
+              <CButton href="/login" title='login' className='bg-info fw-bold'>
                 LOG IN
                 {/* <SignIn size={32} color="aqua" weight="bold" /> */}
                 <IconNfcOff stroke={1} accentHeight={12} width={100} height={100} />

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Survey, SurveyList, SurveyTopic } from "../../../../core/types";
+import type { SurveyTopic } from "../../../../core/types";
 import { SurveyTopics } from "../../../../core/mockData/mockData";
 import "./styles.scss";
 import { Button } from "@/components/ui/button";
@@ -55,16 +55,15 @@ type SortOption =
 
 const ManageSurveyPage = () => {
   // REDUX FAKE NHỚ BỎ ĐI KHI ĐÃ CÓ API
-  const fake = useSelector((state: RootState) => state.fake);
   const user = useSelector((state: RootState) => state.auth.user);
 
   // STATES
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [surveys, setSurveys] = useState<SurveyList | null>(null);
-  const [filteredSurveys, setFilteredSurveys] = useState<SurveyList | null>(
+  const [surveys, setSurveys] = useState<any | null>(null);
+  const [filteredSurveys, setFilteredSurveys] = useState<any | null>(
     null
   );
-  const [selectedSurvey, setSelectedSurvey] = useState<Survey | null>(null);
+  const [selectedSurvey, setSelectedSurvey] = useState<any | null>(null);
   const [topics, setTopics] = useState<SurveyTopic[]>([]);
   const [selectedTopics, setSelectedTopics] = useState<SurveyTopic[]>([]);
   const [searchKeyword, setSearchKeyword] = useState<string>("");
@@ -248,7 +247,7 @@ const ManageSurveyPage = () => {
   };
 
   const handlePublish = (id: number) => {
-    const survey = surveys?.filter((s) => s.Id === id)[0];
+    const survey = surveys?.filter((s: any) => s.Id === id)[0];
     setSelectedSurvey(survey);
     setShowPublishModal(true);
   };
@@ -287,7 +286,7 @@ const ManageSurveyPage = () => {
   };
 
   const changeSurveyStatus = (id: number) => {
-    const updatedSurveys = surveys?.map((survey) =>
+    const updatedSurveys = surveys?.map((survey: any) =>
       survey.Id === id ? { ...survey, Status: 2 } : survey
     );
     setSurveys(updatedSurveys);
@@ -625,7 +624,7 @@ const ManageSurveyPage = () => {
         <div className="w-full mt-10">
           {filteredSurveys && filteredSurveys.length > 0 ? (
             <div className="grid grid-cols-4 gap-5">
-              {filteredSurveys.map((s, index) => (
+              {filteredSurveys.map((s:any, index: number) => (
                 <SurveyMeCard
                   key={index}
                   data={s}

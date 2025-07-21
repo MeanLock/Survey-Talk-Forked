@@ -211,7 +211,7 @@ const PreviewQuestionsTab = () => {
     }, []);
 
    return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className=" mx-0 p-6">
         {questions && questions.length > 0 ? (
             questions.map((question: Question, index: number) =>
                 renderQuestionPreview(question, index, getQuestionTypeName, getInputTypeName)

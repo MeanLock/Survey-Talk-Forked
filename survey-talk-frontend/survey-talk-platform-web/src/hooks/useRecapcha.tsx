@@ -1,5 +1,5 @@
 import Turnstile, { useTurnstile } from "react-turnstile";
-import React, { useEffect, useRef } from "react";
+import  { useEffect, useRef } from "react";
 
 interface TurnstileWidgetProps {
   setIsVerified: (isVerified: boolean) => void;
@@ -168,10 +168,12 @@ function TurnstileWidget({
       }
     `;
     document.head.appendChild(style);
-    return () => document.head.removeChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const cleanup = injectStyles();
     return cleanup;
   }, []);

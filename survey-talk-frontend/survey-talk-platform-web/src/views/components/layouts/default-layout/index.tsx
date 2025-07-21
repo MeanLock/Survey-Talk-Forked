@@ -53,6 +53,7 @@ const DefaultLayout = () => {
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
 
+  const location = window.location.pathname;
   // REDUX
   const auth = useSelector((state: RootState) => state.auth);
 
@@ -64,7 +65,24 @@ const DefaultLayout = () => {
       dispatch(clearAuthToken());
     } else if (auth.token && JwtUtil.isTokenValid(auth.token)) {
       // CALL API TO GET USER INFORMATIONS
-      fetch();
+      fetchForUpdate();
+      setNavItems(_loginNav);
+    } else {
+      console.log("Không valid rồiiiii");
+      alert("Không valid");
+      dispatch(clearAuthToken());
+    }
+  }, [location, auth.token]); // Re-fetch when location or auth token changes
+
+  useEffect(() => {
+    setIsLoading(true);
+    setFooterNavItems(_footerNav);
+    if (!auth.token) {
+      setNavItems(_nonLoginNav);
+      dispatch(clearAuthToken());
+    } else if (auth.token && JwtUtil.isTokenValid(auth.token)) {
+      // CALL API TO GET USER INFORMATIONS
+      fetchForFirst();
       setNavItems(_loginNav);
     } else {
       console.log("Không valid rồiiiii");
@@ -74,7 +92,7 @@ const DefaultLayout = () => {
   }, []);
 
   // FUNCTIONS
-  const fetch = async () => {
+  const fetchForFirst = async () => {
     try {
       const user = await getAccountMe();
       const status = await getAccountStatus();
@@ -125,9 +143,12 @@ const DefaultLayout = () => {
             allowOutsideClick: false,
             allowEscapeKey: false,
           }).then((result) => {
+            console.log("Hủy cập nhật thông tin: ", result.isConfirmed);
             if (result.isConfirmed) {
               navigate("/survey/filter-survey");
             } else {
+              console.log("Hủy cập nhật thông tin: ", result.isConfirmed);
+              alert("Ê");
               dispatch(clearAuthToken());
               navigate("/login");
             }
@@ -213,6 +234,22 @@ const DefaultLayout = () => {
         confirmButtonText: "OK",
       });
     }
+  };
+
+  const fetchForUpdate = async () => {
+    try {
+      const user = await getAccountMe();
+      if (user) {
+        dispatch(
+          updateAuthUser({
+            token: auth.token,
+            user: user.user,
+          })
+        );
+        setUserInformations(user.user);
+      }
+      setIsLoading(false);
+    } catch (error) {}
   };
 
   return (

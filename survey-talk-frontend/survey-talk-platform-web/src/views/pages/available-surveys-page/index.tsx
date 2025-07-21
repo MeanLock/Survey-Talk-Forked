@@ -1,4 +1,3 @@
-import type React from "react";
 import NotFoundImg from "../../../assets/Image/Logo/notfound.png";
 import type {
   SurveyFromSurveyListCustomer,
@@ -235,55 +234,55 @@ const AvailableSurveys: React.FC<AvailableSurveyProps> = () => {
   };
 
   const handleSearchAPI = async () => {
-    try {
-      setIsLoading(true);
-      setTimeout(() => {
-        const surveys = SurveyListCustomer;
-        setSurveys(surveys);
-        setFilteredSurveys(surveys);
-        setSurveyFoundCount(surveys ? surveys.length : 0);
-        setSelectedSurvey(null);
-        setIsShowSelectedSurvey(false);
-        setSelectedTopics([]);
-        setSortMode(0);
-        setIsLoading(false);
-      }, 2000);
-    } catch (error) {
-      console.log("Lỗi khi handleSearchAPI");
-    }
+    // try {
+    //   setIsLoading(true);
+    //   setTimeout(() => {
+    //     const surveys = SurveyListCustomer;
+    //     setSurveys(surveys);
+    //     setFilteredSurveys(surveys);
+    //     setSurveyFoundCount(surveys ? surveys.length : 0);
+    //     setSelectedSurvey(null);
+    //     setIsShowSelectedSurvey(false);
+    //     setSelectedTopics([]);
+    //     setSortMode(0);
+    //     setIsLoading(false);
+    //   }, 2000);
+    // } catch (error) {
+    //   console.log("Lỗi khi handleSearchAPI");
+    // }
   };
 
   const handleAdditionalChangeAPI = async (content: string) => {
-    setAdditional(content);
-    try {
-      setIsLoading(true);
-      setTimeout(() => {
-        const surveys = SurveyListCustomer;
-        setSurveys(surveys);
-        setFilteredSurveys(surveys);
-        setSurveyFoundCount(surveys ? surveys.length : 0);
-        setSelectedSurvey(null);
-        setIsShowSelectedSurvey(false);
-        setSelectedTopics([]);
-        setSortMode(0);
-        setIsLoading(false);
-      }, 2000);
-    } catch (error) {
-      console.log("Lỗi khi handleSearchAPI");
-    }
+    // setAdditional(content);
+    // try {
+    //   setIsLoading(true);
+    //   setTimeout(() => {
+    //     const surveys = SurveyListCustomer;
+    //     setSurveys(surveys);
+    //     setFilteredSurveys(surveys);
+    //     setSurveyFoundCount(surveys ? surveys.length : 0);
+    //     setSelectedSurvey(null);
+    //     setIsShowSelectedSurvey(false);
+    //     setSelectedTopics([]);
+    //     setSortMode(0);
+    //     setIsLoading(false);
+    //   }, 2000);
+    // } catch (error) {
+    //   console.log("Lỗi khi handleSearchAPI");
+    // }
   };
 
   // LỖI Ở HÀM NÀY
   const handleClearFilter = async () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setSelectedTopics([]);
-      setAdditional("");
-      if (Keyword === "") {
-        setFilteredSurveys(SurveyListCustomer);
-      }
-      setIsLoading(false);
-    }, 2000);
+    // setIsLoading(true);
+    // setTimeout(() => {
+    //   setSelectedTopics([]);
+    //   setAdditional("");
+    //   if (Keyword === "") {
+    //     setFilteredSurveys(SurveyListCustomer);
+    //   }
+    //   setIsLoading(false);
+    // }, 2000);
   };
 
   return (

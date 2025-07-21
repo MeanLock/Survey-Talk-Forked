@@ -1,6 +1,4 @@
-"use client";
 
-import type React from "react";
 
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useMemo, useEffect } from "react";
@@ -23,7 +21,6 @@ import {
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import "./styles.scss";
-import { updateFakeData } from "../../../../../redux/fake/fakeSlice";
 import { banks } from "../../../../../core/mockData/banks";
 import type { RootState } from "../../../../../redux/rootReducer";
 import { updateAuthUser } from "../../../../../redux/auth/authSlice";
@@ -125,7 +122,7 @@ export const MoneyOut: React.FC<Props> = ({ balance }) => {
         const data = await response.json();
         // Filter records for current user
         const userWithdrawals = data.filter(
-          (record) => record.CustomerName === user?.FullName
+          (record: any) => record.CustomerName === user?.FullName
         );
         setWithdrawalHistory(userWithdrawals);
       } catch (error) {
@@ -268,12 +265,6 @@ export const MoneyOut: React.FC<Props> = ({ balance }) => {
         throw new Error("Failed to create withdrawal request");
       }
 
-      // Update user balance
-      // dispatch(
-      //   updateAuthUser({
-      //     Balance: user?.Balance - Number.parseInt(amount),
-      //   })
-      // );
 
       // Reset form
       setBankId("");
@@ -288,7 +279,7 @@ export const MoneyOut: React.FC<Props> = ({ balance }) => {
       );
       const updatedHistory = await updatedHistoryResponse.json();
       const userWithdrawals = updatedHistory.filter(
-        (record) => record.CustomerName === user?.FullName
+        (record : any) => record.CustomerName === user?.FullName
       );
       navigate(0);
       setWithdrawalHistory(userWithdrawals);
@@ -309,7 +300,7 @@ export const MoneyOut: React.FC<Props> = ({ balance }) => {
     return Number.parseInt(value).toLocaleString("vi-VN");
   };
 
-  async function updateMoneyOutById(id, amountToAdd) {
+  async function updateMoneyOutById(id: any, amountToAdd: any) {
     const apiUrl = `https://685b91fb89952852c2d9fd1e.mockapi.io/MoneyFlow/${id}`;
 
     try {

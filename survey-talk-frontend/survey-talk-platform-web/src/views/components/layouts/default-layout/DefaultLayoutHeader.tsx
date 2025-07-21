@@ -24,8 +24,6 @@ import { NavItemDropDown } from "./NavItemDropDown";
 import User1 from "../../../../assets/Image/Customers/user-0001/avatar.jpg";
 import { Level } from "./Level";
 import type { RootState } from "../../../../redux/rootReducer";
-import { clearFakeData } from "../../../../redux/fake/fakeSlice";
-import { requesterFake, takerFake } from "../../../../core/mockData/userFake";
 import DefaultAvatar from "@/assets/Image/Customers/default.jpg";
 import type { UserInformations } from "@/services/Profile/get-accounts-me";
 
@@ -68,7 +66,6 @@ export const DefaultLayoutHeader: React.FC<DefaultLayoutHeaderProps> = ({
   }, [auth]);
 
   const handleLogout = () => {
-    dispatch(clearFakeData());
     dispatch(clearAuthToken());
     navigate("/login");
   };

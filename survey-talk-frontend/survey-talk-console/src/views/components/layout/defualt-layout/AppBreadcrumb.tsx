@@ -1,5 +1,5 @@
 import React from "react"
-import { useLocation } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { CBreadcrumb, CBreadcrumbItem } from "@coreui/react"
 import routes from "../../../../routes"
 
@@ -45,7 +45,7 @@ const AppBreadcrumb = () => {
 
     if (matchedRoute) {
       breadcrumbs.push({
-        pathname: "/#",
+        pathname: "/",
         name: "Trang chủ",
         active: false,
       })
@@ -89,17 +89,21 @@ const AppBreadcrumb = () => {
   }
 
   const breadcrumbs = getBreadcrumbs(currentLocation)
-
+  console.log("Breadcrumbs:", breadcrumbs)
   return (
     <CBreadcrumb className="app-breadcrumb my-0">
       {breadcrumbs.map((breadcrumb, index) => {
         return (
           <CBreadcrumbItem
             className="app-breadcrumb__item"
-            {...(breadcrumb.active ? { active: true } : { href: `/#${breadcrumb.pathname}` })}
+            active={breadcrumb.active}
             key={index}
           >
-            {breadcrumb.name}
+            {breadcrumb.active ? (
+              breadcrumb.name
+            ) : (
+              <Link to={breadcrumb.pathname}>{breadcrumb.name}</Link>
+            )}
           </CBreadcrumbItem>
         )
       })}

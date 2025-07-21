@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect } from 'react'
-import { HashRouter, Route, Routes } from 'react-router-dom'
+import { createBrowserRouter, HashRouter, Route, RouterProvider, Routes } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 import { CSpinner, useColorModes } from '@coreui/react'
@@ -10,6 +10,7 @@ import './scss/examples.scss'
 import { RootState } from './redux/root-reducer'
 import { ToastContainer } from 'react-toastify';
 
+
 // Containers
 const DefaultLayout = React.lazy(() => import('./views/components/layout/defualt-layout/index'))
 
@@ -19,6 +20,44 @@ const Register = React.lazy(() => import('./views/pages/register/Register'))
 const Page404 = React.lazy(() => import('./views/pages/page404/Page404'))
 const Page500 = React.lazy(() => import('./views/pages/page500/Page500'))
 
+//Survey-tool
+const SurveyLayout = React.lazy(() => import('./views/components/layout/survey-tool-layout/index'))
+const SurveyCreatePage = React.lazy(() => import("./views/pages/survey/survey-create-page/index"))
+const SurveyCustomer = React.lazy(() => import("./views/pages/survey/pages/SurveyCustomer/index"))
+const EndSurveyCustomer = React.lazy(() => import("./views/pages/survey/pages/EndSurveyCustomer/index"))
+
+const router = createBrowserRouter([
+  {
+    path: '/login',
+    element: <Login />,
+  },
+  {
+    path: '/register',
+    element: <Register />,
+  },
+  {
+    path: '/404',
+    element: <Page404 />,
+  },
+  {
+    path: '/500',
+    element: <Page500 />,
+  },
+  {
+    path: '*',
+    element: <DefaultLayout />,
+  },
+  {
+    path: '/survey',
+    element: <SurveyLayout />,
+    children: [
+      { path: 'new', element: <SurveyCreatePage /> },
+      { path: ':id/editing', element: <SurveyCreatePage /> },
+    ],
+  },
+        { path: '/survey/:id/taking', element: <SurveyCustomer /> },
+      { path: '/survey/:id/end', element: <EndSurveyCustomer /> },
+])
 const App = () => {
   const { isColorModeSet, setColorMode } = useColorModes('')
   const uiSlice = useSelector((state: RootState) => state.ui)
@@ -49,24 +88,16 @@ const App = () => {
   }, [uiSlice])
 
   return (
-    <HashRouter>
-      <Suspense
-        fallback={
-          <div className="pt-3 text-center">
-            <CSpinner color="primary" variant="grow" />
-          </div>
-        }
-      >
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/404" element={<Page404 />} />
-          <Route path="/500" element={<Page500 />} />
-          <Route path="*" element={<DefaultLayout />} />
-        </Routes>
-      </Suspense>
+     <Suspense
+      fallback={
+        <div className="pt-3 text-center">
+          <CSpinner color="primary" variant="grow" />
+        </div>
+      }
+    >
+      <RouterProvider router={router} />
       <ToastContainer />
-    </HashRouter>
+    </Suspense>
   )
 }
 

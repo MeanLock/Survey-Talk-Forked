@@ -1,4 +1,3 @@
-import type React from "react";
 import { useState, useMemo, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
@@ -7,7 +6,6 @@ import { useDispatch, useSelector } from "react-redux";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import "./styles.scss";
-import { updateFakeData } from "../../../../../redux/fake/fakeSlice";
 import type { RootState } from "../../../../../redux/rootReducer";
 import { updateAuthUser } from "../../../../../redux/auth/authSlice";
 import { callAxiosRestApi } from "../../../../../core/api/rest-api/main/api-call";

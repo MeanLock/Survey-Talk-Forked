@@ -3,16 +3,17 @@ import "./styles.scss"
 import { AgGridReact } from "ag-grid-react"
 import { CButton, CButtonGroup, CCard, CCol, CRow, CSpinner } from "@coreui/react"
 import { AllCommunityModule, ColDef, ModuleRegistry } from "ag-grid-community"
-import CustomerUpdate from "../../admin/customer-view/CustomerUpdate"
 import { Eye } from "phosphor-react"
-import Modal_Button from "../../../components/common/modal/ModalButton"
 import { useNavigate } from "react-router-dom"
 import { FilterSurvey } from "../../../../core/types"
 import { managerAxiosInstance } from "../../../../core/api/rest-api/config/instances/v2/manager-axios-instance"
 import SurveyTalkLoading from "../../../components/common/loading"
 import { formatDate } from "../../../../core/utils/date.util"
-import { getFilterSurveys } from "../../../../core/services/survey/survey-core/survey-core.service"
-
+import { deleteSurvey, getFilterSurveys } from "../../../../core/services/survey/survey-core/survey-core.service"
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
+import { confirmAlert } from "@/core/utils/alert.util"
+import { toast } from "react-toastify"
 ModuleRegistry.registerModules([AllCommunityModule])
 
 
@@ -36,7 +37,16 @@ const getSurveyStatusText = (statusId: number): string => {
     }
     return statusMap[statusId] || "Unknown"
 }
-const state_creator = (surveys: FilterSurvey[], navigate: (path: string) => void) => {
+const state_creator = (surveys: FilterSurvey[], navigate: (path: any) => void) => {
+    const handleDelete = async (id: number) => {
+        const alert = await confirmAlert("Bạn có chắc muốn xóa khảo sát này?");
+        if (!alert.isConfirmed) return;
+       const response = await deleteSurvey(managerAxiosInstance, id);
+        if (response && response.success) {
+            navigate(0);
+            toast.success(`Xóa khảo sát ${id} thành công`);
+        }
+    };
     const state = {
         columnDefs: [
             { headerName: "ID", field: "Id", flex: 0.4 },
@@ -62,12 +72,12 @@ const state_creator = (surveys: FilterSurvey[], navigate: (path: string) => void
                     const statusText = getSurveyStatusText(params.data.SurveyStatusId)
                     return <span>{statusText}</span>
                 },
-                flex: 0.8,
+                flex: 0.6,
             },
             {
                 headerName: "Publish Date",
                 field: "PublishedAt",
-                flex: 1,
+                flex: 0.6,
                 valueGetter: (params: { data: FilterSurvey }) => formatDate(params.data.PublishedAt || 'Chưa publish'),
             },
             {
@@ -75,15 +85,29 @@ const state_creator = (surveys: FilterSurvey[], navigate: (path: string) => void
                 cellRenderer: (params: any) => {
                     const surveyId = params.data.Id;
                     return (
-                        <CButton variant="ghost" size="sm" className="survey-card__action-btn mt-n2 text-primary"
-                            onClick={() => {
-                                navigate('/filter-survey/detail/' + surveyId);
-                            }}>
-                            <Eye size={30} />
-                        </CButton>
+                        <div className="d-flex justify-content-center gap-2 flex-row">
+                            <CButton variant="ghost" size="sm" className="survey-card__action-btn mt-n2 text-primary"
+                                onClick={() => {
+                                    navigate('/filter-survey/detail/' + surveyId);
+                                }}>
+                                <Eye size={30} />
+                            </CButton>
+                            <CButton variant="ghost" size="sm" className="survey-card__action-btn mt-n2 text-primary"
+                                onClick={() => {
+                                    window.open(`/survey/${surveyId}/editing`, '_blank');
+                                }}>
+                                <EditOutlinedIcon />
+                            </CButton>
+                            <CButton variant="ghost" size="sm" className="survey-card__action-btn mt-n2 text-primary"
+                                onClick={() => {
+                                    handleDelete(surveyId);
+                                }}>
+                                <DeleteForeverOutlinedIcon />
+                            </CButton>
+                        </div>
                     )
                 },
-                flex: 0.5,
+                flex: 1,
             },
         ],
         rowData: surveys,
@@ -130,7 +154,7 @@ const FilterSurveyView: FC<FilterSurveyViewProps> = () => {
                 <CRow>
                     <div className="filter-survey__header mb-4 mt-4">
                         <h3 className="filter-survey__header-title mb-5">Danh Sách Khảo Sát Đầu Vào</h3>
-                        <CButton className="filter-survey__header-button mt-5" href="#">
+                        <CButton className="filter-survey__header-button mt-5" onClick={() => window.open('/survey/new')}>
                             Tạo Mới
                         </CButton>
                     </div>

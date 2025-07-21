@@ -19,7 +19,7 @@ const EndSurveyCustomer = () => {
   if (!bgDefaultThemes || !Array.isArray(bgDefaultThemes)) {
     return <SurveyTalkLoading />;
   }
-
+console.log("bgDefaultThemes: ", info);
   const handleNavigateToHome = async () => {
     const check = await refetchUser();
     if (check) {
@@ -94,7 +94,7 @@ const EndSurveyCustomer = () => {
               <button
                 className="mt-4 px-6 py-2  text-white rounded hover:bg-blue-700 transition"
                 style={{
-                  backgroundColor: info.ConfigJson.ButtonBackgroundColor,
+                  background: info.ConfigJson.ButtonBackgroundColor,
                   color: info.ConfigJson.ButtonContentColor,
                 }}
                 onClick={() => navigate("/")}

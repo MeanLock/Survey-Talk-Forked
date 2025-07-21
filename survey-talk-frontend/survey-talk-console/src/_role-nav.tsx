@@ -19,6 +19,8 @@ import PaidOutlinedIcon from '@mui/icons-material/PaidOutlined';
 import PollOutlinedIcon from '@mui/icons-material/PollOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import InsertCommentOutlinedIcon from '@mui/icons-material/InsertCommentOutlined';
+
 import {
   HardDrives,
   MagicWand,
@@ -55,11 +57,18 @@ const get_roleNav = (role_id: number, account_id: number) => {
         icon: <Users size={30} weight="duotone" />,
 
       },
-        {
+      {
         component: CNavItem,
         name: 'Người Quản Lý',
         to: '/managers/table',
         icon: <Users size={30} weight="duotone" />,
+
+      },
+      {
+        component: CNavItem,
+        name: 'Đánh Giá ',
+        to: '/platform-feedback/table',
+        icon: <InsertCommentOutlinedIcon sx={{ fontSize: 29 }} />,
 
       },
       {
@@ -69,6 +78,7 @@ const get_roleNav = (role_id: number, account_id: number) => {
         icon: <PollOutlinedIcon sx={{ fontSize: 29 }} />,
 
       },
+
       {
         component: CNavItem,
         name: 'Cài đặt',
@@ -76,7 +86,7 @@ const get_roleNav = (role_id: number, account_id: number) => {
         icon: <SettingsOutlinedIcon sx={{ fontSize: 29 }} />,
 
       }
-      
+
     ],
     // manager ID: 2
     [
@@ -105,10 +115,10 @@ const get_roleNav = (role_id: number, account_id: number) => {
         component: CNavItem,
         name: 'Giao dịch',
         to: '/transactions/table',
-        icon: <PaidOutlinedIcon sx={{ fontSize: 29 }}/>,
+        icon: <PaidOutlinedIcon sx={{ fontSize: 29 }} />,
 
       }
-         
+
     ],
     // design_staff ID: 3
     [
