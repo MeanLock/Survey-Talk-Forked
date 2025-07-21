@@ -10,13 +10,13 @@ interface TurnstileWidgetProps {
   isVerified?: boolean;
 }
 
-function TurnstileWidget({ 
-  setIsVerified, 
+function TurnstileWidget({
+  setIsVerified,
   title = "Xác minh bảo mật",
   subtitle = "Vui lòng hoàn thành xác minh để tiếp tục",
-  onClose, 
+  onClose,
   isRefetch,
-  isVerified
+  isVerified,
 }: TurnstileWidgetProps) {
   const turnstile = useTurnstile();
   const turnstileRef = useRef<any>(null);
@@ -26,7 +26,7 @@ function TurnstileWidget({
       turnstileRef.current.reset();
       turnstile.reset();
     }
-    
+
     return () => {
       if (turnstileRef.current) {
         turnstileRef.current.reset();
@@ -36,7 +36,7 @@ function TurnstileWidget({
 
   useEffect(() => {
     setIsVerified(false);
-  }, [isRefetch])
+  }, [isRefetch]);
 
   // Listen for page refresh/reload events
   useEffect(() => {
@@ -45,19 +45,19 @@ function TurnstileWidget({
     };
 
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === "visible") {
         if (turnstileRef.current) {
           turnstileRef.current.reset();
         }
       }
     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [setIsVerified]);
 
@@ -73,7 +73,7 @@ function TurnstileWidget({
     alignItems: "center",
     zIndex: 9999,
     animation: "fadeIn 0.3s ease-out",
-    display: isVerified ? "none" : "flex"
+    display: isVerified ? "none" : "flex",
   };
 
   const containerStyle: React.CSSProperties = {
@@ -85,25 +85,25 @@ function TurnstileWidget({
     width: "90%",
     textAlign: "center",
     position: "relative",
-    animation: "slideUp 0.3s ease-out"
+    animation: "slideUp 0.3s ease-out",
   };
 
   const headerStyle: React.CSSProperties = {
-    marginBottom: "24px"
+    marginBottom: "24px",
   };
 
   const titleStyle: React.CSSProperties = {
     fontSize: "24px",
     fontWeight: "600",
     color: "#1f2937",
-    margin: "0 0 8px 0"
+    margin: "0 0 8px 0",
   };
 
   const subtitleStyle: React.CSSProperties = {
     fontSize: "14px",
     color: "#6b7280",
     margin: "0 0 24px 0",
-    lineHeight: "1.5"
+    lineHeight: "1.5",
   };
 
   const closeButtonStyle: React.CSSProperties = {
@@ -121,30 +121,30 @@ function TurnstileWidget({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    transition: "all 0.2s ease"
+    transition: "all 0.2s ease",
   };
 
   const turnstileContainerStyle: React.CSSProperties = {
     display: "flex",
     justifyContent: "center",
-    marginBottom: "16px"
+    marginBottom: "16px",
   };
 
   const footerTextStyle: React.CSSProperties = {
     fontSize: "12px",
     color: "#9ca3af",
-    marginTop: "16px"
+    marginTop: "16px",
   };
 
   const refreshNoticeStyle: React.CSSProperties = {
     fontSize: "11px",
     color: "#ef4444",
     marginTop: "8px",
-    fontStyle: "italic"
+    fontStyle: "italic",
   };
 
   const injectStyles = () => {
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.textContent = `
       @keyframes fadeIn {
         from { opacity: 0; }
@@ -197,16 +197,15 @@ function TurnstileWidget({
   };
 
   const handleExpire = () => {
-    console.log('Turnstile verification expired');
+    console.log("Turnstile verification expired");
     setIsVerified(false);
-    
+
     if (turnstileRef.current) {
       turnstileRef.current.reset();
     }
   };
 
-  const handleLoad = () => {
-  };
+  const handleLoad = () => {};
 
   return (
     <div style={overlayStyle}>
@@ -221,7 +220,7 @@ function TurnstileWidget({
             ×
           </button>
         )}
-        
+
         <div style={headerStyle}>
           <h2 style={titleStyle}>{title}</h2>
           <p style={subtitleStyle}>{subtitle}</p>
@@ -229,8 +228,7 @@ function TurnstileWidget({
 
         <div style={turnstileContainerStyle}>
           <Turnstile
-            ref={turnstileRef}
-            sitekey="0x4AAAAAABhydonhR97dh7qM"
+            sitekey="0x4AAAAAABl2UhtPeoGdQS-h"
             onSuccess={handleSuccess}
             onError={handleError}
             onExpire={handleExpire}
@@ -241,9 +239,7 @@ function TurnstileWidget({
           />
         </div>
 
-        <p style={footerTextStyle}>
-          Được bảo vệ bởi Cloudflare Turnstile
-        </p>
+        <p style={footerTextStyle}>Được bảo vệ bởi Cloudflare Turnstile</p>
       </div>
     </div>
   );

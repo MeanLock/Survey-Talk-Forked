@@ -18,11 +18,10 @@ const update = async (payload: PayLoadType) => {
   const response = await callAxiosRestApi({
     instance: loginRequiredAxiosInstance,
     method: "post",
-    url: `Survey/response/community/surveys/${payload.surveyId}?taken_subject=${payload.taken_subject}`,
+    url: `Survey/response/filter/surveys/${payload.surveyId}?taken_subject=${payload.taken_subject}`,
     data: dataClone,
   });
-  console.log("dataClone: ", dataClone);
-
+ 
   return response.data;
 };
 
@@ -30,7 +29,7 @@ type UpdateType = {
   mutationConfig?: MutationConfig<typeof update>;
 };
 
-export const useUpdateSurveyPro = ({ mutationConfig }: UpdateType) => {
+export const useUpdateSurveyFilter = ({ mutationConfig }: UpdateType) => {
   return useMutation({
     ...mutationConfig,
     mutationFn: update,

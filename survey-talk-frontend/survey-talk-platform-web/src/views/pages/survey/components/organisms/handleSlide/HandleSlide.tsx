@@ -8,7 +8,12 @@ import {
   type Dispatch,
   type SetStateAction,
 } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  data,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { handleSetIsValid, setSurveyData } from "@/app/appSlice";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { routesMap } from "../../../routes/routes";
@@ -19,6 +24,7 @@ import "./styles.scss";
 import { useUpdateSurveyPro } from "@/services/CreateSurveyTool/EditSession/update-survey-pro";
 import { v4 as uuidv4 } from "uuid";
 import { NextButton } from "../../atoms/Buttons/NextButton";
+import { useUpdateSurveyFilter } from "@/services/CreateSurveyTool/EditSession/update-survey-filter";
 
 type JumpLogic = {
   Conditions: {
@@ -37,13 +43,16 @@ type Props = {
   takingSubject: string;
 };
 
-
 const HandleSlide = ({ dataResponse, setIsRefetch, takingSubject }: Props) => {
   const [current, setCurrent] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [searchParams] = useSearchParams();
   const taken_subject = useMemo(
     () => searchParams.get("taking_subject"),
+    [searchParams]
+  );
+  const is_filter_survey = useMemo(
+    () => searchParams.get("is_filter_survey"),
     [searchParams]
   );
 
@@ -56,8 +65,27 @@ const HandleSlide = ({ dataResponse, setIsRefetch, takingSubject }: Props) => {
   // Function to update the survey data on the server
   const { mutate } = useUpdateSurveyPro({
     mutationConfig: {
-      // Do nothing on success
-      onSuccess() { },
+      onSuccess: () => {
+        console.log("Community Survey submitted successfully!");
+        // Navigate được gọi trong handleEnd
+      },
+      onError: (error) => {
+        console.error("Error submitting Community Survey:", error);
+        // Có thể thêm toast notification ở đây
+      },
+    },
+  });
+
+  const { mutate: mutateFilter } = useUpdateSurveyFilter({
+    mutationConfig: {
+      onSuccess: () => {
+        console.log("Filter Survey submitted successfully!");
+        // Navigate được gọi trong handleEnd
+      },
+      onError: (error) => {
+        console.error("Error submitting Filter Survey:", error);
+        // Có thể thêm toast notification ở đây
+      },
     },
   });
 
@@ -172,7 +200,6 @@ const HandleSlide = ({ dataResponse, setIsRefetch, takingSubject }: Props) => {
             }
           }
 
-
           if (targetIndex !== -1) {
             const target = surveyData.SurveyResponses[targetIndex];
             setCurrent(target.ValueJson.QuestionContent.Id);
@@ -197,6 +224,7 @@ const HandleSlide = ({ dataResponse, setIsRefetch, takingSubject }: Props) => {
 
   const handleEnd = useCallback(() => {
     if (!surveyData || !id) return;
+
     const dataBuider = {
       ...surveyData,
       surveyId: id,
@@ -217,8 +245,8 @@ const HandleSlide = ({ dataResponse, setIsRefetch, takingSubject }: Props) => {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const { JumpLogics, ...rest } = (i.ValueJson.QuestionContent
                 .ConfigJson || {}) as {
-                  [key: string]: any;
-                };
+                [key: string]: any;
+              };
               return rest;
             })(),
             Options: i.ValueJson.QuestionContent.Options,
@@ -226,13 +254,41 @@ const HandleSlide = ({ dataResponse, setIsRefetch, takingSubject }: Props) => {
         },
       })),
     };
+
+    // Xử lý các trường hợp khác nhau
     if (taken_subject === "Preview") {
+      // Chỉ navigate, không gọi API
       navigate(routesMap.EndSurveyCustomer.replace("/:id/end", `/${id}/end`));
       return;
     }
-    mutate(dataBuider);
-    navigate(routesMap.EndSurveyCustomer.replace("/:id/end", `/${id}/end`)); // Thịnh, đổi đường dẫn từ /survey/end/:id sang /survey/:id/end
-  }, [id, mutate, navigate, surveyData, taken_subject]);
+
+    // Kiểm tra nếu là Filter Survey
+    if (taken_subject === "Verified" && is_filter_survey === "true") {
+      console.log("Calling Filter Survey API...");
+      mutateFilter(dataBuider);
+    }
+    // Kiểm tra nếu là Community Survey hoặc các loại survey khác
+    else if (taken_subject === "Verified" || taken_subject === "Community") {
+      console.log("Calling Community Survey API...");
+      mutate(dataBuider);
+    }
+    // Các trường hợp khác (backup)
+    else {
+      console.log("Calling Default Survey API...");
+      mutate(dataBuider);
+    }
+
+    // Navigate sau khi gọi API
+    navigate(routesMap.EndSurveyCustomer.replace("/:id/end", `/${id}/end`));
+  }, [
+    id,
+    mutate,
+    mutateFilter,
+    navigate,
+    surveyData,
+    taken_subject,
+    is_filter_survey,
+  ]);
 
   if (!surveyData?.SurveyResponses?.length) {
     return (

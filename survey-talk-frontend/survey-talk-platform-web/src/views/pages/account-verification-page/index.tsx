@@ -141,7 +141,7 @@ const AccountVerification: React.FC = () => {
             {otpDigits.map((digit, index) => (
               <Input
                 key={index}
-                ref={(el) => (inputRefs.current[index] = el)}
+                ref={(el) => (inputRefs.current[index] = el) as any}
                 type="text" // Use text to allow paste, then validate
                 maxLength={1}
                 value={digit}

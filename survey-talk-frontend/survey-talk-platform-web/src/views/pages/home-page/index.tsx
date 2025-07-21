@@ -101,22 +101,6 @@ const HomePage: FC<HomePageProps> = () => {
     }
   }, [surveysFeatureFromAPI]);
 
-  // FUNCTIONS
-  // const fetchSurveys = async () => {
-  //   try {
-  //     // CALL API TO GET SURVEYS FEATURES
-  //     const response = homeSurveysData;
-  //     if (response) {
-  //       setSuitYouBest(response.BestmatchSurveys);
-  //       setBigBonus(response.BigbonusSurveys);
-  //       setBaseOnFavTopic(response.FavoriteSurveys);
-  //       setIsLoading(false);
-  //     }
-  //   } catch (error) {
-  //     console.log("Error while fetching surveys at home: ", error);
-  //   }
-  // };
-
   return (
     <div className="home-page w-full flex flex-col items-center">
       <div className="w-full mb-20">
