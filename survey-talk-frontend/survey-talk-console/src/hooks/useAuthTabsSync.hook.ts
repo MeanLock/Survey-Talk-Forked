@@ -17,14 +17,14 @@ const useAuthTabsSync = () => {
       const user = LocalStorageUtil.getAuthUserFromPersistLocalStorage();
       if (!token) {
         dispatch(clearAuthToken());
-        window.location.href = '/#/login';
+        window.location.href = '/login';
       } else if (authSlice) {
         const tokenValid = JwtUtil.isTokenNotExpired(token);
         if (tokenValid && token !== authSlice.token) {
           dispatch(setAuthToken({ token, user }));
         } else if (!tokenValid) {
           dispatch(clearAuthToken());
-          window.location.href = '/#/login';
+          window.location.href = '/login';
         }
       }
     };

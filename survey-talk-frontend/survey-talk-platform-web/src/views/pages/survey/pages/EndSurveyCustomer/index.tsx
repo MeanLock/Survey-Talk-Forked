@@ -1,7 +1,6 @@
 import { useAppSelector } from "@/app/hooks";
 import { useNavigate } from "react-router-dom";
 import { useGetSurveyDefaultBackgroundThemes } from "@/services/CreateSurveyTool/InputDatas/get-default-background-themes";
-import { use, useEffect } from "react";
 import SurveyTalkLoading from "@/views/components/common/loading";
 import { useRefetchUser } from "@/hooks/useRefetchUser";
 
@@ -20,11 +19,13 @@ const EndSurveyCustomer = () => {
   if (!bgDefaultThemes || !Array.isArray(bgDefaultThemes)) {
     return <SurveyTalkLoading />;
   }
-
+console.log("bgDefaultThemes: ", info);
   const handleNavigateToHome = async () => {
     const check = await refetchUser();
     if (check) {
-      navigate("/");
+      setTimeout(() => {
+        navigate("/");
+      }, 5000);
     }
   };
 
@@ -93,7 +94,7 @@ const EndSurveyCustomer = () => {
               <button
                 className="mt-4 px-6 py-2  text-white rounded hover:bg-blue-700 transition"
                 style={{
-                  backgroundColor: info.ConfigJson.ButtonBackgroundColor,
+                  background: info.ConfigJson.ButtonBackgroundColor,
                   color: info.ConfigJson.ButtonContentColor,
                 }}
                 onClick={() => navigate("/")}

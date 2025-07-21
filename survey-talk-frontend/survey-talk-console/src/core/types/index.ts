@@ -12,15 +12,15 @@ export type Account = {
   Level: number;
   ProgressionSurveyCount: number;
   IsFilterSurveyRequired: boolean;
-  LastFilterSurveyTakenAt: string; 
-  DeactivatedAt: string | null; 
-  CreatedAt: string; 
-  UpdatedAt: string; 
-  MainImageUrl: string | null; 
+  LastFilterSurveyTakenAt: string;
+  DeactivatedAt: string | null;
+  CreatedAt: string;
+  UpdatedAt: string;
+  MainImageUrl: string | null;
 }
 
 export type FilterSurvey = {
- Id: number;
+  Id: number;
   Title: string;
   Description: string;
   SurveyTopicId: number;
@@ -54,38 +54,38 @@ export type FilterSurvey = {
   Questions: Question[];
 };
 
-export type  QuestionOption = {
-    Id: string;
-    SurveyQuestionId: string;
-    Content: string;
-    Order: number;
-    MainImageUrl: string | null;
+export type QuestionOption = {
+  Id: string;
+  SurveyQuestionId: string;
+  Content: string;
+  Order: number;
+  MainImageUrl: string | null;
 };
 
-export type  QuestionType = {
-    Id: number;
-    Name: String;
-    Price: number;
-    DeactivatedAt: string | null;
+export type QuestionType = {
+  Id: number;
+  Name: String;
+  Price: number;
+  DeactivatedAt: string | null;
 };
 export type FieldInputType = {
-    Id: number;
-    Name: string;
+  Id: number;
+  Name: string;
 };
-export type Question ={
-    Id: string;
-    SurveyId: number;
-    QuestionTypeId: number;
-    Content: string;
-    Description: string | null;
-    TimeLimit: number;
-    IsVoiced: boolean;
-    Order: number;
-    ConfigJsonString: string | null;
-    DeletedAt: string | null;
-    Version: number;
-    MainImageUrl: string | null;
-    Options?: QuestionOption[];
+export type Question = {
+  Id: string;
+  SurveyId: number;
+  QuestionTypeId: number;
+  Content: string;
+  Description: string | null;
+  TimeLimit: number;
+  IsVoiced: boolean;
+  Order: number;
+  ConfigJsonString: string | null;
+  DeletedAt: string | null;
+  Version: number;
+  MainImageUrl: string | null;
+  Options?: QuestionOption[];
 };
 
 export type SurveyTaker = {
@@ -152,3 +152,11 @@ export type CommunitySurvey = {
   SurveyRewardTrackings: SurveyRewardTracking[];
 };
 
+
+export type PlatformFeedback = {
+  AccountId: number;
+  RatingScore: number;
+  Comment: string;
+  CreatedAt: string;
+  UpdatedAt: string | null;
+};

@@ -21,7 +21,7 @@ export const login = async (instance: AxiosInstance, data : {
     const response = await callAxiosRestApi({
         instance: instance,
         method: "post",
-        url: "/User/auth/login",
+        url: "/User/auth/login-manual",
         data: bodyData,
     }, "Đăng nhập");
 

@@ -160,7 +160,7 @@ const LevelPage = () => {
                       Tiến trình đến Level {userProfiles.Level + 1}
                     </span>
                     <span className="text-sm text-gray-500">
-                      {userProfiles.Xp - getCurrentLevelXp()}/
+                      {userProfiles.Xp}/
                       {getXpForNextLevel() - getCurrentLevelXp()} XP
                     </span>
                   </div>

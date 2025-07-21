@@ -1,9 +1,10 @@
-import { useEffect, useState, type FC } from "react";
+import { Fragment, useEffect, useState, type FC } from "react";
 import "./styles.scss";
 
 // IMAGES
 import TopBanner from "../../../assets/Image/Home/topBanner.png";
 import Gif1 from "../../../assets/Image/Home/gif1.gif";
+import Gif2 from "../../../assets/Image/Home/gif2.gif";
 import Benefit1 from "../../../assets/Image/Home/benefit1.png";
 import Benefit2 from "../../../assets/Image/Home/benefit2.png";
 import Benefit3 from "../../../assets/Image/Home/benefit3.png";
@@ -66,7 +67,7 @@ const benefitData = [
   },
 ];
 
-interface HomePageProps { }
+interface HomePageProps {}
 
 const HomePage: FC<HomePageProps> = () => {
   // REDUX
@@ -99,44 +100,38 @@ const HomePage: FC<HomePageProps> = () => {
     }
   }, [surveysFeatureFromAPI]);
 
-  // FUNCTIONS
-  // const fetchSurveys = async () => {
-  //   try {
-  //     // CALL API TO GET SURVEYS FEATURES
-  //     const response = homeSurveysData;
-  //     if (response) {
-  //       setSuitYouBest(response.BestmatchSurveys);
-  //       setBigBonus(response.BigbonusSurveys);
-  //       setBaseOnFavTopic(response.FavoriteSurveys);
-  //       setIsLoading(false);
-  //     }
-  //   } catch (error) {
-  //     console.log("Error while fetching surveys at home: ", error);
-  //   }
-  // };
-
   return (
     <div className="home-page w-full flex flex-col items-center">
-      <div className="w-full mb-20">
-        <img src={TopBanner} className="w-full" />
-      </div>
       {user ? (
         <div className="features w-full">
+          <div className="w-full mb-20 relative">
+            <img src={TopBanner} className="w-full object-cover" />
+            <div className="absolute top-0 left-0 right-0 bottom-0 bg-[#3e5dab]/35 z-10 p-20 flex flex-col items-center justify-center gap-10">
+              <div className="bg-[#FFC40D] rounded-lg p-5">
+                <p className="text-[#3e5dab] text-4xl font-extrabold">
+                  DANH SÁCH KHẢO SÁT PHÙ HỢP VỚI BẠN!
+                </p>
+              </div>
+
+              {/* <div className="bg-white/20 p-2 rounded-xl border-1 border-white">
+                <img src={Gif2} className="w-[700px] object-cover" />
+              </div> */}
+            </div>
+          </div>
+
           <div className="features-div w-full flex flex-col items-start p-12">
             <p className="features-div___title">Suit You Best!</p>
             {isLoadingFeatureSurveys && !isFetched ? (
               <CircularProgress />
+            ) : suitYouBest && suitYouBest.length === 0 ? (
+              <div className="w-full flex-1 flex flex-col gap-4 items-center justify-center mt-10">
+                <img src={NotFoundImg} className="w-[200px] h-[200px]" />
+                <p className="font-bold text-gray-400">
+                  Chưa có khảo sát nào phù hợp với bạn
+                </p>
+              </div>
             ) : (
-              suitYouBest && suitYouBest.length === 0 ? (
-                <div className="w-full flex-1 flex flex-col gap-4 items-center justify-center mt-10">
-                  <img src={NotFoundImg} className="w-[200px] h-[200px]" />
-                  <p className="font-bold text-gray-400">
-                    Chưa có khảo sát nào phù hợp với bạn
-                  </p>
-                </div>
-              ) : (
-                <SurveysCarousel prefix="suityoubest" data={suitYouBest} />
-              )
+              <SurveysCarousel prefix="suityoubest" data={suitYouBest} />
             )}
           </div>
 
@@ -144,17 +139,15 @@ const HomePage: FC<HomePageProps> = () => {
             <p className="features-div___title">Big bonus!</p>
             {isLoadingFeatureSurveys && !isFetched ? (
               <CircularProgress />
+            ) : bigBonus && bigBonus.length === 0 ? (
+              <div className="w-full flex-1 flex flex-col gap-4 items-center justify-center mt-10">
+                <img src={NotFoundImg} className="w-[200px] h-[200px]" />
+                <p className="font-bold text-gray-400">
+                  Chưa có khảo sát nào big bonus
+                </p>
+              </div>
             ) : (
-              bigBonus && bigBonus.length === 0 ? (
-                <div className="w-full flex-1 flex flex-col gap-4 items-center justify-center mt-10">
-                  <img src={NotFoundImg} className="w-[200px] h-[200px]" />
-                  <p className="font-bold text-gray-400">
-                    Chưa có khảo sát nào big bonus
-                  </p>
-                </div>
-              ) : (
-                <SurveysCarousel prefix="bigbonus" data={bigBonus} />
-              )
+              <SurveysCarousel prefix="bigbonus" data={bigBonus} />
             )}
           </div>
 
@@ -164,138 +157,171 @@ const HomePage: FC<HomePageProps> = () => {
             </p>
             {isLoadingFeatureSurveys && !isFetched ? (
               <CircularProgress />
+            ) : baseOnFavTopic && baseOnFavTopic.length === 0 ? (
+              <div className="w-full flex-1 flex flex-col gap-4 items-center justify-center mt-10">
+                <img src={NotFoundImg} className="w-[200px] h-[200px]" />
+                <p className="font-bold text-gray-400">
+                  Chưa có khảo sát nào phù hợp với chủ đề yêu thích của bạn
+                </p>
+              </div>
             ) : (
-              baseOnFavTopic && baseOnFavTopic.length === 0 ? (
-                <div className="w-full flex-1 flex flex-col gap-4 items-center justify-center mt-10">
-                  <img src={NotFoundImg} className="w-[200px] h-[200px]" />
-                  <p className="font-bold text-gray-400">
-                    Chưa có khảo sát nào phù hợp với chủ đề yêu thích của bạn
-                  </p>
-                </div>
-              ) : (
-                <SurveysCarousel prefix="base" data={baseOnFavTopic} />
-              )
+              <SurveysCarousel prefix="base" data={baseOnFavTopic} />
             )}
           </div>
         </div>
       ) : (
         <>
-          <p className="home-page__title mt-10 mx-10">
-            Tạo khảo sát một cách khác biệt và thú vị
-          </p>
-          <p className="home-page__sub-title mx-10">
-            Tạo các cuộc khảo sát được thiết kế để cung cấp cho bạn nhiều dữ
-            liệu hơn và tốt hơn.
-          </p>
-          <div className="my-5 py-10 px-20 mx-10">
-            <img src={Gif1} />
-          </div>
-
-          <div className="progress-visualize w-full flex flex-col items-center mx-10">
-            <p className="progress-visualize__title">
-              Với giao diện thân thiện với người dùng, bạn sẽ nhận được các phản
-              hồi khảo sát và ý kiến phản hồi được cải thiện đáng kể.
+          {/* Title Section */}
+          <div className="max-w-7xl mx-auto px-4 md:px-10">
+            <h1 className="home-page__title text-3xl md:text-5xl font-bold text-[#3E5DAB] text-center mt-10 mb-4 animate-fadeIn">
+              Tạo khảo sát một cách khác biệt và thú vị
+            </h1>
+            <p className="home-page__sub-title text-lg md:text-xl text-gray-600 text-center mb-10">
+              Tạo các cuộc khảo sát được thiết kế để cung cấp cho bạn nhiều dữ
+              liệu hơn và tốt hơn.
             </p>
-            <div className="progress-visualize__image w-11/12 p-10 rounded-md my-5 flex items-center justify-around">
-              {progressVisualizeSteps.map((p) => (
-                <>
-                  <div className="progress-visualize__image__icons flex flex-col items-center gap-1">
-                    <div className="progress-visualize__image__icons__container flex p-7 items-center justify-center">
-                      {p.icon}
-                    </div>
-                    <p className="progress-visualize__image__icons__text">
-                      {p.name}
-                    </p>
-                  </div>
-                  {p.index !== 3 && <div className="divider w-72 h-0.5"></div>}
-                </>
-              ))}
+            {/* GIF Section */}
+            <div className="my-5 py-5 md:py-10 flex justify-center">
+              <img
+                src={Gif1}
+                alt="Survey Creation Animation"
+                className="rounded-lg shadow-lg w-full mx-auto"
+              />
             </div>
           </div>
-
-          <div className="benefit w-full flex flex-col items-center gap-3 p-14 mt-20 mx-10">
-            {benefitData.map((b) =>
-              b.index % 2 === 0 ? (
-                <div
-                  className="benefit__container w-full grid grid-cols-2"
-                  key={b.index}
-                >
-                  {/* Nội dung cho benefit với index chẵn */}
-                  <div className="benefit__container__text w-full flex flex-col items-center justify-center">
-                    <div className="benefit__container__text__title">
-                      <p>{b.title}</p>
+          {/* Progress Visualize Section */}
+          <div className="progress-visualize w-full flex flex-col items-center bg-gray-50 py-16 px-4 mt-10">
+            <div className="max-w-7xl mx-auto">
+              <p className="progress-visualize__title text-xl md:text-2xl text-center text-gray-700 mb-10 max-w-4xl mx-auto">
+                Với giao diện thân thiện với người dùng, bạn sẽ nhận được các
+                phản hồi khảo sát và ý kiến phản hồi được cải thiện đáng kể.
+              </p>
+              <div className="progress-visualize__image w-full bg-white p-6 md:p-10 rounded-xl shadow-md my-5 grid grid-cols-5 ">
+                {progressVisualizeSteps.map((p, index) => (
+                  <Fragment key={p.index}>
+                    <div className="progress-visualize__image__icons flex flex-col items-center justify-center gap-3 py-4">
+                      <div className="progress-visualize__image__icons__container flex p-5 items-center justify-center bg-white rounded-full shadow-md hover:shadow-lg transition-shadow duration-300">
+                        {p.icon}
+                      </div>
+                      <p className="progress-visualize__image__icons__text text-lg font-semibold text-[#3E5DAB]">
+                        {p.name}
+                      </p>
                     </div>
-                    <p className="benefit__container__text__sub-title">
-                      {b.description}
-                    </p>
-                  </div>
-                  <div className="w-full flex items-center justify-end">
-                    <img src={b.imageUrl} alt={b.title} />
-                  </div>
-                </div>
-              ) : (
-                <div
-                  className="benefit__container w-full grid grid-cols-2"
-                  key={b.index}
-                >
-                  {/* Nội dung cho benefit với index lẻ */}
-                  <div className="w-full flex items-center justify-start">
-                    <img src={b.imageUrl} alt={b.title} />
-                  </div>
-                  <div className="benefit__container__text w-full flex flex-col items-center gap-2 justify-center">
-                    <div className="benefit__container__text__title">
-                      <p>{b.title}</p>
+                    {index < progressVisualizeSteps.length - 1 && (
+                      <div className="flex items-center justify-center">
+                        <div className="divider w-0.5 h-16 md:w-24 md:h-0.5 bg-gray-300 my-2 md:my-0"></div>
+                      </div>
+                    )}
+                  </Fragment>
+                ))}
+              </div>
+            </div>
+          </div>
+          {/* Benefits Section */}
+          <div className="benefit w-full flex flex-col items-center gap-16 py-16 px-4 mt-10 max-w-7xl mx-auto">
+            {benefitData.map((b) => (
+              <div
+                className={`benefit__container w-full grid grid-cols-1 ${
+                  b.index % 2 === 0
+                    ? "md:grid-cols-[1fr_1fr]"
+                    : "md:grid-cols-[1fr_1fr]"
+                } gap-8 items-center`}
+                key={b.index}
+              >
+                {b.index % 2 === 0 ? (
+                  <>
+                    <div className="benefit__container__text w-full flex flex-col items-center md:items-start justify-center">
+                      <div className="benefit__container__text__title mb-4">
+                        <h3 className="text-2xl md:text-3xl font-bold text-[#3E5DAB]">
+                          {b.title}
+                        </h3>
+                      </div>
+                      <p className="benefit__container__text__sub-title text-gray-600 text-lg">
+                        {b.description}
+                      </p>
                     </div>
-                    <p className="benefit__container__text__sub-title">
-                      {b.description}
-                    </p>
-                  </div>
-                </div>
-              )
-            )}
-
-            <div className="w-full flex items-center justify-center mt-20">
+                    <div className="w-full flex items-center justify-center md:justify-end">
+                      <img
+                        src={b.imageUrl}
+                        alt={b.title}
+                        className="rounded-lg shadow-lg max-w-full"
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-full flex items-center justify-center md:justify-start order-last md:order-first">
+                      <img
+                        src={b.imageUrl}
+                        alt={b.title}
+                        className="rounded-lg shadow-lg max-w-full"
+                      />
+                    </div>
+                    <div className="benefit__container__text w-full flex flex-col items-center md:items-start gap-2 justify-center">
+                      <div className="benefit__container__text__title mb-4">
+                        <h3 className="text-2xl md:text-3xl font-bold text-[#3E5DAB]">
+                          {b.title}
+                        </h3>
+                      </div>
+                      <p className="benefit__container__text__sub-title text-gray-600 text-lg">
+                        {b.description}
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+            {/* CTA Button */}
+            <div className="w-full flex items-center justify-center mt-10">
               <LinkButton
                 title="TẠO KHẢO SÁT NGAY"
                 backgroundColor="#3E5DAB"
                 color="white"
-                link="/createSurveys"
+                link="/survey/new"
+                // className="animate-bounce"
               />
             </div>
           </div>
-
-          <div className="mx-10">
-            <div className="banner w-full px-10 py-10 my-30 rounded-md flex justify-center items-center">
-              <p className="banner__text">
+          {/* Banner */}
+          <div className="w-full px-4 max-w-7xl mx-auto my-16">
+            <div className="banner w-full px-6 py-10 md:px-10 md:py-16 rounded-xl flex justify-center items-center bg-gradient-to-r from-[#3E5DAB] to-[#2d4580] shadow-lg">
+              <p className="banner__text text-xl md:text-3xl font-bold text-white text-center">
                 Hãy thử tạo những khảo sát mới mẻ và khác biệt!
               </p>
             </div>
           </div>
-
-          <div className="sub-footer w-full flex flex-col items-center py-20">
-            <p className="sub-footer__title">
-              Bạn trả lời, chúng tôi trả tiền—đơn giản vậy thôi!
-            </p>
-            <p className="sub-footer__sub-title">
-              Một nền tảng giúp bạn kiếm tiền từ dữ liệu!
-            </p>
-            <p className="sub-footer__sub-title">
-              Người dùng có thể bán dữ liệu dưới hai hình thức: tham gia khảo
-              sát hoặc giao dịch cổ phiếu dữ liệu.
-            </p>
-            <div className="w-1/3 flex justify-around items-center mt-10">
-              <LinkButton
-                title="Khám Phá"
-                color="#3E5DAB"
-                backgroundColor="white"
-                link="/explore"
-              />
-              <LinkButton
-                title="Liên Hệ"
-                color="#3E5DAB"
-                backgroundColor="white"
-                link="/contact"
-              />
+          {/* Sub-footer */}
+          <div className="sub-footer w-full flex flex-col items-center py-16 px-4 bg-gray-50">
+            <div className="max-w-7xl mx-auto text-center">
+              <h2 className="sub-footer__title text-2xl md:text-4xl font-bold text-[#3E5DAB] mb-4">
+                Bạn trả lời, chúng tôi trả tiền—đơn giản vậy thôi!
+              </h2>
+              <p className="sub-footer__sub-title text-lg md:text-xl text-gray-700 mb-2">
+                Một nền tảng giúp bạn kiếm tiền từ dữ liệu!
+              </p>
+              <p className="sub-footer__sub-title text-lg md:text-xl text-gray-700 mb-10">
+                Người dùng có thể bán dữ liệu dưới hai hình thức:{" "}
+                <strong className="text-[#FFC40D]">Tham gia khảo sát</strong>{" "}
+                hoặc{" "}
+                <strong className="text-[#FFC40D]">
+                  Giao dịch cổ phiếu dữ liệu
+                </strong>
+                .
+              </p>
+              <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-10">
+                <LinkButton
+                  title="Khám Phá"
+                  color="#3E5DAB"
+                  backgroundColor="white"
+                  link="/explore"
+                />
+                <LinkButton
+                  title="Liên Hệ"
+                  color="#3E5DAB"
+                  backgroundColor="white"
+                  link="/contact"
+                />
+              </div>
             </div>
           </div>
         </>
