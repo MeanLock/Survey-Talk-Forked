@@ -856,7 +856,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                     SurveyTypeId = 1, // Filter survey type id
                     SurveyStatusIds = new List<int> { 1, 2, 3, 4, 5 }, // Only get surveys with status "Draft"
                     IsDeletedContain = true,
-                    IsAvailable = true,
+                    // IsAvailable = true,
                 };
                 bool isSurveyPrivateDataTaken = true;
 
