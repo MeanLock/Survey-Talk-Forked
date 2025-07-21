@@ -100,7 +100,7 @@ const calculateChoiceResponses = (question: Question, responses: ApiResponse[], 
   if (responses.length > 0) {
     try {
       const firstResponse = JSON.parse(responses[0].ValueJsonString)
-      optionsFromResponses = firstResponse.questionContent?.options || []
+      optionsFromResponses = firstResponse.QuestionContent?.Options || []
       console.log("Options from response:", optionsFromResponses)
     } catch (error) {
       console.error("Error parsing first response for options:", error)
@@ -127,20 +127,20 @@ const calculateChoiceResponses = (question: Question, responses: ApiResponse[], 
   responses.forEach((response) => {
     try {
       const parsedValue = JSON.parse(response.ValueJsonString)
-      const questionResponse = parsedValue.questionResponse
+      const questionResponse = parsedValue.QuestionResponse
 
-      console.log(`Processing response: ${response.ValueJsonString}`)
+      console.log(`Processing response: parsedValue`, parsedValue)
       console.log("Question response:", questionResponse)
 
       if (question.QuestionTypeId === 1) {
         // Single Choice - get from singleChoice field
-        const optionId = questionResponse.singleChoice
+        const optionId = questionResponse.SingleChoice
         if (optionId && optionCounts.hasOwnProperty(optionId)) {
           optionCounts[optionId]++
         }
       } else if (question.QuestionTypeId === 2) {
         // Multiple Choice - get from multipleChoice field (should be array)
-        const selectedOptions = questionResponse.multipleChoice
+        const selectedOptions = questionResponse.MultipleChoice
         if (Array.isArray(selectedOptions)) {
           selectedOptions.forEach((optionId) => {
             if (optionCounts.hasOwnProperty(optionId)) {
@@ -192,9 +192,9 @@ const calculateSliderResponses = (question: Question, responses: ApiResponse[], 
     responses.forEach((response) => {
       try {
         const parsedValue = JSON.parse(response.ValueJsonString)
-        const questionResponse = parsedValue.questionResponse
+        const questionResponse = parsedValue.QuestionResponse
 
-        const inputValue = questionResponse.input?.value
+        const inputValue = questionResponse.Input?.Value
         if (inputValue !== null && inputValue !== undefined) {
           const numValue = typeof inputValue === "number" ? inputValue : Number.parseFloat(inputValue)
           if (!isNaN(numValue)) {
@@ -263,8 +263,8 @@ const calculateSliderResponses = (question: Question, responses: ApiResponse[], 
     try {
       if (question.ConfigJsonString) {
         const config = JSON.parse(question.ConfigJsonString)
-        configMin = config.min || 0
-        configMax = config.max || 100
+        configMin = config.Min  || 0
+        configMax = config.Max || 100
       }
     } catch (error) {
       console.error("Error parsing config:", error)
@@ -273,12 +273,12 @@ const calculateSliderResponses = (question: Question, responses: ApiResponse[], 
     responses.forEach((response) => {
       try {
         const parsedValue = JSON.parse(response.ValueJsonString)
-        const questionResponse = parsedValue.questionResponse
+        const questionResponse = parsedValue.QuestionResponse
 
-        const rangeValue = questionResponse.range
+        const rangeValue = questionResponse.Range
         if (rangeValue && typeof rangeValue === "object") {
-          const minValue = rangeValue.min
-          const maxValue = rangeValue.max
+          const minValue = rangeValue.Min
+          const maxValue = rangeValue.Max
 
           if (minValue !== null && minValue !== undefined && maxValue !== null && maxValue !== undefined) {
             const numMin = typeof minValue === "number" ? minValue : Number.parseFloat(minValue)
@@ -363,10 +363,10 @@ const calculateRatingResponses = (question: Question, responses: ApiResponse[], 
   responses.forEach((response) => {
     try {
       const parsedValue = JSON.parse(response.ValueJsonString)
-      const questionResponse = parsedValue.questionResponse
+      const questionResponse = parsedValue.QuestionResponse
 
       // Rating is stored in input.value
-      const rating = questionResponse.input?.value
+      const rating = questionResponse.Input?.Value
       const ratingNum = typeof rating === "number" ? rating : Number.parseInt(rating)
 
       if (ratingNum >= 1 && ratingNum <= 5) {
@@ -399,10 +399,10 @@ const calculateTextResponses = (question: Question, responses: ApiResponse[], to
     .map((response, index) => {
       try {
         const parsedValue = JSON.parse(response.ValueJsonString)
-        const questionResponse = parsedValue.questionResponse
+        const questionResponse = parsedValue.QuestionResponse
 
         // Text is stored in input.value
-        const content = questionResponse.input?.value
+        const content = questionResponse.Input?.Value
         const textContent = typeof content === "string" ? content : String(content)
 
         return {
@@ -456,14 +456,14 @@ const calculateRankingResponses = (question: Question, responses: ApiResponse[],
   responses.forEach((response) => {
     try {
       const parsedValue = JSON.parse(response.ValueJsonString)
-      const questionResponse = parsedValue.questionResponse
+      const questionResponse = parsedValue.QuestionResponse
 
       // Ranking is stored in ranking array with surveyOptionId and rankIndex
-      const rankings = questionResponse.ranking
+      const rankings = questionResponse.Ranking
       if (Array.isArray(rankings)) {
         rankings.forEach((rankItem: any) => {
-          const optionId = rankItem.surveyOptionId
-          const rankIndex = rankItem.rankIndex
+          const optionId = rankItem.SurveyOptionId
+          const rankIndex = rankItem.RankIndex
 
           if (optionRankings[optionId] && !isNaN(rankIndex)) {
             optionRankings[optionId].push(rankIndex)
