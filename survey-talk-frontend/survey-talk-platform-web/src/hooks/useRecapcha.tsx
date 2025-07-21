@@ -231,7 +231,7 @@ function TurnstileWidget({
 
         <div style={turnstileContainerStyle}>
           <Turnstile
-            sitekey="0x4AAAAAABhydonhR97dh7qM"
+            sitekey="0x4AAAAAABl2UhtPeoGdQS-h"
             onSuccess={handleSuccess}
             onError={handleError}
             onExpire={handleExpire}
