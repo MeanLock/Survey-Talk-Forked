@@ -20,7 +20,7 @@ const EndPage = ({ formData, defaultBackgroundThemes }: Props) => {
     if (formData.Id) {
       const url = routesMap.SurveyCustomer.replace(
         "/:id/taking",
-        `/${formData.Id}/taking?taking_subject=Preview`
+        `#/survey/${formData.Id}/taking?taking_subject=Preview`
       );
       window.open(url, "_blank");
     }

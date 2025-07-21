@@ -201,9 +201,11 @@ const SurveyNew = () => {
         latestDataRef.current = sentBody;
         console.log("sentBody: ", sentBody);
         setIsSucces(responseData?.IsSuccess);
-        const currentPath = window.location.pathname;
+           const currentPath = location.pathname;
+        console.log("currentPath: ", currentPath);
+
         if (!id && currentPath.endsWith('/survey/new')) {
-          window.history.pushState({}, "", `/survey/${sentBody.Id}/editing`);
+          window.history.pushState({}, "", `#/survey/${sentBody.Id}/editing`);
         }
       },
       onError(error) {
@@ -222,9 +224,10 @@ const SurveyNew = () => {
         setIsApiCalling(false);
         latestDataRef.current = sentBody;
         setIsSucces(responseData?.IsSuccess);
-        const currentPath = window.location.pathname;
+        const currentPath = location.pathname;
+        console.log("currentPath: ", currentPath);
         if (!id && currentPath.endsWith('/survey/new')) {
-          window.history.pushState({}, "", `/survey/${sentBody.Id}/editing`);
+          window.history.pushState({}, "", `#/survey/${sentBody.Id}/editing`);
         }
       },
       onError(error: any) {
