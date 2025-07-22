@@ -141,7 +141,6 @@ const ProfilePage = () => {
         },
       });
       if (response && response.success) {
-        alert("Ê");
         toast.success("Cập nhật ảnh thành công!");
         navigate(0);
       }
@@ -418,7 +417,7 @@ const ProfilePage = () => {
                         </Button>
                         <Button
                           onClick={handleProfileUpdate}
-                          className="px-8 bg-[#3e5dab] hover:bg-[#2d4491]"
+                          className="px-8 !bg-[#3e5dab] !hover:bg-[#2d4491] !text-white"
                           disabled={!isChanged}
                         >
                           Lưu các thay đổi

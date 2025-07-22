@@ -115,7 +115,7 @@ export const SegmentAge: React.FC<Props> = ({ value, onChangeValue }) => {
                     }
                     className="ml-2 hover:text-red-600 transition-colors"
                   >
-                    <X className="w-3 h-3" />
+                    <X className="w-3 h-3 !bg-transparent !hover:bg-gray-400" />
                   </button>
                 </Badge>
               ))}

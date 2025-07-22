@@ -370,8 +370,9 @@ const LoginPage: FC<LoginPageProps> = (props) => {
           <button
             onClick={() => handleLoginManual()}
             className="login-form__button mb-5"
+            disabled={manualLoading}
           >
-            ĐĂNG NHẬP
+            {manualLoading ? "Đang Đăng Nhập ..." : "ĐĂNG NHẬP"}
           </button>
 
           <div className="oauth mb-5">

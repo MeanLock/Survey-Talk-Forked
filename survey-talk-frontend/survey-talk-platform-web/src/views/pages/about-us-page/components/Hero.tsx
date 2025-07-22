@@ -28,7 +28,7 @@ export function Hero() {
             </p>
             <button
               onClick={() => handleStart()}
-              className="bg-[#FFC40D] hover:bg-[#e6b00c] text-[#3E5DAB] font-bold px-8 py-4 rounded-lg text-lg shadow-lg transition-all transform hover:scale-105"
+              className="!bg-[#FFC40D] !hover:bg-[#e6b00c] !text-[#3E5DAB] font-bold px-8 py-4 rounded-lg text-lg shadow-lg transition-all transform hover:scale-105"
             >
               Bắt đầu ngay
             </button>

@@ -148,7 +148,7 @@ const DefaultLayout = () => {
               navigate("/survey/filter-survey");
             } else {
               console.log("Hủy cập nhật thông tin: ", result.isConfirmed);
-              alert("Ê");
+             
               dispatch(clearAuthToken());
               navigate("/login");
             }

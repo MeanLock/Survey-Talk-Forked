@@ -1,7 +1,7 @@
 .level-container {
   display: flex;
   align-items: center;
-  width: 123px;
+  width: 130px;
   height: 23px;
   background-color: app_vars.$text-white;
   border-radius: 12px; // Bo góc tròn cho thanh
@@ -23,7 +23,7 @@
 .progress-bar-active {
   height: 100%;
   background-color: app_vars.$bg-secondary; // Màu vàng (hoặc app_vas.$text-secondary)
-  border-radius: 12px;
+  // border-radius: 12px;
   position: relative;
   display: flex;
   justify-content: end;
@@ -32,7 +32,6 @@
   color: app_vars.$text-primary; // Màu chữ xanh
   font-weight: bold;
   font-size: 14px;
-  border-radius: 12px;
   transition: width 0.3s ease-in-out;
 }
 
