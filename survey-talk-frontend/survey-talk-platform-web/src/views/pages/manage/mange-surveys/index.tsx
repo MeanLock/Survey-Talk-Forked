@@ -535,7 +535,7 @@ const ManageSurveyPage = () => {
             <Button
               size="sm"
               variant="ghost"
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+              className="absolute !bg-transparent !hover:bg-gray-300 right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
               onClick={handleSearch}
             >
               <Search className="h-4 w-4 !text-blue-600 !bg-transparent" />

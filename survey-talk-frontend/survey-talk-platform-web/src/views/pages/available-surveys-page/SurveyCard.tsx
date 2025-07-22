@@ -14,7 +14,7 @@ interface Props {
 const handleTakeSurvey = () => {
   // Logic to handle taking the survey
   console.log("Taking survey:");
-}
+};
 export const SurveyCard: React.FC<Props> = ({ survey, onShowDetail }) => {
   // FUNCTIONS
   const timeCal = (questionCount: number, security: number) => {
@@ -32,7 +32,8 @@ export const SurveyCard: React.FC<Props> = ({ survey, onShowDetail }) => {
   const topicName = (id: number) => {
     // const name = SurveyTopics.filter((s) => s.id === id)[0].name;
     // return name;
-   return "Chưa xác định";  };
+    return "Chưa xác định";
+  };
 
   return (
     <div
@@ -96,9 +97,9 @@ export const SurveyCard: React.FC<Props> = ({ survey, onShowDetail }) => {
           </div>
 
           <div className="survey-card__topic w-full flex items-center justify-start">
-            <div className="p-2 bg-[#E0E8FF] rounded-md text-[#7A8FC5] flex items-center justify-center">
+            {/* <div className="p-2 bg-[#E0E8FF] rounded-md text-[#7A8FC5] flex items-center justify-center">
               {topicName(survey.SurveyTopicId)}
-            </div>
+            </div> */}
           </div>
 
           <div className="w-full h-[1px] bg-gray-400"></div>
@@ -139,7 +140,8 @@ export const SurveyCard: React.FC<Props> = ({ survey, onShowDetail }) => {
             </div>
 
             <div className="survey-card__actions">
-              <div className="px-3 py-1 bg-[#FF7260] text-white font-bold rounded-md hover:bg-[#EF2D13] cursor-pointer"
+              <div
+                className="px-3 py-1 bg-[#FF7260] text-white font-bold rounded-md hover:bg-[#EF2D13] cursor-pointer"
                 onClick={() =>
                   window.open(
                     `/survey/${survey.Id}/taking?taking_subject=Verified`,
