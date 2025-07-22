@@ -85,7 +85,7 @@ export const SegmentAge: React.FC<Props> = ({ value, onChangeValue }) => {
           <Button
             onClick={handleAddAgeRange}
             disabled={!minAge || !maxAge}
-            className="bg-[#FFC40D] hover:bg-[#FFC40D]/90 text-black font-medium"
+            className="!bg-[#FFC40D] !hover:bg-[#FFC40D]/90 !text-black font-medium"
           >
             <Plus className="w-4 h-4 mr-1" />
             Thêm
@@ -113,7 +113,7 @@ export const SegmentAge: React.FC<Props> = ({ value, onChangeValue }) => {
                         } tuổi`
                       )
                     }
-                    className="ml-2 hover:text-red-600 transition-colors"
+                    className="ml-2 !hover:text-red-600 !bg-transparent !hover:bg-gray-300"
                   >
                     <X className="w-3 h-3 !bg-transparent !hover:bg-gray-400" />
                   </button>
