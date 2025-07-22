@@ -34,7 +34,7 @@ const routes = [
   { path: '/community-survey/detail/:id', name: 'Chi Tiết', element: Community_Survey_Detail_View, role_id: [2], parent: '/community-survey' },
   { path: '/data-market', name: 'Data Market', element: Data_Market_View, role_id: [2] },
   { path: '/data-market/detail/:id', name: 'Chi Tiết', element: Data_Market_Detail_View, role_id: [2], parent: '/data-market' },
-  { path: '/filter-survey/table', name: 'Khảo Sát Lọc', element: Filter_Survey_View, role_id: [2] },
+  { path: '/filter-survey/table', name: 'Khảo Sát Đầu Vào', element: Filter_Survey_View, role_id: [2] },
   { path: '/filter-survey/detail/:id', name: 'Chi Tiết', element: Filter_Survey_Detail_View, role_id: [2], parent: '/filter-survey/table' },
   { path: '/transactions/table', name: 'Giao Dịch', element: Transaction_View, role_id: [2] },
 

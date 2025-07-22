@@ -115,7 +115,6 @@ export const SurveyLayoutHeader: FC<SurveyLayoutHeaderProps> = ({ }) => {
           {...(href && { href, target: "_blank", rel: "noopener noreferrer" })}
           className="d-flex align-items-center nav-item-custom"
         >
-          {icon && <span className="nav-icon">{icon}</span>}
           <span className="nav-text">{name}</span>
           {badge && (
             <CBadge color={badge.color} size="sm" className="nav-badge">

@@ -604,7 +604,7 @@ any) {
   return (
     <>
       <div className="config-section">
-        <h5 className="text-left" >CHỦ ĐỀ KHẢO SÁT</h5>
+        <h6 className="text-left" >CHỦ ĐỀ KHẢO SÁT</h6>
         <FormControl
           // disabled={isTrigger}
           fullWidth
@@ -665,7 +665,7 @@ any) {
         </FormControl>
       </div>
       <div className="config-section">
-        <h3  className="text-left" >CHỦ ĐỀ KHẢO SÁT CỤ THỂ</h3>
+        <h6 className="text-left" >CHỦ ĐỀ KHẢO SÁT CỤ THỂ</h6>
         <FormControl
           fullWidth
           sx={{
@@ -872,7 +872,7 @@ function BackgroundMode({
   return (
     <>
       <div>
-        <h3  className="text-left" >SỬ DỤNG HÌNH NỀN</h3>
+        <h6 className="text-left">SỬ DỤNG HÌNH NỀN</h6>
         <div
           className={`background-main-preview ${
             formData?.ConfigJson?.Background === "image" ? "active" : ""
@@ -938,7 +938,7 @@ function BackgroundMode({
       </div>
       {backgroundMode === "image" && (
         <div>
-          <h3  className="text-left" >ĐỘ SÁNG HÌNH NỀN</h3>
+          <h6  className="text-left" >ĐỘ SÁNG HÌNH NỀN</h6>
           <Slider
             value={Brightness}
             onChange={handleBrightnessChange}
@@ -960,7 +960,7 @@ function BackgroundMode({
         </div>
       )}
       <div>
-        <h3  className="text-left" >SỬ DỤNG MÀU NỀN</h3>
+        <h6 className="text-left">SỬ DỤNG MÀU NỀN</h6>
         <div
           className={`background-main-preview ${
             formData?.ConfigJson?.Background === "color_gradient"
