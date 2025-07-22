@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect } from 'react'
-import { createBrowserRouter, HashRouter, Route, RouterProvider, Routes } from 'react-router-dom'
+import { createBrowserRouter, createHashRouter, HashRouter, Route, RouterProvider, Routes } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 import { CSpinner, useColorModes } from '@coreui/react'
@@ -26,7 +26,7 @@ const SurveyCreatePage = React.lazy(() => import("./views/pages/survey/survey-cr
 const SurveyCustomer = React.lazy(() => import("./views/pages/survey/pages/SurveyCustomer/index"))
 const EndSurveyCustomer = React.lazy(() => import("./views/pages/survey/pages/EndSurveyCustomer/index"))
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: '/login',
     element: <Login />,
@@ -44,10 +44,6 @@ const router = createBrowserRouter([
     element: <Page500 />,
   },
   {
-    path: '*',
-    element: <DefaultLayout />,
-  },
-  {
     path: '/survey',
     element: <SurveyLayout />,
     children: [
@@ -55,8 +51,18 @@ const router = createBrowserRouter([
       { path: ':id/editing', element: <SurveyCreatePage /> },
     ],
   },
-        { path: '/survey/:id/taking', element: <SurveyCustomer /> },
-      { path: '/survey/:id/end', element: <EndSurveyCustomer /> },
+  {
+    path: '/survey/:id/taking',
+    element: <SurveyCustomer />
+  },
+  {
+    path: '/survey/:id/end',
+    element: <EndSurveyCustomer />
+  },
+  {
+    path: '*',
+    element: <DefaultLayout />,
+  },
 ])
 const App = () => {
   const { isColorModeSet, setColorMode } = useColorModes('')
@@ -88,7 +94,7 @@ const App = () => {
   }, [uiSlice])
 
   return (
-     <Suspense
+    <Suspense
       fallback={
         <div className="pt-3 text-center">
           <CSpinner color="primary" variant="grow" />

@@ -87,7 +87,7 @@ const segmentData = {
       "Trung học phổ thông",
       "Cao học (Cao đẳng, Học nghề)",
       "Đại học",
-      "Sau Đại học",
+      // "Sau Đại học",
       "Không quan tâm",
     ],
   },

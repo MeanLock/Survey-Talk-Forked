@@ -297,7 +297,7 @@ const AvailableSurveys: React.FC<AvailableSurveyProps> = () => {
       ) : (
         <div className="survey-list-container w-full flex flex-col gap-5">
           <div className="search-and-filter__container w-full flex flex-col">
-            <div className="search-and-filter__actions w-full flex h-9 order-1 border-gray-400 mb-3">
+            {/* <div className="search-and-filter__actions w-full flex h-9 order-1 border-gray-400 mb-3">
               <SearchSurvey
                 keyword={Keyword}
                 setKeyword={setKeyword}
@@ -307,10 +307,10 @@ const AvailableSurveys: React.FC<AvailableSurveyProps> = () => {
                 handleTopicFilterChange={handleTopicFilterChange}
                 handleSearchAPI={handleSearchAPI}
               />
-            </div>
+            </div> */}
           </div>
 
-          <div className="search-and-filter__data-display w-full flex items-center gap-2">
+          {/* <div className="search-and-filter__data-display w-full flex items-center gap-2">
             {Additional !== "" && (
               <div className="p-2 bg-[#FBEFC7] rounded-md text-[#EAB308] flex items-center justify-center">
                 {Additional}
@@ -335,7 +335,7 @@ const AvailableSurveys: React.FC<AvailableSurveyProps> = () => {
                 Clear Filters
               </Button>
             )}
-          </div>
+          </div> */}
 
           <div className="count-and-sort__container w-full flex items-center justify-between">
             <div className="count flex items-center gap-1 text-2xl font-bold">

@@ -94,7 +94,7 @@ const state_creator = (surveys: FilterSurvey[], navigate: (path: any) => void) =
                             </CButton>
                             <CButton variant="ghost" size="sm" className="survey-card__action-btn mt-n2 text-primary"
                                 onClick={() => {
-                                    window.open(`/survey/${surveyId}/editing`, '_blank');
+                                    window.open(`#/survey/${surveyId}/editing`, '_blank');
                                 }}>
                                 <EditOutlinedIcon />
                             </CButton>
@@ -154,7 +154,7 @@ const FilterSurveyView: FC<FilterSurveyViewProps> = () => {
                 <CRow>
                     <div className="filter-survey__header mb-4 mt-4">
                         <h3 className="filter-survey__header-title mb-5">Danh Sách Khảo Sát Đầu Vào</h3>
-                        <CButton className="filter-survey__header-button mt-5" onClick={() => window.open('/survey/new')}>
+                        <CButton className="filter-survey__header-button mt-5" onClick={() => window.open('#/survey/new')}>
                             Tạo Mới
                         </CButton>
                     </div>

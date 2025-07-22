@@ -60,9 +60,7 @@ const ManageSurveyPage = () => {
   // STATES
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [surveys, setSurveys] = useState<any | null>(null);
-  const [filteredSurveys, setFilteredSurveys] = useState<any | null>(
-    null
-  );
+  const [filteredSurveys, setFilteredSurveys] = useState<any | null>(null);
   const [selectedSurvey, setSelectedSurvey] = useState<any | null>(null);
   const [topics, setTopics] = useState<SurveyTopic[]>([]);
   const [selectedTopics, setSelectedTopics] = useState<SurveyTopic[]>([]);
@@ -537,10 +535,10 @@ const ManageSurveyPage = () => {
             <Button
               size="sm"
               variant="ghost"
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+              className="absolute !bg-transparent !hover:bg-gray-300 right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
               onClick={handleSearch}
             >
-              <Search className="h-4 w-4 text-blue-600" />
+              <Search className="h-4 w-4 !text-blue-600 !bg-transparent" />
             </Button>
           </div>
         </div>
@@ -624,7 +622,7 @@ const ManageSurveyPage = () => {
         <div className="w-full mt-10">
           {filteredSurveys && filteredSurveys.length > 0 ? (
             <div className="grid grid-cols-4 gap-5">
-              {filteredSurveys.map((s:any, index: number) => (
+              {filteredSurveys.map((s: any, index: number) => (
                 <SurveyMeCard
                   key={index}
                   data={s}

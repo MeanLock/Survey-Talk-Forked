@@ -41,7 +41,7 @@ export const routes = [
     },
     {
         name: "SurveyCustomer",
-        path: "/survey/:id/taking", //Thịnh, đổi đường dẫn từ /survey/taking/:id sang /survey/:id/taking
+        path: "/:id/taking", //Thịnh, đổi đường dẫn từ /survey/taking/:id sang /survey/:id/taking
         element: <SurveyCustomer />,
         requiresAuth: false,
     },

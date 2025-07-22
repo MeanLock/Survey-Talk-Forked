@@ -107,7 +107,7 @@ const QRModal: FC<QRModalProps> = ({ visible, onClose, transaction, onConfirm, o
           </p>
         </div>
 
-        <div className="mb-4">
+        <div className="mb-4 flex flex-column align-items-center">
           <h6>Mã QR chuyển khoản</h6>
           <img
             src={qrUrl || "/placeholder.svg"}

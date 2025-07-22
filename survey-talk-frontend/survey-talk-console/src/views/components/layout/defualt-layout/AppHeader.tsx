@@ -173,7 +173,7 @@ const AppHeader = () => {
               <CButton onClick={handleLogout} title='logout' className='bg-danger btn-sm fw-bold '>
                 LOG OUT
                 {/* <SignOut className='fw-bold' size={25} color="hotpink" weight="bold" /> */}
-                <IconNfcOff stroke={1} accentHeight={12} width={20} height={20} />
+                {/* <IconNfcOff stroke={1} accentHeight={12} width={20} height={20} /> */}
               </CButton>
             </CNavItem>
           </CHeaderNav>

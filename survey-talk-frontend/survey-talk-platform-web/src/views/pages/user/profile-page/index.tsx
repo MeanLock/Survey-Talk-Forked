@@ -29,6 +29,10 @@ const ProfilePage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isChanged, setIsChanged] = useState(false);
   const dispatch = useDispatch();
+
+  // TEST ERROR: Uncomment the line below to trigger "Cannot read properties" error
+  // const testError = null.someProperty.anotherProperty; // This will throw immediately
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -141,7 +145,6 @@ const ProfilePage = () => {
         },
       });
       if (response && response.success) {
-        alert("Ê");
         toast.success("Cập nhật ảnh thành công!");
         navigate(0);
       }
@@ -182,9 +185,11 @@ const ProfilePage = () => {
 
   return (
     <div className="w-full flex flex-col items-start p-10 bg-gray-50 min-h-screen">
-      <p className="font-bold text-[36px] text-[#3e5dab] mb-10">
-        Trang quản lý thông tin cá nhân
-      </p>
+      <div className="flex items-center justify-between w-full mb-10">
+        <p className="font-bold text-[36px] text-[#3e5dab]">
+          Trang quản lý thông tin cá nhân
+        </p>
+      </div>
 
       {isLoadingProfiles ? (
         <div className="w-full h-56 flex flex-col items-center justify-center">
@@ -418,7 +423,7 @@ const ProfilePage = () => {
                         </Button>
                         <Button
                           onClick={handleProfileUpdate}
-                          className="px-8 bg-[#3e5dab] hover:bg-[#2d4491]"
+                          className="px-8 !bg-[#3e5dab] !hover:bg-[#2d4491] !text-white"
                           disabled={!isChanged}
                         >
                           Lưu các thay đổi
