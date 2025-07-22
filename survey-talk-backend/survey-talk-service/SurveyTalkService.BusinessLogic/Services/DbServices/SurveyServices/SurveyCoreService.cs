@@ -777,7 +777,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                 if (dacAccounts.Count == 0)
                 {
                     trList.Add(0);
-                    Console.WriteLine($"Ngày: {day:yyyy-MM-dd}, DAC: 0, TR: 0");
+                    // Console.WriteLine($"Ngày: {day:yyyy-MM-dd}, DAC: 0, TR: 0");
                     continue;
                 }
 
@@ -787,20 +787,20 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                     .Select(str => str.TakerId)
                     .Distinct()
                     .ToList();
-                float trn = dacAccounts.Count > 0 ? (float)datAccounts.Count / dacAccounts.Count : 0;
+                // float trn = dacAccounts.Count > 0 ? (float)datAccounts.Count / dacAccounts.Count : 0;
+                float trn = dacAccounts.Count > 0 ? (float)datAccounts.Count / (float)dacAccounts.Count : 0;
+
+
                 trList.Add(trn);
 
-                // in kết quả tổng hết ngày
-                Console.WriteLine($"Ngày: {day:yyyy-MM-dd}, DAC: {dacAccounts.Count}, TR: {trn}");
             }
-
-
 
             // Tính trung bình DAC và TR
             float avgDAC = dacList.Count > 0 ? (float)dacList.Average() : 0;
             float avgTR = trList.Count > 0 ? trList.Average() : 0;
+
             float R = avgDAC * avgTR;
-            return R;
+            return R == 0 ? 0.07f : R;
         }
 
 
@@ -1370,6 +1370,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
                     {
                         Kpi = surveyPrivateData.Kpi,
                         ExtraPrice = surveyPrivateData.ExtraPrice,
+                        TheoryPrice = surveyPrivateData.TheoryPrice,          
                         CreatedAt = surveyPrivateData.CreatedAt,
                         UpdatedAt = surveyPrivateData.UpdatedAt,
                     };
@@ -1626,7 +1627,7 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.SurveyServices
 
 
 
-                    if (survey.SurveyTypeId == 1 )
+                    if (survey.SurveyTypeId == 1)
                     {
                         // kiểm tra survey status
                         if (currentSurveyStatus?.SurveyStatusId == 2)
