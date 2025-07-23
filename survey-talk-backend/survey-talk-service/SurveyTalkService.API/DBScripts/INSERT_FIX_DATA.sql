@@ -23,7 +23,7 @@ INSERT INTO SurveyTopic (name) VALUES
 (N'Du lịch & Giải trí'),
 (N'Xã hội & Hành vi'),
 (N'Môi trường'),
-(N'Chinhs trị & Pháp luật');
+(N'Chính trị & Pháp luật');
 
 
 INSERT INTO SurveySpecificTopic (name, surveyTopicId) VALUES

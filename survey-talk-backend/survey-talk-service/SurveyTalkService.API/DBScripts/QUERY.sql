@@ -2,6 +2,7 @@
 use SurveyTalkDB_test_1
 
 SELECT * from Account
+SELECT * from PlatformFeedback
 SELECT * from AccountOnlineTracking
 SELECT * from FilterTag
 SELECT * from TakerTagFilter 
@@ -19,7 +20,7 @@ SELECT * from AccountProfile where accountid = 3
 SELECT * from SurveyTakerSegment where surveyId = 8
 SELECT * from Survey where surveyTypeId = 1 and id = 1
 SELECT * from SurveyRewardTracking where surveyId = 10
-SELECT * from SurveyStatusTracking where surveyId = 4
+SELECT * from SurveyStatusTracking where surveyId = 326
 
 SELECT * from SurveyGeneralConfig 
 SELECT * from SurveyQuestion
@@ -37,6 +38,8 @@ SELECT * from SurveyTakenResult where surveyId = 283
 SELECT * from SurveyTakenResultTagFilter where surveyTakenResultId =147
 SELECT * from SurveyResponse where SurveyTakenResultId = 1
 SELECT * from AccountBalanceTransaction
+SELECT * from SurveyCommunityTransaction
+
 SELECT * from TransactionType
 DBCC CHECKIDENT ('AccountBalanceTransaction', RESEED, 42);
 
@@ -124,4 +127,14 @@ ADD googleId VARCHAR(250) NULL,
     verifyCode NVARCHAR(250) NULL;
 
 	UPDATE Account SET isVerified = 1;
+
+SELECT 
+    name AS TriggerName,
+    object_id AS TriggerObjectId,
+    parent_class_desc,
+    create_date,
+    modify_date,
+    is_disabled
+FROM sys.triggers;
+
 
