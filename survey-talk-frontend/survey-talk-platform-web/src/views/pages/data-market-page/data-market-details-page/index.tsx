@@ -57,7 +57,7 @@ const DataMarketDetailsPage = () => {
         setIsLoading(false);
       }, 2000);
     } catch (error) {
-      console.log("Lỗi khi fetch DataMarket Details: ", error);
+      //console.log("Lỗi khi fetch DataMarket Details: ", error);
     }
   };
 

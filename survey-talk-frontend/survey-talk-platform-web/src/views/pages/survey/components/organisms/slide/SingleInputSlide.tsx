@@ -32,9 +32,9 @@ const SingleInputSlide = ({ data }: Props) => {
                         type="text"
                         placeholder="Vui lòng nhập tại đây"
                         className="text-input w-full px-5 py-3 border-white border-[1px] outline-none rounded-[4px]"
-                        // style={{
-                        //     color: config?.ConfigJson?.ContentColor || "#000",
-                        // }}
+                        style={{
+                            color: config?.ConfigJson?.ContentColor || "#000",
+                        }}
                         value={
                             data?.ValueJson?.QuestionResponse?.Input?.Value ||
                             ""

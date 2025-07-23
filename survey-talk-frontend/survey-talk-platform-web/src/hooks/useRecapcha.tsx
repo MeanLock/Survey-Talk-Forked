@@ -199,7 +199,7 @@ function TurnstileWidget({
   };
 
   const handleExpire = () => {
-    console.log("Turnstile verification expired");
+    //console.log("Turnstile verification expired");
     setIsVerified(false);
 
     if (turnstileRef.current) {

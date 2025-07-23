@@ -48,9 +48,9 @@ const ResponsesAnalysisTab = () => {
       setLoading(true)
       try {
         const response = await getFilterSurveySummary(managerAxiosInstance, context.survey.Id)
-        console.log("Fetching survey summary for ID:", context.survey.Id)
+        //console.log("Fetching survey summary for ID:", context.survey.Id)
 
-        console.log("API Response:", response.data)
+        //console.log("API Response:", response.data)
 
         if (response.data?.QuestionResponseSummaryLists) {
           const calculatedData = calculateResponseData(

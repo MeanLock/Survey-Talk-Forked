@@ -128,7 +128,7 @@ const PaymentHistoryTab: FC = () => {
 
     useEffect(() => {
         loadAllData()
-        console.log("check")
+        //console.log("check")
     }, [])
 
     return (

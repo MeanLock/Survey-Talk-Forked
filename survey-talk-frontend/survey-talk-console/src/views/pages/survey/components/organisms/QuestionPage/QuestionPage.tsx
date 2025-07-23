@@ -465,7 +465,7 @@ const QuestionPage = ({
         Questions: [{ ...questionDefault, Id: generateUUID(), Order: 1 }],
       }));
     }
-    console.log("formData?.Questions?.length: ", formData);
+    //console.log("formData?.Questions?.length: ", formData);
   }, [formData?.Questions?.length, setFormData]);
 
   const handleUploadImageBase64 = (e: any) => {
@@ -494,7 +494,7 @@ const QuestionPage = ({
       defaultBackgroundThemes
     );
   }, []);
-  console.log("questionedit: ", questionedit);
+  //console.log("questionedit: ", questionedit);
   return (
     <div className="question-page flex flex-col h-full">
       <input type="file" hidden ref={ref} onChange={handleUploadImageBase64} />

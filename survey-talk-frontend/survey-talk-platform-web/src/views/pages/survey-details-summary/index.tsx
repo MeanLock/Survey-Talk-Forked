@@ -24,10 +24,10 @@ const SurveyDetailsPage = () => {
 
   // HOOKS
   useEffect(() => {
-    console.log("Survey ID:", id);
-    console.log("Survey Details: ", SurveyDetails);
-    console.log("\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> \n");
-    console.log("Survey Summaries: ", SurveySummaries);
+    //console.log("Survey ID:", id);
+    //console.log("Survey Details: ", SurveyDetails);
+    //console.log("\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> \n");
+    //console.log("Survey Summaries: ", SurveySummaries);
   }, [id, SurveyDetails, SurveySummaries]);
 
   if (!id) {

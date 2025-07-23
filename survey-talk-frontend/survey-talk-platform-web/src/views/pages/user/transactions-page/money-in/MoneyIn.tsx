@@ -220,7 +220,7 @@ export const MoneyIn: React.FC<Props> = ({ balance }) => {
       });
 
       const updated = await updateRes.json();
-      console.log("✅ Đã cập nhật thành công:", updated);
+      //console.log("✅ Đã cập nhật thành công:", updated);
     } catch (err) {
       console.error("❌ Lỗi khi cập nhật:", err);
     }

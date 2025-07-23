@@ -71,13 +71,13 @@ const ManagePointPage = () => {
           (sum: number, transaction: Transaction) => sum + transaction.Amount,
           0
         );
-        console.log("Total Earned Points: ", response.data.TransactionHistory);
+        //console.log("Total Earned Points: ", response.data.TransactionHistory);
        
         setTotalEarnedPoints(total);
         setIsLoading(false);
       }
     } catch (error) {
-      console.log("Error: ", error);
+      //console.log("Error: ", error);
       setIsLoading(false);
     }
   };

@@ -57,7 +57,7 @@ const Action = ({
 
   const isEnd = useMemo(() => {
     const current = surveyData?.SurveyResponses?.[currentIndex];
-    console.log("current >>> ", current);
+    //console.log("current >>> ", current);
     return current?.isEnd;
   }, [currentIndex, surveyData?.SurveyResponses]);
 

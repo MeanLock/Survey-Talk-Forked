@@ -234,7 +234,7 @@ export default function SurveyFilterPage() {
         toast.error("Lỗi khi fetch thông tin cá nhân của bạn");
       }
     } catch (error) {
-      console.log("Error while fetching data/me: ", error);
+      //console.log("Error while fetching data/me: ", error);
     }
   };
 

@@ -162,7 +162,7 @@ const RegistersPage: FC<RegisterPageProps> = () => {
                       message: "Tên phải có ít nhất 2 ký tự",
                     },
                     pattern: {
-                      value: /^[A-Z]/,
+                      value: /^[A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯẠ-ỹ]/,
                       message: "Chữ cái đầu tiên phải viết hoa",
                     },
                   }}
@@ -232,7 +232,7 @@ const RegistersPage: FC<RegisterPageProps> = () => {
                           className="flex flex-row space-x-6"
                         >
                           <div className="flex items-center space-x-2">
-                            <RadioGroupItem  value="male" id="male" />
+                            <RadioGroupItem value="male" id="male" />
                             <Label htmlFor="male">Nam</Label>
                           </div>
                           <div className="flex items-center space-x-2">

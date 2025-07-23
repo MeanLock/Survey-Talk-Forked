@@ -38,7 +38,7 @@ export function CashFlowChart({ activeTab }: { activeTab: string }) {
   const moneyIn = item.DepositTransactionAmount.toLocaleString('vi-VN') + ' VND';
   const moneyOut = item.WithdrawalTransactionAmount.toLocaleString('vi-VN') + ' VND';
   if (activeTab === 'Daily' || activeTab === 'Weekly') {
-    console.log("Daily or Weekly data:", moneyIn);
+    //console.log("Daily or Weekly data:", moneyIn);
     return [
       `Nạp: ${moneyIn}`,
       `Rút: ${moneyOut}`
@@ -72,7 +72,7 @@ export function CashFlowChart({ activeTab }: { activeTab: string }) {
         if (res.success && res.data) {
           setMoneyFlowData(res.data)
         }
-        console.log("Money Flow Data:", res.data)
+        //console.log("Money Flow Data:", res.data)
       } catch (err) {
         console.error("Failed to fetch revenue data:", err)
       } finally {

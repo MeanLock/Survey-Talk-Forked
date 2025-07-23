@@ -32,7 +32,7 @@ const ShortSentences = ({
       { ...optionDefault, Order: question.Options.length + 1 },
     ]);
   }, [handleUpdateQuestion, question.Options]);
-  console.log(isDisable);
+  //console.log(isDisable);
   useEffect(() => {
     if (!question?.Options?.length) {
       handleUpdateQuestion("Options", [optionDefault]);

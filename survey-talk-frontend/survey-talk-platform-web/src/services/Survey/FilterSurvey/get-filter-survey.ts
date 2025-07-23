@@ -16,7 +16,7 @@ export const GetFilterSurveyId = async () => {
       return null;
     }
   } catch (error) {
-    console.log("Error While Getting Filter Survey: ", error);
+    //console.log("Error While Getting Filter Survey: ", error);
     return null;
   }
 };

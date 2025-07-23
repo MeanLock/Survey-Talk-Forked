@@ -27,7 +27,7 @@ function SurveyCustomer() {
   });
 
   const { data: bgDefaultThemes } = useGetSurveyDefaultBackgroundThemes({});
-  console.log("Data: ", apiData);
+  //console.log("Data: ", apiData);
   useEffect(() => {
     if (apiData && !isLoadingSlide) {
       setDataResponse(apiData);

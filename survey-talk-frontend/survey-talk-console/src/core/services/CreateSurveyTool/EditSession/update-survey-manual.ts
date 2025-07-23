@@ -11,7 +11,7 @@ type PayLoadType = SurveyType & {
 
 const update = async (payload: PayLoadType) => {
   try {
-    console.log("Payload-manual: ", payload);
+    //console.log("Payload-manual: ", payload);
     const { SurveyId, ...body } = payload;
 
     const response = await callAxiosRestApi({

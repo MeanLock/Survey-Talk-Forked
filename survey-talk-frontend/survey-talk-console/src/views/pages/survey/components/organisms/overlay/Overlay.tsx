@@ -26,7 +26,7 @@ const Overlay = ({
 }: Props) => {
   const [isViewConfirm, setIsViewConfirm] = useState(false);
   const [isSwap, setIsSwap] = useState(false);
-  console.log(">>>>>>>>>Form Data mà Overlay nhận được: ", formData);
+  //console.log(">>>>>>>>>Form Data mà Overlay nhận được: ", formData);
   return (
     <div className="overlay absolute top-0 right-0 left-0 bottom-0 bg-white/80 z-50 flex flex-col items-center justify-end p-4">
       {isViewConfirm ? (
@@ -107,7 +107,7 @@ const Confirm = ({
   orderCurrent: number;
 }) => {
   const [value, setValue] = useState(orderCurrent);
-  console.log(">>>>>>>>>>>>>>>>>>>>>Form Data: ", formData);
+  //console.log(">>>>>>>>>>>>>>>>>>>>>Form Data: ", formData);
   const handleVerify = () => {
     if (isSwap) {
       onSwap(value);

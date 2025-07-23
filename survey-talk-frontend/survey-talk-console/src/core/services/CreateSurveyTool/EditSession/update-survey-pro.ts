@@ -21,7 +21,7 @@ const update = async (payload: PayLoadType) => {
     url: `Survey/response/filter/surveys/${payload.surveyId}?taken_subject=${payload.taken_subject}`,
     data: dataClone,
   });
-  console.log("dataClone: ", dataClone);
+  //console.log("dataClone: ", dataClone);
   return response.data;
 };
 

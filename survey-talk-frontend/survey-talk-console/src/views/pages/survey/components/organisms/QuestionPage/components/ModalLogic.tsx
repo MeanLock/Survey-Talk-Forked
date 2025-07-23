@@ -246,8 +246,8 @@ const [localJumpLogics, setLocalJumpLogics] = React.useState<JumpLogicType[]>(
         }
     };
 
-    console.log("Jump Logics: ", localJumpLogics);
-    console.log("que >>> ", questions);
+    //console.log("Jump Logics: ", localJumpLogics);
+    //console.log("que >>> ", questions);
 
     return (
         <div style={styles.modalOverlay}>

@@ -89,7 +89,7 @@ const AppBreadcrumb = () => {
   }
 
   const breadcrumbs = getBreadcrumbs(currentLocation)
-  console.log("Breadcrumbs:", breadcrumbs)
+  //console.log("Breadcrumbs:", breadcrumbs)
   return (
     <CBreadcrumb className="app-breadcrumb my-0">
       {breadcrumbs.map((breadcrumb, index) => {

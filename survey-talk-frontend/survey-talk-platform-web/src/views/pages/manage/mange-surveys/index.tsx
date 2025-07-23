@@ -89,7 +89,7 @@ const ManageSurveyPage = () => {
 
   useEffect(() => {
     if (MeSurveysFromAPI) {
-      console.log("Fetched Me Surveys:", MeSurveysFromAPI);
+      //console.log("Fetched Me Surveys:", MeSurveysFromAPI);
       setSurveys(MeSurveysFromAPI);
       setFilteredSurveys(MeSurveysFromAPI);
       setSelectedSurvey(null);
@@ -99,7 +99,7 @@ const ManageSurveyPage = () => {
   }, [MeSurveysFromAPI]);
 
   useEffect(() => {
-    console.log("Query changed:", query);
+    //console.log("Query changed:", query);
   }, [query]);
 
   // Effect để filter theo topics và sort
@@ -211,7 +211,7 @@ const ManageSurveyPage = () => {
     }
 
     setQuery(newQuery);
-    console.log("Updated query:", newQuery);
+    //console.log("Updated query:", newQuery);
   };
 
   const handleFilterTopic = (checked: boolean, topicId: number) => {
@@ -232,8 +232,8 @@ const ManageSurveyPage = () => {
       Keyword: keyword || null,
     };
     setQuery(newQuery);
-    console.log("Tìm kiếm Survey với query:", newQuery);
-    console.log("Keyword được gửi:", keyword);
+    //console.log("Tìm kiếm Survey với query:", newQuery);
+    //console.log("Keyword được gửi:", keyword);
   };
 
   const handleEdit = (id: number) => {
@@ -270,7 +270,7 @@ const ManageSurveyPage = () => {
 
   const handleDelete = async (id: number) => {
     const alert = await confirmAlert("Bạn có chắc muốn xóa khảo sát này?");
-    console.log("Xóa khảo sát với ID:", alert);
+    //console.log("Xóa khảo sát với ID:", alert);
     if (!alert.isConfirmed) return;
     const response = await callAxiosRestApi({
       instance: loginRequiredAxiosInstance,
