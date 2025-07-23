@@ -12,6 +12,8 @@ yarn.lock
 /build
 /dist   
 *.tsbuildinfo
+.htaccess
+
 # misc
 .eslintcache
 .DS_Store
