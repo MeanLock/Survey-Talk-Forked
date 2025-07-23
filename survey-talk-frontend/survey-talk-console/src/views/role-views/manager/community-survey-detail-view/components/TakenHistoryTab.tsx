@@ -82,7 +82,7 @@ const TakenHistoryTab: FC = () => {
        const handleDataChange = async () => {
         if (!context?.surveyData) return;
         
-        console.log("TakenHistoryTab: Loading data...");
+        //console.log("TakenHistoryTab: Loading data...");
         setLoading(true);
         
         try {

@@ -43,7 +43,7 @@ export const calculateResponseData = (contextQuestions: Question[], summaryLists
     allResponses.push(...summary.Responses)
   })
 
-  console.log("allResponses:", allResponses)
+  //console.log("allResponses:", allResponses)
 
   // Process each question from context
   contextQuestions.forEach((question) => {
@@ -53,7 +53,7 @@ export const calculateResponseData = (contextQuestions: Question[], summaryLists
 
     const totalResponses = questionResponses.length
 
-    console.log(`Question ${question.Id} has ${totalResponses} responses`)
+    //console.log(`Question ${question.Id} has ${totalResponses} responses`)
 
     switch (question.QuestionTypeId) {
       case 1: // Single Choice
@@ -86,7 +86,7 @@ export const calculateResponseData = (contextQuestions: Question[], summaryLists
     }
   })
 
-  console.log("Final processedData:", processedData)
+  //console.log("Final processedData:", processedData)
   return processedData
 }
 
@@ -94,14 +94,14 @@ const calculateChoiceResponses = (question: Question, responses: ApiResponse[], 
   const optionCounts: { [key: number]: number } = {}
   let optionsFromResponses: any[] = []
 
-  console.log(`Calculating choice responses for question ${question.Id}`)
+  //console.log(`Calculating choice responses for question ${question.Id}`)
 
   // Get options from the first response since Questions in summaryLists have empty Options
   if (responses.length > 0) {
     try {
       const firstResponse = JSON.parse(responses[0].ValueJsonString)
       optionsFromResponses = firstResponse.QuestionContent?.Options || []
-      console.log("Options from response:", optionsFromResponses)
+      //console.log("Options from response:", optionsFromResponses)
     } catch (error) {
       console.error("Error parsing first response for options:", error)
     }
@@ -129,8 +129,8 @@ const calculateChoiceResponses = (question: Question, responses: ApiResponse[], 
       const parsedValue = JSON.parse(response.ValueJsonString)
       const questionResponse = parsedValue.QuestionResponse
 
-      console.log(`Processing response: parsedValue`, parsedValue)
-      console.log("Question response:", questionResponse)
+      //console.log(`Processing response: parsedValue`, parsedValue)
+      //console.log("Question response:", questionResponse)
 
       if (question.QuestionTypeId === 1) {
         // Single Choice - get from singleChoice field
@@ -162,7 +162,7 @@ const calculateChoiceResponses = (question: Question, responses: ApiResponse[], 
     MainImageUrl: option.MainImageUrl || null,
   }))
 
-  console.log("processedResponses for question", question.Id, ":", processedResponses)
+  //console.log("processedResponses for question", question.Id, ":", processedResponses)
 
   return {
     totalResponses,

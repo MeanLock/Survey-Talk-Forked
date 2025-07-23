@@ -65,7 +65,8 @@ const calculateAverageRating = (platformFeedback: PlatformFeedback[] | null): nu
     if (!platformFeedback || platformFeedback.length === 0) return 0;
 
     const totalRating = platformFeedback.reduce((sum, feedback) => sum + feedback.RatingScore, 0);
-    return Math.round((totalRating / platformFeedback.length) * 10) / 10; // Làm tròn đến 1 chữ số thập phân
+    const average = totalRating / platformFeedback.length;
+    return Number(average.toFixed(2)); // Làm tròn đến 2 chữ số thập phân
 };
 const getMetricsForPeriod = (
     period: TimePeriod,

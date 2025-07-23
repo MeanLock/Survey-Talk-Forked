@@ -19,11 +19,11 @@ const SingleChooseSlide = ({ data }: Props) => {
     [data]
   );
   // const isValid = useMemo(() => data?.IsValid, [data]);
-  console.log("data", isValid);
+  //console.log("data", isValid);
   const handleSelect = useCallback(
     (id: string) => {
       // if (isValid) return;
-      console.log("id", isValid);
+      //console.log("id", isValid);
       dispatch(
         handleUpdateSigleChoose({
           idChoose: id,

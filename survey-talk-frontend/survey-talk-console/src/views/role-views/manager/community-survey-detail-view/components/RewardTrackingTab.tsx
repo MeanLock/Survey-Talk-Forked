@@ -81,7 +81,7 @@ const RewardTrackingTab: FC = () => {
     const handleDataChange = async () => {
         if (!context?.surveyData) return;
         
-        console.log("RewardTrackingTab: Loading data...");
+        //console.log("RewardTrackingTab: Loading data...");
         setLoading(true);
         
         try {

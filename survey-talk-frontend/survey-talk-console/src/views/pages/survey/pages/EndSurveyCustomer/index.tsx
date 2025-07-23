@@ -10,7 +10,7 @@ const EndSurveyCustomer = () => {
   // Hooks cập nhật User Informations
   const refetchUser = useRefetchUser();
 
-  console.log("StateEndSurveyCustomer: ", state);
+  //console.log("StateEndSurveyCustomer: ", state);
 
   const survey = useAppSelector((state) => state.appSlice.surveyData);
   const info = useAppSelector((state) => state.appSlice.infoSurvey);
@@ -20,7 +20,7 @@ const EndSurveyCustomer = () => {
   if (!bgDefaultThemes || !Array.isArray(bgDefaultThemes)) {
     return <SurveyTalkLoading />;
   }
-console.log("bgDefaultThemes: ", info);
+//console.log("bgDefaultThemes: ", info);
   // const handleNavigateToHome = async () => {
   //   const check = await refetchUser();
   //   if (check) {

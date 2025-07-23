@@ -412,11 +412,11 @@ const VersionManagementTab: FC = () => {
   }
 
   const handleCreateVersion = () => {
-    console.log("Creating new version...")
+    //console.log("Creating new version...")
   }
 
   const handleStopVersion = (versionId: string) => {
-    console.log("Stopping version:", versionId)
+    //console.log("Stopping version:", versionId)
   }
 
   useEffect(() => {

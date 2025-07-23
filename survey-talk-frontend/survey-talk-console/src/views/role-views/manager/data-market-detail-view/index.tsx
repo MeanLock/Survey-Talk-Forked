@@ -187,13 +187,13 @@ const DataMarketDetailView: FC<DataMarketDetailViewProps> = () => {
   const [surveyData, setSurveyData] = useState<SurveyData | null>(null);
   const handleDataChange = () => {
     if (id) {
-      console.log("Refreshing data for ID:", id)
+      //console.log("Refreshing data for ID:", id)
       setSurveyData(mockSurveyData)
     }
   }
   useEffect(() => {
     if (id) {
-      console.log('Fetching data for ID:', id);
+      //console.log('Fetching data for ID:', id);
       setSurveyData(mockSurveyData);
     }
   }, [id]);

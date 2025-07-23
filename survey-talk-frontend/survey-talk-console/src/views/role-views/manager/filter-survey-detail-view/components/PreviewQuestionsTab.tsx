@@ -176,7 +176,7 @@ const PreviewQuestionsTab = () => {
     const [fieldInputTypes, setFieldInputTypes] = useState<FieldInputType[]>([])
     const context = useContext(FilterSurveyDetailViewContext)
     const questions = context?.survey?.Questions.sort((a, b) => a.Order - b.Order)
-    console.log("Question", questions)
+    //console.log("Question", questions)
 
     const getQuestionTypeName = (typeId?: number): string => {
         const type = questionTypes.find((type: QuestionType) => type.Id === typeId);

@@ -199,10 +199,10 @@ const SurveyNew = () => {
         setIsApiCalling(false); //Thịnh thêm biến này để check api đang gọi hay không
         //setFormData(sentBody);
         latestDataRef.current = sentBody;
-        console.log("sentBody: ", sentBody);
+        //console.log("sentBody: ", sentBody);
         setIsSucces(responseData?.IsSuccess);
            const currentPath = location.pathname;
-        console.log("currentPath: ", currentPath);
+        //console.log("currentPath: ", currentPath);
 
         if (!id && currentPath.endsWith('/survey/new')) {
           window.history.pushState({}, "", `#/survey/${sentBody.Id}/editing`);
@@ -225,7 +225,7 @@ const SurveyNew = () => {
         latestDataRef.current = sentBody;
         setIsSucces(responseData?.IsSuccess);
         const currentPath = location.pathname;
-        console.log("currentPath: ", currentPath);
+        //console.log("currentPath: ", currentPath);
         if (!id && currentPath.endsWith('/survey/new')) {
           window.history.pushState({}, "", `#/survey/${sentBody.Id}/editing`);
         }
@@ -362,9 +362,9 @@ const SurveyNew = () => {
     const loadInitialData = async () => {
       let initialData: SurveyType;
       //const savedFormData = localStorage.getItem("surveyFormData");
-      console.log("Location: ", location.pathname);
+      //console.log("Location: ", location.pathname);
       if (location.pathname === "/survey/new") {
-        console.log("Rơi vào New");
+        //console.log("Rơi vào New");
         // Gọi API để lấy ID của khảo sát mới
         const newSurvey = await callAxiosRestApi({
           instance: managerAxiosInstance,
@@ -372,7 +372,7 @@ const SurveyNew = () => {
           url: "Survey/core/filter/surveys",
         });
         if (newSurvey) {
-          console.log("Data nè: ", newSurvey);
+          //console.log("Data nè: ", newSurvey);
           const NewId = newSurvey.data.NewSurveyId;
           if (NewId) {
             // Lấy Edit Session từ ID vừa tạo
@@ -386,7 +386,7 @@ const SurveyNew = () => {
             });
 
             if (response) {
-              console.log("responsehihi", response);
+              //console.log("responsehihi", response);
               const savedFormData = response.data.EditingSession;
               if (savedFormData) {
                 initialData = savedFormData;
@@ -427,7 +427,7 @@ const SurveyNew = () => {
         }
       } else {
         const id = Number(location.pathname.split("/")[2]); //Thịnh, đổi cách lấy id do thay đường dẫn
-        console.log("Rơi vào Update", id);
+        //console.log("Rơi vào Update", id);
         // Gọi API để lấy edit session từ id có sẵn
         const response = await callAxiosRestApi({
           instance: loginRequiredAxiosInstance,
@@ -435,7 +435,7 @@ const SurveyNew = () => {
           url: `Survey/session/surveys/${id}/editing-session`,
         });
 
-        console.log("responsehihi update", response);
+        //console.log("responsehihi update", response);
         const savedFormData = response.data.EditingSession;
         if (savedFormData) {
           initialData = savedFormData;
@@ -503,7 +503,7 @@ const SurveyNew = () => {
   }, [formData]);
 
   useBlocker(true);
-  console.log("isSaving:", isSaving, "isSuccess:", isSuccess);
+  //console.log("isSaving:", isSaving, "isSuccess:", isSuccess);
   return (
     <MainTemPlate>
      {isDisable && (

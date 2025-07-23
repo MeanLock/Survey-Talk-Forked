@@ -35,7 +35,7 @@ const CommunitySurveyDetailView: FC<CommunitySurveyDetailViewProps> = () => {
 
     const handleDataChange = async () => {
         if (id) {
-            console.log("Refreshing data for ID:", id)
+            //console.log("Refreshing data for ID:", id)
             setLoading(true)
             try {
                 const response = await getCommunitySurveyDetail(managerAxiosInstance, Number(id));
@@ -52,7 +52,7 @@ const CommunitySurveyDetailView: FC<CommunitySurveyDetailViewProps> = () => {
         }
     }
         const handleTabChange = async (tabKey: string) => {
-        console.log("Tab changed to:", tabKey);
+        //console.log("Tab changed to:", tabKey);
         setActiveTab(tabKey);
         await handleDataChange();
     };
