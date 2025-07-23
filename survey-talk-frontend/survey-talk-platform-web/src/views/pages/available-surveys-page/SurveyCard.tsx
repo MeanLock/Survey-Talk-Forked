@@ -13,7 +13,7 @@ interface Props {
 }
 const handleTakeSurvey = () => {
   // Logic to handle taking the survey
-  console.log("Taking survey:");
+  //console.log("Taking survey:");
 };
 export const SurveyCard: React.FC<Props> = ({ survey, onShowDetail }) => {
   // FUNCTIONS

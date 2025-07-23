@@ -29,6 +29,6 @@ export function response_with_mess (
         },
         data: data
     }
-    console.log("RESPONSE HERE", response)
+    //console.log("RESPONSE HERE", response)
     return response;
 }

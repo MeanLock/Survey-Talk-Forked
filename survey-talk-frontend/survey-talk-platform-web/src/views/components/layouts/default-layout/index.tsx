@@ -68,7 +68,7 @@ const DefaultLayout = () => {
       fetchForUpdate();
       setNavItems(_loginNav);
     } else {
-      console.log("Không valid rồiiiii");
+      //console.log("Không valid rồiiiii");
       alert("Không valid");
       dispatch(clearAuthToken());
     }
@@ -85,7 +85,7 @@ const DefaultLayout = () => {
       fetchForFirst();
       setNavItems(_loginNav);
     } else {
-      console.log("Không valid rồiiiii");
+      //console.log("Không valid rồiiiii");
       alert("Không valid");
       dispatch(clearAuthToken());
     }
@@ -143,11 +143,11 @@ const DefaultLayout = () => {
             allowOutsideClick: false,
             allowEscapeKey: false,
           }).then((result) => {
-            console.log("Hủy cập nhật thông tin: ", result.isConfirmed);
+            //console.log("Hủy cập nhật thông tin: ", result.isConfirmed);
             if (result.isConfirmed) {
               navigate("/survey/filter-survey");
             } else {
-              console.log("Hủy cập nhật thông tin: ", result.isConfirmed);
+              //console.log("Hủy cập nhật thông tin: ", result.isConfirmed);
              
               dispatch(clearAuthToken());
               navigate("/login");

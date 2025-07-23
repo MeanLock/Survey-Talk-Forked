@@ -4,6 +4,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import WarningIcon from "@mui/icons-material/Warning";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   formData: SurveyType;
@@ -57,7 +58,7 @@ const getErrors = (formData: SurveyType): string[] => {
 const CompletePage = ({ formData, defaultBackgroundThemes }: Props) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [listBackground, setListBackground] = useState<any[]>([]);
-
+const navigate = useNavigate();
   const errors = getErrors(formData);
 
   useEffect(() => {
@@ -110,13 +111,20 @@ const CompletePage = ({ formData, defaultBackgroundThemes }: Props) => {
           </Box>
         ) : (
           <Box className="p-4">
-            <Typography variant="h4">Survey Completed!</Typography>
+            <Typography variant="h4">Khảo Sát Hoàn Thành</Typography>
             {formData.Title && (
               <Typography variant="body1">
-                Survey Title: {formData.Title}
+                Tiêu đề: {formData.Title}
               </Typography>
             )}
+                <button
+                className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                onClick={() => navigate("/manage/surveys")}
+              >
+                Quay về trang chủ
+              </button>
           </Box>
+          
         )}
       </Box>
     </div>

@@ -25,7 +25,7 @@ const Answer = ({
   formData,
 }: Props) => {
   const [showImage, setShowImage] = useState(false);
-  console.log("Formdata: ", formData);
+  //console.log("Formdata: ", formData);
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     handleUpdateOption({ ...data, Content: event.target.value });
   };

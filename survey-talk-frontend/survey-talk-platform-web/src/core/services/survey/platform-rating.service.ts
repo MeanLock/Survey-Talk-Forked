@@ -17,12 +17,12 @@ type PlatformRatingType = {
 };
 // CREATE
 export async function createRating(data: PlatformRatingType) {
-  console.log("Alo");
+  //console.log("Alo");
   const res = await addDoc(ratingsRef, {
     ...data,
     createdAt: new Date(),
   });
-  console.log("Response: ", res);
+  //console.log("Response: ", res);
   return res.id;
 }
 

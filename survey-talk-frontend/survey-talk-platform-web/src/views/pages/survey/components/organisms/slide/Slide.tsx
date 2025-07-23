@@ -67,12 +67,12 @@ const Slide = ({ currentQuestionId }: Props) => {
       recognition.stop();
     };
     recognition.onspeechend = function (e: any) {
-      console.log(e);
+      //console.log(e);
     };
 
     recognition.onerror = function (event: any) {
-      console.log(event);
-      console.log(event.error);
+      //console.log(event);
+      //console.log(event.error);
     };
   }, []);
 
@@ -103,7 +103,7 @@ const Slide = ({ currentQuestionId }: Props) => {
 
   // recognition.onspeechend = () => {
   //   recognition.stop();
-  //   console.log("Người dùng ngưng nói");
+  //   //console.log("Người dùng ngưng nói");
   // };
 
   // recognition.onerror = (event: any) => {

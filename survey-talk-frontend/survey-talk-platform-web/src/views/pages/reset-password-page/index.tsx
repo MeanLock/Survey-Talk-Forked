@@ -55,7 +55,7 @@ const ResetPassword = () => {
         }
       } catch (error) {
         errorAlert("Không thể đổi mật khẩu");
-        console.log("Error while reset password: ", error);
+        //console.log("Error while reset password: ", error);
       }
     } else {
       return;

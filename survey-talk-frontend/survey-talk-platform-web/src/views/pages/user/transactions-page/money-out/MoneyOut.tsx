@@ -325,7 +325,7 @@ export const MoneyOut: React.FC<Props> = ({ balance }) => {
       });
 
       const updated = await updateRes.json();
-      console.log("✅ Đã cập nhật thành công:", updated);
+      //console.log("✅ Đã cập nhật thành công:", updated);
     } catch (err) {
       console.error("❌ Lỗi khi cập nhật:", err);
     }
@@ -337,7 +337,7 @@ export const MoneyOut: React.FC<Props> = ({ balance }) => {
     <div className="money-out w-full flex flex-col items-start">
       <p className="money-out__remain-title">Số dư khả dụng</p>
       <p className="money-out__remain-value">
-        {balance.toLocaleString("vi-VN")}đ
+        {balance?.toLocaleString("vn")} VND
       </p>
 
       <div className="w-full grid grid-cols-2 gap-6 mt-5">

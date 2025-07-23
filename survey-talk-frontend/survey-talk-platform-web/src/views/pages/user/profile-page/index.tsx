@@ -102,12 +102,12 @@ const ProfilePage = () => {
     } else {
       toast.error("Có lỗi xảy ra, vui lòng thử lại sau ...");
     }
-    console.log("Updating profile with data:", formData);
+    //console.log("Updating profile with data:", formData);
     // TODO: Implement actual update logic
   };
 
   const handlePasswordChange = () => {
-    console.log("Changing password:", passwordData);
+    //console.log("Changing password:", passwordData);
     // TODO: Implement actual password change logic
   };
 

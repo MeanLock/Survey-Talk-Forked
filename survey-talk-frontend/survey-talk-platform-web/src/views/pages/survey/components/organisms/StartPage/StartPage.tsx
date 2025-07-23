@@ -402,13 +402,13 @@ PageProps) => {
               )}
             </div>
           </div>
-          <div className="config-section">
+          {/* <div className="config-section">
             <h3 className="config-title">KHẢO SÁT TRÊN NỀN AUDIO</h3>
             <div className="flex items-center justify-between mb-3">
               <span className="text-gray-600">Bật</span>
               <button className="buy-now-button">Mua đi nè</button>
             </div>
-          </div>
+          </div> */}
           {/* Lộc Bỏ Cái Này */}
           {/* <CustomizePassword
             formData={formData}
@@ -867,7 +867,7 @@ function BackgroundMode({
   Brightness: Brightness,
   setFormData: setFormData,
 }: any) {
-  console.log("check formData: ", formData?.ConfigJson?.Background);
+  //console.log("check formData: ", formData?.ConfigJson?.Background);
 
   return (
     <>
@@ -988,7 +988,7 @@ function BackgroundMode({
               opacity: 1,
             }}
             // onClick={(e) => {
-            //     // console.log("run");
+            //     // //console.log("run");
             //     // e.stopPropagation();
             //     handleSelectColorBackground();
             // }}
@@ -1004,7 +1004,7 @@ function BackgroundMode({
             }}
             className="absolute main-check-icon z-10"
             // onClick={() => {
-            //     console.log("run >>>>>>>>>>>>");
+            //     //console.log("run >>>>>>>>>>>>");
             //     setFormData((prev: any) => ({
             //         ...prev,
             //         Background:

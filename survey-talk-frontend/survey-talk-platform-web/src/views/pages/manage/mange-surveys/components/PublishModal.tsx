@@ -329,7 +329,7 @@ export const PublishModal: React.FC<Props> = ({
   const handleFilter = async () => {
     setIsFilterLoading(true);
     try {
-      console.log("Filter response: ", prompt, accuracy, marriage, education);
+      //console.log("Filter response: ", prompt, accuracy, marriage, education);
       const response = await callAxiosRestApi({
         instance: loginRequiredAxiosInstance,
         method: "post",
@@ -355,7 +355,7 @@ export const PublishModal: React.FC<Props> = ({
         setFilterTags(response.data.FilterTags);
       }
     } catch (error) {
-      console.log("Error while filtering: ", error);
+      //console.log("Error while filtering: ", error);
     } finally {
       setIsFilterLoading(false);
     }
@@ -508,21 +508,21 @@ export const PublishModal: React.FC<Props> = ({
         onClose();
         changeStatus();
       }
-      console.log("Hoàn thành đăng khảo sát!");
+      //console.log("Hoàn thành đăng khảo sát!");
     } catch (error) {
-      console.log("Error while publish survey: ", error);
+      //console.log("Error while publish survey: ", error);
     } finally {
       setIsPublishLoading(false);
     }
   };
 
   const checkData = () => {
-    console.log("Giới Tính: ", sex);
-    console.log("Xu hướng tính dục: ", sexual);
-    console.log("Độ Tuổi: ", age);
-    console.log("Prompt:", prompt);
-    console.log("Accuracy: ", accuracy[0]);
-    console.log("Income: ", income);
+    //console.log("Giới Tính: ", sex);
+    //console.log("Xu hướng tính dục: ", sexual);
+    //console.log("Độ Tuổi: ", age);
+    //console.log("Prompt:", prompt);
+    //console.log("Accuracy: ", accuracy[0]);
+    //console.log("Income: ", income);
   };
 
   return (

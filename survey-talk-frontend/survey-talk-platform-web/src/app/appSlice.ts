@@ -47,7 +47,7 @@ const compareAnswers = (answer1: any, answer2: any, questionType: string) => {
 
     switch (questionType) {
         case "SingleChoice":
-            console.log('Comparing SingleChoice:', answer1.SingleChoice, answer2.SingleChoice);
+            ////console.log('Comparing SingleChoice:', answer1.SingleChoice, answer2.SingleChoice);
             return answer1.SingleChoice === answer2.SingleChoice;
         case "MultipleChoice":
             const arr1 = Array.isArray(answer1.MultipleChoice)
@@ -56,10 +56,10 @@ const compareAnswers = (answer1: any, answer2: any, questionType: string) => {
             const arr2 = Array.isArray(answer2.MultipleChoice)
                 ? answer2.MultipleChoice.sort()
                 : [];
-            console.log('Comparing MultipleChoice:', arr1, arr2);
+            //console.log('Comparing MultipleChoice:', arr1, arr2);
             return JSON.stringify(arr1) === JSON.stringify(arr2);
         case "Input":
-            console.log('Comparing Input:', answer1.Input?.Value, answer2.Input?.Value);
+            //console.log('Comparing Input:', answer1.Input?.Value, answer2.Input?.Value);
             return answer1.Input?.Value === answer2.Input?.Value;
         // case "Range":
         //     return (
@@ -67,7 +67,7 @@ const compareAnswers = (answer1: any, answer2: any, questionType: string) => {
         //         answer1.Range?.Max === answer2.Range?.Max
         //     );
         case "Ranking":
-            console.log('Comparing Ranking:',  JSON.stringify(answer1.Ranking), JSON.stringify(answer2.Ranking));
+            //console.log('Comparing Ranking:',  JSON.stringify(answer1.Ranking), JSON.stringify(answer2.Ranking));
             return (
                 JSON.stringify(answer1.Ranking) ===
                 JSON.stringify(answer2.Ranking)
@@ -99,8 +99,8 @@ const validateDuplicateAnswers = (
 
     const answer1 = current.ValueJson.QuestionResponse;
     const answer2 = parent.ValueJson.QuestionResponse;
-    console.log('Validating answers:', answer1, answer2, questionType);
-    console.log('SO SÁNH KQ:', compareAnswers(answer1, answer2, questionType));
+    //console.log('Validating answers:', answer1, answer2, questionType);
+    //console.log('SO SÁNH KQ:', compareAnswers(answer1, answer2, questionType));
     if (!compareAnswers(answer1, answer2, questionType)) {
         const hasReason = !!state.surveyData.InvalidReason;
         const mess = `${hasReason ? ". " : ""}Câu ${current.parentId} có đáp án không khớp với nhau`;

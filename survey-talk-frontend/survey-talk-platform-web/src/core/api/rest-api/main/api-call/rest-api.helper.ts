@@ -38,7 +38,7 @@ export async function callAxiosRestApi(
     );
   } catch (error: any) {
     // toast.error(error.response.data.message);
-    console.log("Error nè: ", error.response.data.message);
+    //console.log("Error nè: ", error.response.data.message);
     let isAppError = false;
     let errorMessage = "Có gì đó không ổn";
 

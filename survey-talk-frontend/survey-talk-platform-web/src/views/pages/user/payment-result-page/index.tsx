@@ -13,7 +13,7 @@ const PaymentResultPage: React.FC = () => {
 
   const auth = useSelector((state: RootState) => state.auth);
 
-  console.log("Auth: ", auth);
+  //console.log("Auth: ", auth);
 
   useEffect(() => {
     const type = searchParams.get("type");

@@ -61,7 +61,7 @@ const LevelPage = () => {
         setIsShowUpdateLevelSurvey(true);
       }
     } catch (error) {
-      console.log("Error: ", error);
+      //console.log("Error: ", error);
     } finally {
       setIsLoadingSurvey(false);
     }
@@ -80,8 +80,9 @@ const LevelPage = () => {
     const nextLevelXp = getXpForNextLevel();
     const progressInCurrentLevel = userProfiles.Xp - currentLevelXp;
     const xpNeededForCurrentLevel = nextLevelXp - currentLevelXp;
+;
     return Math.min(
-      (progressInCurrentLevel / xpNeededForCurrentLevel) * 100,
+      (userProfiles.Xp / xpNeededForCurrentLevel) * 100,
       100
     );
   };
@@ -144,7 +145,7 @@ const LevelPage = () => {
                     <div className="flex items-center justify-center gap-2">
                       <Target className="w-6 h-6 text-green-500" />
                       <span className="text-2xl font-bold text-green-600">
-                        {getXpForNextLevel()}
+                        {getXpForNextLevel() - getCurrentLevelXp() - userProfiles.Xp}
                       </span>
                     </div>
                     <p className="text-sm text-gray-600">

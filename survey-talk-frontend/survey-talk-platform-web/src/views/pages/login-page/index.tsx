@@ -143,7 +143,7 @@ const LoginPage: FC<LoginPageProps> = (props) => {
           return;
         }
         if (token) {
-          console.log("Token: ", token);
+          //console.log("Token: ", token);
           // Lưu token vào Redux
           dispatch(
             setAuthToken({
@@ -183,13 +183,15 @@ const LoginPage: FC<LoginPageProps> = (props) => {
           //     ? response.message
           //     : "Lỗi khi đăng nhập!"
           // );
-          console.log("Error: ", response);
+          //console.log("Error: ", response);
         }
       } else {
-        console.log("Error while login: ", response.message.content);
+        //console.log("Error while login: ", response.message.content);
+        toast.error(response.message.content || "Đăng nhập thất bại, vui lòng thử lại !")
+
       }
     } catch (error) {
-      console.log("Error while login: ", error);
+      //console.log("Error while login: ", error);
     }
     setManualLoading(false);
   };
@@ -230,7 +232,7 @@ const LoginPage: FC<LoginPageProps> = (props) => {
           }
 
           if (token) {
-            console.log("Token: ", token);
+            //console.log("Token: ", token);
             // Lưu token vào Redux
             dispatch(
               setAuthToken({
@@ -262,18 +264,18 @@ const LoginPage: FC<LoginPageProps> = (props) => {
             toast.error("Không nhận được token từ server!");
           }
         } else {
-          console.log("ERROR", login_result.message.content);
+          //console.log("ERROR", login_result.message.content);
           toast.error("Đăng nhập Google thất bại!");
         }
       } catch (error) {
-        console.log("Error during Google login:", error);
+        //console.log("Error during Google login:", error);
         toast.error("Có lỗi xảy ra khi đăng nhập với Google!");
       } finally {
         setGoogleLoading(false);
       }
     },
     onError: (error) => {
-      console.log("Google OAuth Error:", error);
+      //console.log("Google OAuth Error:", error);
       toast.error("Lỗi xác thực Google: " + error.error);
       setGoogleLoading(false);
     },

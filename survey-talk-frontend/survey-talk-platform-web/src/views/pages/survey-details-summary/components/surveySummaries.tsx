@@ -280,14 +280,14 @@ export const ResponseSummaries: React.FC<Props> = ({ summaryLists }) => {
   //         const parsed = JSON.parse(response.ValueJsonString);
   //         const questionResponse = parsed.QuestionResponse;
 
-  //         console.log("Slider - Raw response:", parsed);
+  //         //console.log("Slider - Raw response:", parsed);
 
   //         if (question.QuestionTypeId === 3) {
-  //           console.log("Type 3 - Input:", questionResponse?.Input);
+  //           //console.log("Type 3 - Input:", questionResponse?.Input);
   //         }
 
   //         if (question.QuestionTypeId === 4) {
-  //           console.log("Type 4 - Range:", questionResponse?.Range);
+  //           //console.log("Type 4 - Range:", questionResponse?.Range);
   //         }
   //       } catch (error) {
   //         console.error("Error parsing response:", error);
@@ -349,10 +349,10 @@ export const ResponseSummaries: React.FC<Props> = ({ summaryLists }) => {
 
     responses.forEach((response) => {
       try {
-        console.log("🔥 Raw ValueJsonString:", response.ValueJsonString);
+        //console.log("🔥 Raw ValueJsonString:", response.ValueJsonString);
 
         const parsed = JSON.parse(response.ValueJsonString);
-        console.log("🔥 Parsed value:", parsed);
+        //console.log("🔥 Parsed value:", parsed);
 
         const questionResponse = parsed.QuestionResponse;
 
@@ -371,7 +371,7 @@ export const ResponseSummaries: React.FC<Props> = ({ summaryLists }) => {
             rawValue = input;
           }
 
-          console.log("✅ Slider input value (raw):", rawValue);
+          //console.log("✅ Slider input value (raw):", rawValue);
 
           const value = Number.parseFloat(rawValue);
           if (!isNaN(value)) {
@@ -445,7 +445,7 @@ export const ResponseSummaries: React.FC<Props> = ({ summaryLists }) => {
   //     responses.forEach((response) => {
   //       try {
   //         const parsed = JSON.parse(response.ValueJsonString);
-  //         console.log("🔍 Raw Rating ValueJsonString:", parsed);
+  //         //console.log("🔍 Raw Rating ValueJsonString:", parsed);
   //       } catch (error) {
   //         console.error("❌ Error parsing rating response:", error);
   //       }

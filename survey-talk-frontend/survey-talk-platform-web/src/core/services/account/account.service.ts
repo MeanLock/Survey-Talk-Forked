@@ -25,6 +25,6 @@ export const login = async (instance: AxiosInstance, data : {
         data: bodyData,
     }, "Đăng nhập");
 
-    console.log("Rest API Response:", response);
+    //console.log("Rest API Response:", response);
     return response;
 }

@@ -17,7 +17,7 @@ type Props = {
   ) => void;
 };
 const optionDefault = {
-  Id:"",
+  Id: "",
   Order: 1,
   Content: "",
 };
@@ -32,28 +32,37 @@ const ShortSentences = ({
       { ...optionDefault, Order: question.Options.length + 1 },
     ]);
   }, [handleUpdateQuestion, question.Options]);
-  console.log(isDisable);
+  //console.log(isDisable);
   useEffect(() => {
     if (!question?.Options?.length) {
       handleUpdateQuestion("Options", [optionDefault]);
     }
   }, [handleUpdateQuestion, question]);
   return (
+    // <div className="short-sentences-container">
+    //   {question?.Options?.length
+    //     ? question.Options.map((_, index) => {
+    //         return (
+    //           <input
+    //             key={index}
+    //             type="text"
+    //             disabled
+    //             placeholder="Vui lòng nhập tại đây"
+    //             className="text-input"
+    //           />
+    //         );
+    //       })
+    //     : null}
+    //   {isDisable ? null : <ButtonAddAnswer onClick={() => handleAddOption()} />}
+    // </div>
     <div className="short-sentences-container">
-      {question?.Options?.length
-        ? question.Options.map((_, index) => {
-            return (
-              <input
-                key={index}
-                type="text"
-                disabled
-                placeholder="Vui lòng nhập tại đây"
-                className="text-input"
-              />
-            );
-          })
-        : null}
-      {isDisable ? null : <ButtonAddAnswer onClick={() => handleAddOption()} />}
+      <input
+        type="text"
+        disabled={isDisable}
+        placeholder="Vui lòng nhập tại đây"
+        className="text-input"
+       
+      />
     </div>
   );
 };

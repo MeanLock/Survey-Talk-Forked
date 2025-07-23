@@ -177,23 +177,27 @@ const SurveyNew = () => {
           defaultBackgroundThemes={defaultBgThemes} //Thịnh thêm dòng này
         />
       ),
+            disabled: false,// thêm tạm để tránh lỗi
+
     },
-    {
-      label: "Chia Sẻ",
-      value: 4,
-      component: (
-        <SharePage
-          formData={formData}
-          defaultBackgroundThemes={defaultBgThemes} //Thịnh thêm dòng này
-        />
-      ),
-    },
-    {
-      label: "Báo cáo",
-      value: 5,
-      component: <ReportPage />,
-      disabled: true,
-    },
+    // Tạm thời comment lại
+    // {
+    //   label: "Chia Sẻ",
+    //   value: 4,
+    //   component: (
+    //     <SharePage
+    //       formData={formData}
+    //       defaultBackgroundThemes={defaultBgThemes} //Thịnh thêm dòng này
+    //     />
+        
+    //   ),
+    // },
+    // {
+    //   label: "Báo cáo",
+    //   value: 5,
+    //   component: <ReportPage />,
+    //   disabled: true,
+    // },
   ];
 
   const ActiveComponent = tabs[activeTab].component;
@@ -204,7 +208,7 @@ const SurveyNew = () => {
         setIsApiCalling(false); //Thịnh thêm biến này để check api đang gọi hay không
         //setFormData(sentBody);
         latestDataRef.current = sentBody;
-        console.log("sentBody: ", sentBody);
+        //console.log("sentBody: ", sentBody);
         setIsSucces(responseData?.IsSuccess);
         const currentPath = window.location.pathname;
         if (!id && currentPath.endsWith('/survey/new')) {
@@ -364,9 +368,9 @@ const SurveyNew = () => {
     const loadInitialData = async () => {
       let initialData: SurveyType;
       //const savedFormData = localStorage.getItem("surveyFormData");
-      console.log("Location: ", location.pathname);
+      //console.log("Location: ", location.pathname);
       if (location.pathname === "/survey/new") {
-        console.log("Rơi vào New");
+        //console.log("Rơi vào New");
         // Gọi API để lấy ID của khảo sát mới
         const newSurvey = await callAxiosRestApi({
           instance: loginRequiredAxiosInstance,
@@ -374,7 +378,7 @@ const SurveyNew = () => {
           url: "Survey/core/community/surveys",
         });
         if (newSurvey) {
-          console.log("Data nè: ", newSurvey);
+          //console.log("Data nè: ", newSurvey);
           const NewId = newSurvey.data.NewSurveyId;
           if (NewId) {
             // Lấy Edit Session từ ID vừa tạo
@@ -388,7 +392,7 @@ const SurveyNew = () => {
             });
 
             if (response) {
-              console.log("responsehihi", response);
+              //console.log("responsehihi", response);
               const savedFormData = response.data.EditingSession;
               if (savedFormData) {
                 initialData = savedFormData;
@@ -429,7 +433,7 @@ const SurveyNew = () => {
         }
       } else {
         const id = Number(location.pathname.split("/")[2]); //Thịnh, đổi cách lấy id do thay đường dẫn
-        console.log("Rơi vào Update", id);
+        //console.log("Rơi vào Update", id);
         // Gọi API để lấy edit session từ id có sẵn
         const response = await callAxiosRestApi({
           instance: loginRequiredAxiosInstance,
@@ -437,7 +441,7 @@ const SurveyNew = () => {
           url: `Survey/session/surveys/${id}/editing-session`,
         });
 
-        console.log("responsehihi update", response);
+        //console.log("responsehihi update", response);
         const savedFormData = response.data.EditingSession;
         if (savedFormData) {
           initialData = savedFormData;
@@ -505,7 +509,7 @@ const SurveyNew = () => {
   }, [formData]);
 
   useBlocker(true);
-  console.log("isSaving:", isSaving, "isSuccess:", isSuccess);
+  //console.log("isSaving:", isSaving, "isSuccess:", isSuccess);
   return (
     <MainTemPlate>
      {isDisable && (

@@ -28,7 +28,7 @@ export const SurveyMeCard: React.FC<Props> = ({
 }) => {
   // FUNCTIONS
   const countTakenResult = (survey: any): string => {
-    console.log("Survey: ", survey);
+    //console.log("Survey: ", survey);
     if (survey.SurveyStatusId !== 2) {
       return "Khảo sát chưa đăng";
     }

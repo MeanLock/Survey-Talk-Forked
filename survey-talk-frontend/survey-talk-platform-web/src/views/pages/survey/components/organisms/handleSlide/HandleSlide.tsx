@@ -58,7 +58,7 @@ const HandleSlide = ({ dataResponse, setIsRefetch, takingSubject }: Props) => {
 
   // Get the survey data from the app state
   const surveyData = useAppSelector((state) => state.appSlice.surveyData);
-  console.log("surveyData", surveyData);
+  //console.log("surveyData", surveyData);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
@@ -66,7 +66,7 @@ const HandleSlide = ({ dataResponse, setIsRefetch, takingSubject }: Props) => {
   const { mutate } = useUpdateSurveyPro({
     mutationConfig: {
       onSuccess: () => {
-        console.log("Community Survey submitted successfully!");
+        //console.log("Community Survey submitted successfully!");
         // Navigate được gọi trong handleEnd
       },
       onError: (error) => {
@@ -79,7 +79,7 @@ const HandleSlide = ({ dataResponse, setIsRefetch, takingSubject }: Props) => {
   const { mutate: mutateFilter } = useUpdateSurveyFilter({
     mutationConfig: {
       onSuccess: () => {
-        console.log("Filter Survey submitted successfully!");
+        //console.log("Filter Survey submitted successfully!");
         // Navigate được gọi trong handleEnd
       },
       onError: (error) => {
@@ -115,12 +115,12 @@ const HandleSlide = ({ dataResponse, setIsRefetch, takingSubject }: Props) => {
       ?.ConfigJson as Record<string, any>;
     // Get the jump logics of the current question
     const jump: JumpLogic[] = (configJson?.JumpLogics || []) as JumpLogic[];
-    console.log("jump nè", configJson);
+    //console.log("jump nè", configJson);
     // If there are jump logics, go through each logic and check if the conditions are met
     if (jump.length) {
       for (const logic of jump) {
         let result: boolean | null = null;
-        console.log("logic", logic);
+        //console.log("logic", logic);
         // Go through each condition of the logic
         for (let i = 0; i < logic.Conditions.length; i++) {
           const cond = logic.Conditions[i];
@@ -264,17 +264,17 @@ const HandleSlide = ({ dataResponse, setIsRefetch, takingSubject }: Props) => {
 
     // Kiểm tra nếu là Filter Survey
     if (taken_subject === "Verified" && is_filter_survey === "true") {
-      console.log("Calling Filter Survey API...");
+      //console.log("Calling Filter Survey API...");
       mutateFilter(dataBuider);
     }
     // Kiểm tra nếu là Community Survey hoặc các loại survey khác
     else if (taken_subject === "Verified" || taken_subject === "Community") {
-      console.log("Calling Community Survey API...");
+      //console.log("Calling Community Survey API...");
       mutate(dataBuider);
     }
     // Các trường hợp khác (backup)
     else {
-      console.log("Calling Default Survey API...");
+      //console.log("Calling Default Survey API...");
       mutate(dataBuider);
     }
 
@@ -339,7 +339,7 @@ const Start = ({
   );
 
   const handleStart = () => {
-    console.log("Handle Start...");
+    //console.log("Handle Start...");
     if (dataResponse) {
       let dataStore = (dataResponse?.Questions || []).map(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -426,7 +426,7 @@ const Start = ({
         });
         dataStore = [...dataStore, ...newData];
       }
-      console.log("dataStore >>>", dataStore);
+      //console.log("dataStore >>>", dataStore);
       // Set isEnd: true for the last question of the entire survey
       if (dataStore.length > 0) {
         dataStore[dataStore.length - 1] = {
