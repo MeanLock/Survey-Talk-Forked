@@ -7,3 +7,6 @@ SurveyTalkService.DataAccess/bin/
 SurveyTalkService.DataAccess/obj/
 SurveyTalkService.Common/bin/
 SurveyTalkService.Common/obj/
+
+SurveyTalkService.Infrastructure/
+kafka test/

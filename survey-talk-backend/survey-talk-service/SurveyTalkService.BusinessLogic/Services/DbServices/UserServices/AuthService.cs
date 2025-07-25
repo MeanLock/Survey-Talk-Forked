@@ -416,7 +416,6 @@ namespace SurveyTalkService.BusinessLogic.Services.DbServices.UserServices
                         IsUsed = false,
                         CreatedAt = _dateHelpers.GetNowByAppTimeZone()
                     });
-                    // [thiếu] gửi mail
                     string resetPasswordUrl = _appConfig.RESET_PASSWORD.Url + "?email=" + email + "&token=" + NewGuid;
                     Console.WriteLine("Reset Password URL: " + resetPasswordUrl);
                     await _mailHelpers.SendEmail(email, new ForgotPasswordEmailViewModel

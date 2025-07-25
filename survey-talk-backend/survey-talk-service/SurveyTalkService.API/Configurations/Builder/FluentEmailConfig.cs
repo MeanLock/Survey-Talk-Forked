@@ -28,21 +28,6 @@ namespace SurveyTalkService.API.Configurations.Builder
                     EnableSsl = googleMailConfig.EnableSsl
                 });
         }
-        // public static void AddBuilderFluentEmailConfig(this WebApplicationBuilder builder)
-        // {
-        //     var emailSettings = builder.Configuration.GetSection("Mail");
-
-        //     var defaultFromEmail = emailSettings["FromEmail"];
-        //     var host = emailSettings["SmtpHost"];
-        //     var port = emailSettings.GetValue<int>("SmtpHost");
-        //     var username = emailSettings["Username"];
-        //     var password = emailSettings["SmtpPassword"];
-
-        //     builder.Services.AddFluentEmail(defaultFromEmail)
-        //         .AddRazorRenderer()
-        //         .AddSmtpSender(host, port, username, password);
-
-        // }
 
     }
 }

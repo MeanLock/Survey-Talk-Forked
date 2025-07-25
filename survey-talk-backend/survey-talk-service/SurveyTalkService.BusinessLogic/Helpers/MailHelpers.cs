@@ -1,5 +1,4 @@
-﻿using SurveyTalkService.Common.AppConfigurations.Mail.interfaces;
-using Microsoft.AspNetCore.Mvc.Razor;
+﻿using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -21,51 +20,26 @@ namespace SurveyTalkService.BusinessLogic.Helpers
 {
     public class MailHelpers
     {
-        private readonly IMailConfig _mailConfig;
         private readonly IRazorViewEngine _viewEngine;
         private readonly ITempDataProvider _tempDataProvider;
         private readonly IServiceProvider _serviceProvider;
         private IFluentEmail _fluentEmail;
-        private IGoogleMailConfig _googleMailConfig;
-        private readonly IHostingEnvironment _hostingEnvironment;
 
 
 
         public MailHelpers(
-            IMailConfig mailConfig,
             IRazorViewEngine viewEngine,
             ITempDataProvider tempDataProvider,
             IServiceProvider serviceProvider,
-            IFluentEmail fluentEmail,
-            IGoogleMailConfig googleMailConfig,
-            IHostingEnvironment hostingEnvironment
+            IFluentEmail fluentEmail
             )
         {
-            _mailConfig = mailConfig;
             _viewEngine = viewEngine;
             _tempDataProvider = tempDataProvider;
             _serviceProvider = serviceProvider;
             _fluentEmail = fluentEmail;
-            _googleMailConfig = googleMailConfig;
-            _hostingEnvironment = hostingEnvironment;
         }
 
-        // public async Task SendEmail(string to, string content)
-        // {
-        //     string basePath = AppDomain.CurrentDomain.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
-        //     Console.WriteLine($"Base Path: {basePath}");
-
-        //     string templateFilePath = _googleMailConfig.ForgotPasswordTemplateViewPath;
-
-        //     var model = new
-        //     {
-        //         Name = content
-        //     };
-        //     // await _fluentEmail.To(to)
-        //     //     .Subject("TestEmail")
-        //     //     .UsingTemplateFromFile(templateFilePath, model)
-        //     //     .SendAsync();
-        // }
         public async Task SendEmail(string to, object model, string templateFilePath, string subject)
         {
 

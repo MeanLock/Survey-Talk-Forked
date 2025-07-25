@@ -9,8 +9,6 @@ using SurveyTalkService.Common.AppConfigurations.FilePath;
 using SurveyTalkService.Common.AppConfigurations.FilePath.interfaces;
 using SurveyTalkService.Common.AppConfigurations.Jwt;
 using SurveyTalkService.Common.AppConfigurations.Jwt.interfaces;
-using SurveyTalkService.Common.AppConfigurations.Mail;
-using SurveyTalkService.Common.AppConfigurations.Mail.interfaces;
 using SurveyTalkService.Common.AppConfigurations.Google;
 using SurveyTalkService.Common.AppConfigurations.Google.interfaces;
 using SurveyTalkService.Common.AppConfigurations.Redis.interfaces;
@@ -52,8 +50,6 @@ namespace SurveyTalkService.Common.Registrations
             services.AddSingleton<IGoogleOAuth2Config, GoogleOAuth2Config>();
             services.AddSingleton<IGoogleMailConfig, GoogleMailConfig>();
 
-            // Mail
-            services.AddSingleton<IMailConfig, MailConfig>();
 
             // Redis
             services.AddSingleton<IRedisDefaultConfig, RedisDefaultConfig>();
