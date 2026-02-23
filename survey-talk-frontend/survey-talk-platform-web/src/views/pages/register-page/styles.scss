@@ -1,0 +1,174 @@
+.register-right-decoration {
+  .register-right-decoration__shape {
+    width: 95%;
+    height: 80%;
+    background-color: app_vars.$bg-primary;
+    border-top-left-radius: 100vh;
+    border-bottom-left-radius: 100vh;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative; /* Để có thể sử dụng overflow: hidden */
+    overflow: hidden; /* Ẩn phần dưới của ảnh */
+  }
+
+  .register-right-decoration__shape__img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(
+      -37%,
+      -50%
+    ); /* Dịch ảnh về giữa cả theo chiều ngang và chiều dọc */
+    width: auto; /* Giữ tỷ lệ ảnh */
+    height: 100%; /* Làm cho chiều cao của ảnh đầy đủ */
+    object-fit: cover; /* Đảm bảo ảnh bao phủ đầy không gian của div */
+  }
+}
+
+.register-left-decoration {
+  background-color: app_vars.$bg-primary;
+  .register-left-decoration__image {
+    height: 100vh;
+  }
+}
+
+.register-form {
+  .register-form__input {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 5px 15px;
+    gap: 5px;
+    border-radius: 20px;
+    border-color: app_vars.$bg-primary;
+    color: app_vars.$text-primary;
+    background-color: app_vars.$text-white;
+    border: 1.5px;
+    border-style: solid;
+    .register-form__input-label {
+      display: flex;
+      vertical-align: middle;
+      width: 100px;
+      // margin-left: 10px;
+      // margin-top: 10px;
+      // margin-bottom: 10px;
+      font-weight: 600;
+      font-family: app_vars.$font-primary;
+      font-size: 15px;
+    }
+    .register-form__input-value {
+      // margin-right: 20px;
+      vertical-align: middle;
+    }
+  }
+
+  .actions {
+    font-family: app_vars.$font-primary;
+    color: app_vars.$text-primary;
+    font-weight: bold;
+    .actions__no-account p {
+      font-size: 13px;
+      cursor: pointer;
+      &:hover {
+        color: app_vars.$text-secondary;
+      }
+    }
+    .actions__forgot-password p {
+      font-size: 12px;
+      cursor: pointer;
+      &:hover {
+        color: app_vars.$text-secondary;
+      }
+    }
+  }
+
+  .register-form__button {
+    width: 100%;
+    // padding: 10px 50px;
+    border-radius: 30px;
+    background-color: app_vars.$bg-primary;
+    color: app_vars.$text-white;
+    &:hover {
+      filter: brightness(1.4); // Làm sáng màu nền (tương tự lighten)
+      color: app_vars.$text-white;
+    }
+  }
+
+  .oauth {
+    .oauth__title {
+      .oauth__title-divider {
+        height: 1px;
+        width: 136px;
+        background-color: app_vars.$bg-primary;
+      }
+      .oauth__title-text {
+        font-size: 12px;
+        font-weight: bold;
+        font-family: app_vars.$font-primary;
+        color: app_vars.$bg-primary;
+      }
+    }
+  }
+
+  .register-form__gender {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: app_vars.$font-primary;
+    font-size: 15px;
+    font-weight: 600;
+    color: app_vars.$text-primary;
+
+    .register-form__gender-label {
+      margin-right: 10px;
+    }
+
+    .register-form__gender-checkbox {
+      cursor: pointer;
+    }
+  }
+
+  .register-form__address {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 5px 15px;
+    gap: 5px;
+    border-radius: 20px;
+    border-color: app_vars.$bg-primary;
+    color: app_vars.$text-primary;
+    background-color: app_vars.$text-white;
+    border: 1.5px solid;
+    font-family: app_vars.$font-primary;
+    font-size: 15px;
+  }
+
+  .register-form__upload {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .register-form__upload-button {
+      padding: 5px 15px;
+      border-radius: 20px;
+      background-color: app_vars.$bg-primary;
+      color: app_vars.$text-white;
+      cursor: pointer;
+      &:hover {
+        filter: brightness(1.4);
+      }
+    }
+
+    .register-form__upload-preview {
+      margin-top: 10px;
+      width: 100px;
+      height: 100px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid app_vars.$bg-primary;
+    }
+  }
+}

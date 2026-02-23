@@ -1,0 +1,318 @@
+import { useState, useMemo, useEffect } from "react";
+import { AgGridReact } from "ag-grid-react";
+import type { ColDef } from "ag-grid-community";
+import { Button, TextField, InputAdornment, Chip } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
+import "./styles.scss";
+import type { RootState } from "../../../../../redux/rootReducer";
+import { updateAuthUser } from "../../../../../redux/auth/authSlice";
+import { callAxiosRestApi } from "../../../../../core/api/rest-api/main/api-call";
+import { loginRequiredAxiosInstance } from "../../../../../core/api/rest-api/config/instances/v2";
+import { ENV_CONFIG } from "@/config";
+interface Props {
+  balance: number | null;
+}
+
+interface MoneyInRecord {
+  Id: number;
+  Amount: number;
+  CreatedAt: string;
+  StatusId: number;
+}
+interface TransactionHistory {
+  Id: number;
+  Amount: number;
+  CreatedAt: string;
+  Account: {
+    Id: number;
+    FullName: string;
+    Email: string;
+    Phone: string;
+    MainImageUrl: string;
+  };
+  TransactionStatus: {
+    Id: number;
+    Name: string;
+  };
+  TransactionType: {
+    Id: number;
+    Name: string;
+  };
+}
+// Custom cell renderer for Amount column
+const AmountCellRenderer = (params: any) => {
+  return (
+    <span className="amount-cell">{params.value.toLocaleString("vi-VN")}đ</span>
+  );
+};
+
+// Custom cell renderer for Status column
+const StatusCellRenderer = (params: any) => {
+  const getStatusInfo = (statusId: number) => {
+    switch (statusId) {
+      case 1:
+        return { label: "Success", className: "status-success" };
+      default:
+        return { label: "Unknown", className: "status-unknown" };
+    }
+  };
+
+  const statusInfo = getStatusInfo(params.value);
+
+  return (
+    <Chip
+      label={statusInfo.label}
+      className={`status-chip ${statusInfo.className}`}
+      size="small"
+    />
+  );
+};
+
+// Custom cell renderer for Date column
+const DateCellRenderer = (params: any) => {
+  const formatDate = (dateString: string) => {
+    // Convert "16/06/2025 - 18:02:21" to more readable format
+    const [datePart, timePart] = dateString.split(" - ");
+    const [day, month, year] = datePart.split("/");
+    return `${day}/${month}/${year} ${timePart}`;
+  };
+
+  return <span className="date-cell">{formatDate(params.value)}</span>;
+};
+
+export const MoneyIn: React.FC<Props> = ({ balance }) => {
+  const [transactions, setTransactions] = useState<TransactionHistory[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const user = useSelector((state: RootState) => state.auth.user);
+  // STATES
+  const [pushAmount, setPushAmount] = useState<string>("");
+  const dispatch = useDispatch();
+
+
+  // HOOKS
+  useEffect(() => {
+    const fetchTransactionHistory = async () => {
+      setLoading(true);
+      try {
+        const response = await callAxiosRestApi({
+          instance: loginRequiredAxiosInstance,
+          method: "get",
+          url: "Payment/account/balance-deposits/history",
+        });
+
+        if (response.success) {
+          setTransactions(response.data.TransactionHistory);
+        }
+      } catch (error) {
+        console.error("Error fetching transaction history:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTransactionHistory();
+  }, []);
+
+
+
+  const columnDefs: ColDef[] = useMemo(
+    () => [
+      {
+        headerName: "Mã Giao Dịch",
+        field: "Id",
+        cellClass: "transaction-id-cell",
+        flex: 0.8,
+      },
+      {
+        headerName: "Họ Tên",
+        field: "Account.FullName",
+        flex: 1,
+      },
+      {
+        headerName: "Số Tiền Nạp",
+        field: "Amount",
+        cellRenderer: AmountCellRenderer,
+      },
+      {
+        headerName: "Ngày Nạp",
+        field: "CreatedAt",
+        cellRenderer: (params: any) => {
+          const date = new Date(params.value);
+          return date.toLocaleString("vi-VN");
+        },
+      },
+      {
+        headerName: "Trạng Thái",
+        field: "TransactionStatus.Name",
+        flex: 1,
+        cellRenderer: (params: any) => {
+          const getStatusLabel = (status: any) => {
+            if (params.data.TransactionStatus.Id === 2) {
+              return "Thành công";
+            }
+            return status;
+          };
+
+          return (
+            <Chip
+              label={getStatusLabel(params.value)}
+              className={`status-chip ${params.data.TransactionStatus.Id === 2
+                  ? "status-success"
+                  : "status-unknown"
+                }`}
+              size="small"
+            />
+          );
+        },
+      },
+
+    ],
+    []
+  );
+  const handlePushMoney = async () => {
+    const amount = Number.parseInt(pushAmount);
+    try {
+      const response = await callAxiosRestApi({
+        instance: loginRequiredAxiosInstance,
+        method: "post",
+        url: `Payment/account/balance-deposits/create-payment-link`,
+        data: {
+          Amount: Number.parseInt(pushAmount),
+          ReturnUrl: `${ENV_CONFIG.VITE_BASE_URL}/user/transactions/payment-result?type=1&amount=${amount}`,
+          CancelUrl: `${ENV_CONFIG.VITE_BASE_URL}/user/transactions/payment-result?type=1&amount=${amount}`,
+        },
+      });
+      updateMoneyInById(7, amount);
+      if (response.success) {
+
+        const PaymentLink = response.data.PaymentLink;
+        window.open(PaymentLink, "_blank");
+      }
+    } catch (error) {
+      console.error("Error creating payment link:", error);
+    }
+  };
+
+  async function updateMoneyInById(id: any, amountToAdd: any) {
+    const apiUrl = `https://685b91fb89952852c2d9fd1e.mockapi.io/MoneyFlow/${id}`;
+
+    try {
+      // 1. Lấy dữ liệu hiện tại của object
+      const res = await fetch(apiUrl);
+      const currentData = await res.json();
+
+      // 2. Tính moneyIn mới
+      const updatedMoneyIn = (parseInt(currentData.moneyIn) || 0) + amountToAdd;
+
+      // 3. Gửi PUT để cập nhật
+      const updateRes = await fetch(apiUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...currentData,
+          moneyIn: updatedMoneyIn,
+        }),
+      });
+
+      const updated = await updateRes.json();
+      //console.log("✅ Đã cập nhật thành công:", updated);
+    } catch (err) {
+      console.error("❌ Lỗi khi cập nhật:", err);
+    }
+  }
+
+  const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value.replace(/[^0-9]/g, "");
+    setPushAmount(value);
+  };
+
+  const formatDisplayAmount = (value: string) => {
+    if (!value) return "";
+    return Number.parseInt(value).toLocaleString("vi-VN");
+  };
+
+  return (
+    <div className="money-in w-full flex flex-col items-start">
+      <p className="money-in__remain-title">Số dư khả dụng</p>
+      <p className="money-in__remain-value">
+        {/* {user?.Balance?.toLocaleString("vi-VN")}đ */}
+        {balance?.toLocaleString("vn")} VND
+      </p>
+
+      <div className="w-full grid grid-cols-2 gap-6 mt-5">
+        <div className="money-in-table">
+          <h3 className="table-title">Lịch sử nạp tiền</h3>
+          <div className="ag-theme-alpine table-container">
+            <AgGridReact
+              rowData={transactions}
+              columnDefs={columnDefs}
+              domLayout="normal"
+              rowHeight={50}
+              paginationPageSize={5}
+              pagination={true}
+              suppressHorizontalScroll={false}
+              defaultColDef={{
+                sortable: true,
+                filter: true,
+                resizable: true,
+              }}
+
+            />
+          </div>
+        </div>
+
+        <div className="money-in-push">
+          <h3 className="push-title">Nạp tiền vào tài khoản</h3>
+          <div className="push-form">
+            <div className="amount-input-container">
+              <TextField
+                fullWidth
+                label="Số tiền muốn nạp"
+                value={formatDisplayAmount(pushAmount)}
+                onChange={handleAmountChange}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">đ</InputAdornment>
+                  ),
+                }}
+                placeholder="Nhập số tiền"
+                className="amount-input"
+              />
+            </div>
+
+            <div className="quick-amounts">
+              <p className="quick-amounts-title">Chọn nhanh:</p>
+              <div className="quick-amounts-buttons">
+                {[50000, 100000, 200000, 500000].map((amount) => (
+                  <Button
+                    key={amount}
+                    variant="outlined"
+                    className="quick-amount-btn"
+                    onClick={() => setPushAmount(amount.toString())}
+                  >
+                    {amount.toLocaleString("vi-VN")}đ
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            <Button
+              variant="contained"
+              fullWidth
+              className="push-money-btn"
+              onClick={handlePushMoney}
+              disabled={!pushAmount || Number.parseInt(pushAmount) <= 0}
+            >
+              Nạp tiền
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
