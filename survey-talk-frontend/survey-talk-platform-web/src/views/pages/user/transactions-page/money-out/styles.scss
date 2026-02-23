@@ -1,0 +1,234 @@
+// Define variables
+$bg-primary: #3E5DAB;
+$text-primary: #3E5DAB;
+$bg-secondary: #FFC40D;
+$text-secondary: #FFC40D;
+$font-primary: 'Roboto', sans-serif;
+$success-color: #4CAF50;
+$success-bg: rgba(76, 175, 80, 0.1);
+$error-color: #f44336;
+$error-bg: rgba(244, 67, 54, 0.1);
+$processing-color: #9e9e9e;
+$processing-bg: rgba(158, 158, 158, 0.1);
+
+.money-out {
+  .money-out__remain-title {
+    font-family: $font-primary;
+    color: $text-primary;
+    font-weight: 600;
+    font-size: 30px;
+  }
+  
+  .money-out__remain-value {
+    color: black;
+    font-size: 40px;
+    font-weight: bold;
+  }
+
+  // Table styles
+  .money-out-table {
+    .table-title {
+      font-family: $font-primary;
+      color: $text-primary;
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .table-container {
+      height: 400px;
+      width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      .ag-header {
+        background-color: $bg-primary;
+        color: white;
+        font-weight: 600;
+      }
+
+      .ag-header-cell-text {
+        color: white !important;
+      }
+
+      .ag-row {
+        &:hover {
+          background-color: rgba($bg-primary, 0.05);
+        }
+      }
+
+      .transaction-id-cell {
+        font-weight: 600;
+        color: $text-primary;
+      }
+
+      .amount-cell {
+        color: $error-color;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .bank-name-cell {
+        color: #333;
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      .date-cell {
+        color: #666;
+        font-size: 13px;
+      }
+
+      .status-chip {
+        &.status-processing {
+          background-color: $processing-bg;
+          color: $processing-color;
+          border: 1px solid $processing-color;
+          font-weight: 500;
+        }
+
+        &.status-success {
+          background-color: $success-bg;
+          color: $success-color;
+          border: 1px solid $success-color;
+          font-weight: 500;
+        }
+
+        &.status-failed {
+          background-color: $error-bg;
+          color: $error-color;
+          border: 1px solid $error-color;
+          font-weight: 500;
+        }
+      }
+
+      // Pagination styles
+      .ag-paging-panel {
+        background-color: #f5f5f5;
+        border-top: 1px solid #e0e0e0;
+        
+        .ag-paging-button {
+          color: $text-primary;
+          
+          &:hover {
+            background-color: rgba($bg-primary, 0.1);
+          }
+        }
+      }
+    }
+  }
+
+  // Withdraw form styles
+  .money-out-withdraw {
+    padding-left: 24px;
+
+    .withdraw-title {
+      font-family: $font-primary;
+      color: $text-primary;
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+
+    .withdraw-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      .bank-select {
+        .MuiOutlinedInput-root {
+          &:hover .MuiOutlinedInput-notchedOutline {
+            border-color: $bg-primary;
+          }
+          
+          &.Mui-focused .MuiOutlinedInput-notchedOutline {
+            border-color: $bg-primary;
+          }
+        }
+
+        .MuiInputLabel-root {
+          &.Mui-focused {
+            color: $bg-primary;
+          }
+        }
+
+        .error-text {
+          color: $error-color;
+          font-size: 12px;
+          margin-top: 4px;
+          margin-left: 14px;
+        }
+      }
+
+      .account-input,
+      .account-name-input,
+      .amount-input {
+        .MuiOutlinedInput-root {
+          &:hover .MuiOutlinedInput-notchedOutline {
+            border-color: $bg-primary;
+          }
+          
+          &.Mui-focused .MuiOutlinedInput-notchedOutline {
+            border-color: $bg-primary;
+          }
+        }
+
+        .MuiInputLabel-root {
+          &.Mui-focused {
+            color: $bg-primary;
+          }
+        }
+
+        .MuiInputBase-input {
+          font-size: 16px;
+          font-weight: 500;
+        }
+      }
+
+      .amount-input {
+        .MuiInputBase-input {
+          font-size: 18px;
+          font-weight: 600;
+        }
+      }
+
+      .balance-error {
+        margin: 0;
+        
+        .MuiAlert-message {
+          font-weight: 500;
+        }
+      }
+
+      .withdraw-money-btn {
+        background-color: $bg-primary;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        padding: 12px 0;
+        border-radius: 8px;
+        text-transform: none;
+        margin-top: 8px;
+        
+        &:hover {
+          background-color: darken($bg-primary, 10%);
+        }
+        
+        &:disabled {
+          background-color: #ccc;
+          color: #666;
+        }
+      }
+    }
+  }
+}
+
+// Global AG-Grid theme customization for MoneyOut
+.money-out .ag-theme-alpine {
+  --ag-header-background-color: #{$bg-primary};
+  --ag-header-foreground-color: white;
+  --ag-border-color: #e0e0e0;
+  --ag-row-hover-color: rgba(#{red($bg-primary)}, #{green($bg-primary)}, #{blue($bg-primary)}, 0.05);
+  --ag-selected-row-background-color: rgba(#{red($bg-primary)}, #{green($bg-primary)}, #{blue($bg-primary)}, 0.1);
+}

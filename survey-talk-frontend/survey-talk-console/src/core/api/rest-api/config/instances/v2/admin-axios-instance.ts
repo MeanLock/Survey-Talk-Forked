@@ -9,15 +9,15 @@ import { API_CONFIG } from "../../../../../../config";
 
 
 const adminAxiosInstance = axios.create({
-  baseURL: API_CONFIG.REST_API_BASE_URL,
-  timeout: 10000,
+  //baseURL:  API_CONFIG.REST_API_BASE_URL,
+  baseURL:  API_CONFIG.REST_API_BASE_URL,
+  timeout: 200000,
 });
 
 
 adminAxiosInstance.interceptors.request.use(
   async (config) => {
     const token = LocalStorageUtil.getAuthTokenFromPersistLocalStorage();
-
     if (token) {
       if (JwtUtil.isTokenValid(token) === false) {
 
@@ -37,7 +37,7 @@ adminAxiosInstance.interceptors.request.use(
       const user = JwtUtil.decodeToken(token);
 
       //if (user.role.id != 2 && user.role.id != 3 && user.role.id != 4) {
-      if (!user || ![2,3,4].includes(Number(user.role_id))) {
+      if (!user || ![1,2].includes(Number(user.role_id))) {
         //** CHO HIỆN THÔNG BÁO YÊU CẦU ĐĂNG NHẬP
         // await loginRequiredAlert();
         

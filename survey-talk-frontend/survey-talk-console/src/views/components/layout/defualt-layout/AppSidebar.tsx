@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 
 import {
   CCloseButton,
+  CHeaderToggler,
   CSidebar,
   CSidebarBrand,
   CSidebarFooter,
@@ -15,13 +16,13 @@ import { useNavigate } from 'react-router-dom'
 import { RootState } from '../../../../redux/root-reducer'
 import { JwtUtil } from '../../../../core/utils/jwt.util'
 import { get_roleNav } from '../../../../_role-nav'
-import { logo } from '../../../../assets/brand/logo'
-import { sygnet } from '../../../../assets/brand/sygnet'
-import { UiState } from '../../../../redux/ui/ui.slice'
-
+import { setUi, UiState } from '../../../../redux/ui/ui.slice'
+import { cilMenu } from '@coreui/icons'
+import logo from '../../../../assets/brand/logo.png'
 const AppSidebar = () => {
+
   // const unfoldable = useSelector((state : State) => state.sidebarUnfoldable)
-  const sidebarShow = useSelector((state: UiState) => state.sidebarShow)
+  // const sidebarShow = useSelector((state: UiState) => state.sidebarShow)
 
   // STATES
   const [navigation, setNavigation] = useState<any[]>([]);
@@ -48,20 +49,27 @@ const AppSidebar = () => {
   }, [authSlice])
   return (
     <CSidebar
-      className="border-end"
-      colorScheme="dark"
+      className={`app-sidebar`}
       position="fixed"
-      // unfoldable={unfoldable}
-      visible={uiSlice.sidebarShow}
-      onVisibleChange={(visible) => {
-        dispatch({ type: 'set', sidebarShow: visible })
-      }}
+      narrow={uiSlice.sidebarNarrow}
     >
-      <CSidebarHeader className="border-bottom">
-        <CSidebarBrand >
-          <CIcon customClassName="sidebar-brand-full" icon={logo} height={32} />
-          <CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} />
-        </CSidebarBrand>
+      <CSidebarHeader className="app-sidebar__header">
+        <div className="app-sidebar__header-content">
+          <CSidebarBrand >
+            {uiSlice.sidebarNarrow ? (
+              <CHeaderToggler onClick={() => dispatch(setUi({ sidebarNarrow: false }))}>
+                <img src={logo} alt="Logo" className="sidebar-brand-narrow" />
+              </CHeaderToggler>
+            ) : (
+              <img src={logo} alt="Logo" className="sidebar-brand-full" />)}
+          </CSidebarBrand>
+          {!uiSlice.sidebarNarrow && (
+            <CHeaderToggler onClick={() => dispatch(setUi({ sidebarNarrow: true }))}>
+              <CIcon icon={cilMenu} size="xxl" className="header-toggler-icon" />
+            </CHeaderToggler>
+          )}
+        </div>
+
         <CCloseButton
           className="d-lg-none"
           dark

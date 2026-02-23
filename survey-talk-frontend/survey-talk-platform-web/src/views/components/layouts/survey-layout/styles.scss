@@ -1,10 +1,10 @@
 .survey-layout {
-  background-color: red;
+  background-color: app_vars.$background-color-primary;
   .survey-layout-header {
     background-color: aqua;
   }
   .survey-layout-content {
-    background-color: yellow;
+    background-color: app_vars.$background-color-primary;
   }
   .survey-layout-footer {
     background-color: green;

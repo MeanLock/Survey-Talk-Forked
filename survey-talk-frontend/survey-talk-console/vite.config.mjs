@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'node:path'
-import autoprefixer from 'autoprefixer'
 import dotenv from 'dotenv'
+import tailwindcss from "@tailwindcss/vite";
 
 dotenv.config()
 
@@ -12,35 +12,12 @@ export default defineConfig(() => {
     build: {
       outDir: 'build',
     },
-    css: {
-      postcss: {
-        plugins: [
-          autoprefixer({}), // add options if needed
-        ],
-      },
-    },
-    // esbuild: {
-    //   loader: 'jsx',
-    //   include: /src\/.*\.jsx?$/,
-    //   exclude: [],
-    //   jsx: 'automatic'
-    // },
-    // optimizeDeps: {
-    //   force: true,
-    //   esbuildOptions: {
-    //     loader: {
-    //       '.js': 'jsx',
-    //     },
-    //   },
-    // },
-    plugins: [react()],
+    plugins: [react(), tailwindcss()],
     resolve: {
-      alias: [
-        {
-          find: 'src/',
-          replacement: `${path.resolve(__dirname, 'src')}/`,
-        },
-      ],
+      alias: {
+        src: path.resolve(__dirname, "src"),
+        '@': path.resolve(__dirname, "./src"),
+      },
       extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.scss'],
     },
     server: {

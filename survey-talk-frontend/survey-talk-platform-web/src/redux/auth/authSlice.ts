@@ -1,8 +1,30 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 export interface AuthState {
   token: string | null;
-  user: any | null;
+  user: {
+    Id: string | null;
+    RoleId: string | null;
+    FullName?: string;
+    Balance?: number;
+    IsVerified?: boolean;
+    Xp?: number;
+    Level?: number;
+    IsFilterSurveyRequired?: boolean;
+    LastFilterSurveyTakenAt?: string | null;
+    MainImageUrl: string | null;
+    Profile: {
+      AccountId: number;
+      CountryRegion: string;
+      MaritalStatus: string;
+      AverageIncome: string;
+      EducationLevel: string;
+      JobField: string;
+      ProvinceCode: number;
+      DistrictCode: number;
+      WardCode: number;
+    };
+  } | null;
 }
 
 const initialState: AuthState = {
@@ -11,20 +33,25 @@ const initialState: AuthState = {
 };
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
-    setAuthToken: (state, action ) => {
+    setAuthToken: (state, action) => {
       state.token = action.payload.token;
-      state.user = action.payload.user; 
+      state.user = action.payload.user; // Lưu toàn bộ thông tin user
     },
     clearAuthToken: (state) => {
-        
       state.token = null;
       state.user = null;
+    },
+    updateAuthUser: (state, action) => {
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+      }
     },
   },
 });
 
-export const { setAuthToken, clearAuthToken } = authSlice.actions;
+export const { setAuthToken, clearAuthToken, updateAuthUser } =
+  authSlice.actions;
 export default authSlice.reducer;
