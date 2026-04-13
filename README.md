@@ -72,9 +72,11 @@ survey-talk-platform-web/src/
 ### 1. Tạo Khảo Sát (Create Survey)
 
 https://github.com/user-attachments/assets/63c3c38d-a77c-4f80-ba06-39bb791f4e57
+_(Tạo Khảo Sát 1)_
 
+<img width="2636" height="1447" alt="image" src="https://github.com/user-attachments/assets/02cc8b95-0913-4e25-aade-671a21501afb" />
 [![Tạo Khảo Sát Demo 2](https://img.icons8.com/color/96/google-drive--v1.png)](https://drive.google.com/file/d/1jGBEVyE8Z6t3952I-ZhU9oHDk7Rlo4Xq/view?usp=drive_link)
-
+_(Tạo Khảo Sát 2)_
 
 
 
