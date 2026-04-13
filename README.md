@@ -74,9 +74,7 @@ survey-talk-platform-web/src/
 https://github.com/user-attachments/assets/63c3c38d-a77c-4f80-ba06-39bb791f4e57
 
 
-<video src="[link-video-cua-ban.mp4](https://drive.google.com/file/d/1jGBEVyE8Z6t3952I-ZhU9oHDk7Rlo4Xq/view?usp=sharing)" width="600" controls autoplay loop>
-  Trình duyệt của bạn không hỗ trợ thẻ video.
-</video>
+[![Xem Video Demo 2](https://drive.google.com/file/d/1jGBEVyE8Z6t3952I-ZhU9oHDk7Rlo4Xq/view?usp=drive_link)](LINK_CHIA_SE_GOOGLE_DRIVE)
 
 
 
