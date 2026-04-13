@@ -71,19 +71,31 @@ survey-talk-platform-web/src/
 ## Demo Chức Năng 
 ### 1. Tạo Khảo Sát (Create Survey)
 
-https://github.com/user-attachments/assets/63c3c38d-a77c-4f80-ba06-39bb791f4e57
-_(Tạo Khảo Sát 1)_
+Demo Videos:
+https://github.com/user-attachments/assets/1685c828-e067-45b3-8214-984a366b88bd
 
-<img width="2636" height="1447" alt="image" src="https://github.com/user-attachments/assets/02cc8b95-0913-4e25-aade-671a21501afb" />
-[![Tạo Khảo Sát Demo 2](https://img.icons8.com/color/96/google-drive--v1.png)](https://drive.google.com/file/d/1jGBEVyE8Z6t3952I-ZhU9oHDk7Rlo4Xq/view?usp=drive_link)
-_(Tạo Khảo Sát 2)_
+[Create Survey Demo](https://drive.google.com/file/d/1VhQq-Zc0hy7rZoKKE9kJqIb3Egf0PkEA/view?usp=sharing)
 
 
 
+### 2. Làm Khảo Sát (Take Survey)
+
+Demo Videos:
+<img width="2647" height="1571" alt="image" src="https://github.com/user-attachments/assets/cdde6547-7289-4f3c-9d96-68a04a3ec276" />
+
+[Take Survey Demo](https://drive.google.com/file/d/1UqWeAUAIdKeOF3E3z2oB__7Eew90CAsq/view?usp=sharing)
+
+### 3. Luồng Tiền (Money Transaction)
+
+Demo Videos:
+<img width="2643" height="1456" alt="image" src="https://github.com/user-attachments/assets/997b8f06-4d6c-4d2d-a5d8-2c773b0edd58" />
+
+[Money Transaction Demo](https://drive.google.com/file/d/1mlBkCB2_cGR6symkBA22dBB0CQ6A87jC/view?usp=sharing)
 
 
+### 4. Recap Tổng Thể:
 
-
+[Recap Tổng](https://drive.google.com/file/d/1egEt4B89AuoJHCkXke0ptH7u7RhjpkJD/view?usp=sharing)
 
 
 ---
