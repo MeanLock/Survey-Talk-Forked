@@ -71,6 +71,16 @@ survey-talk-platform-web/src/
 ## Demo Chức Năng 
 ### 1. Tạo Khảo Sát (Create Survey)
 
+https://github.com/user-attachments/assets/63c3c38d-a77c-4f80-ba06-39bb791f4e57
+
+
+<video src="[link-video-cua-ban.mp4](https://drive.google.com/file/d/1jGBEVyE8Z6t3952I-ZhU9oHDk7Rlo4Xq/view?usp=sharing)" width="600" controls autoplay loop>
+  Trình duyệt của bạn không hỗ trợ thẻ video.
+</video>
+
+
+
+
 
 
 
