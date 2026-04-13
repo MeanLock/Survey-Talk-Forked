@@ -67,6 +67,15 @@ survey-talk-platform-web/src/
 └── views/       # Các thành phần giao diện ở mức Page/View tương ứng với từng đường dẫn (Route)
 ```
 
+---
+## Demo Chức Năng 
+### 1. Tạo Khảo Sát (Create Survey)
+
+
+
+
+
+---
 ### 💡 Những bài học thiết kế đáng giá (Lessons Learned)
 
 Trong quá trình xây dựng dự toán này, một số kỹ thuật chuyên sâu và bài học quý báu đã được áp dụng:
