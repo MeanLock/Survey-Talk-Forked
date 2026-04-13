@@ -1,1 +1,60 @@
 # Survey-Talk
+
+## Tổng quan dự án (Project Overview)
+Survey-Talk là một nền tảng trung gian kết nối giữa người có nhu cầu tạo khảo sát và những người tham gia làm khảo sát. 
+- **Người đăng khảo sát**: Có thể thiết kế, tạo các bài khảo sát trực tiếp trên nền tảng web, sau đó đăng tải để thu thập ý kiến người dùng. Họ sẽ là người trả chi phí cho các lượt tham gia.
+- **Người tham gia (Panelist)**: Tham gia trả lời các câu hỏi khảo sát để nhận được thù lao (thù lao này do người tạo khảo sát chi trả).
+
+Hệ thống bao gồm các module/services chính:
+- `survey-talk-backend`: Hệ thống máy chủ, xử lý business logic và tương tác cơ sở dữ liệu.
+- `survey-talk-console` (Frontend): Giao diện quản trị (Admin/Owner).
+- `survey-talk-platform-web` (Frontend): Giao diện ứng dụng người dùng, nơi người tạo và người tham gia tương tác.
+
+---
+
+## 🎯 Survey-Talk Platform Web
+
+Đây là phân hệ Front-end chính hướng đến khách hàng, được xây dựng trên bộ công cụ React (Vite) kết hợp cùng Tailwind, Redux Toolkit và các thư viện hiện đại khác. Tôi là người chịu trách nhiệm phát triển chính cho phân hệ này.
+
+### ⚙️ Các tính năng quan trọng
+
+1. **Tạo Khảo Sát (Create Survey)**: 
+   - Quản lý quá trình người đăng tạo nội dung câu hỏi, thiết lập điều kiện và xuất bản. Cung cấp flow tạo form tương tác trực tiếp giúp các tổ chức/cá nhân dễ dàng thiết lập một bài survey tùy chỉnh phức tạp.
+2. **Làm Khảo Sát (Do Survey)**:
+   - Giao diện thân thiện dành cho người tham gia. Trải nghiệm làm bài đánh giá xuyên suốt, logic luồng (flow) rẽ nhánh được kiểm soát chặt chẽ, tối ưu để nhận về chất lượng câu trả lời cao nhất.
+
+### 📂 Cấu trúc thư mục (Directory Structure)
+Dự án được áp dụng các chuẩn cấu trúc thư mục quy chuẩn, dưới đây là tổ chức bên trong thư mục `src`:
+
+```text
+survey-talk-platform-web/src/
+├── app/         # Thiết lập app cốt lõi
+├── assets/      # Nơi lưu trữ tài nguyên tĩnh (hình ảnh, icon, font)
+├── components/  # Chứa các UI Component dùng chung (được thiết kế theo Atomic Design)
+├── config/      # Định nghĩa biến môi trường, thông số cấu hình hệ thống
+├── contexts/    # Các React Contexts dùng để chia sẻ state cục bộ
+├── core/        # Chứa những module, logic cốt lõi có thể dùng lại ở nhiều phần
+├── hooks/       # Custom React Hooks
+├── lib/         # Setup, cấu hình các thư viện bên thứ 3 (Axios, Firebase, v.v.)
+├── modules/     # Tổ chức các component, logic theo từng chức năng/domain lớn (phù hợp theo quy tắc của tôi)
+├── redux/       # Cấu hình store và các slice để quản lý Global State (Redux Toolkit)
+├── router/      # Quản lý cấu hình định tuyến (React Router DOM)
+├── services/    # Hàm tương tác trực tiếp API với Backend
+├── styles/      # Styling chung toàn dự án (Tailwind, SCSS)
+└── views/       # Các thành phần giao diện ở mức Page/View tương ứng với từng đường dẫn (Route)
+```
+
+### 💡 Những bài học thiết kế đáng giá (Lessons Learned)
+
+Trong quá trình xây dựng dự toán này, một số kỹ thuật chuyên sâu và bài học quý báu đã được áp dụng:
+
+1. **Quản lý State thông minh (Smart State Management)**
+   - Thay vì lưu mọi thứ vào global state làm giật lag ứng dụng, hệ thống phân tách logic linh hoạt. Trạng thái giao diện và các form dữ liệu được xử lý chặt chẽ theo từng hành vi người dùng, giới hạn được vòng đời re-render và tối ưu tốc độ đáng kể.
+
+2. **Bài học về Optimistic UI và chuyển dịch sang Long Polling Pattern**
+   - **Vấn đề**: Ở chức năng nhận thù lao (tiền) sau khi làm khảo sát xong, ban đầu tôi nghĩ tới việc áp dụng **Optimistic UI** (cập nhật số dư ảo lên màn hình trước ngay khi gọi API để tạo cảm giác phản hồi tức thì cho người dùng). 
+   - **Thực tế**: Quá trình backend ghi nhận một lượt làm khảo sát, kiểm duyệt, và cộng tiền và đồng bộ trạng thái thanh toán gồm rất nhiều bước. Nếu cập nhật hiển thị lên giao diện sớm trước khi tiến trình DB hoàn tất, trong trường hợp lỗi xảy ra, người dùng sẽ thấy số tiền bị thụt lùi (nhảy về số cũ), gây mất uy tín.
+   - **Giải pháp**: Xoay trục thiết kế sang **Long Polling Pattern**. Cho phép Client API liên tục hoặc định kỳ poll thông tin từ hệ thống để xác nhận luồng xử lý từ DB xong hoàn toàn mới bung thông báo & render số dư tới tài khoản người dùng, chấp nhận một chút loading nhưng đảm bảo tính chính xác 100% của Data liên quan tới Tiền.
+
+3. **Thiết kế Component theo hướng Atomic Design**
+   - Cây cấu trúc component được thiết kế cực kỳ tỉ mỉ theo cấu trúc nguyên tử (Atoms -> Molecules -> Organisms). Các UI nhỏ (như Text, Button, Input) đều được tách hạt từ sớm, giúp giao diện đồng nhất tuyệt đối và đội ngũ mở rộng form dễ dàng mà không bị trùng lặp Code.
